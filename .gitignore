@@ -1,0 +1,66 @@
+# ═══════════════════════════════════════════════════════════
+# TEREN .gitignore (Go / Svelte / Flutter / DevOps)
+# ═══════════════════════════════════════════════════════════
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Env & Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Go
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+vendor/
+go.sum
+
+# Node / SvelteKit
+node_modules/
+.svelte-kit/
+dist/
+.build/
+.eslintcache
+.npmrc
+
+# Flutter / Dart
+.dart_tool/
+.packages
+pubspec.lock
+build/
+.ios/
+.android/
+*.iml
+xcuserdata/
+
+# Docker
+docker-compose.override.yml
+
+# Logs & Temp
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+temp/
+tmp/
+coverage/
+
+# DB / Migrations (optional: keep schema, ignore local dumps)
+*.sql.bak
+*.dump
