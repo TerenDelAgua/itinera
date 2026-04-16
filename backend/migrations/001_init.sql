@@ -9,7 +9,8 @@ CREATE TABLE users (
 -- Trips
 CREATE TABLE trips (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    owner_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE, -- NULL for guests
+    session_id VARCHAR(255), -- For guests (maps to cookie)
     name VARCHAR(255) NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
@@ -31,17 +32,17 @@ CREATE TABLE expenses (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Places (destinos dentro de un viaje: Tokyo, Nara, Kyoto...)
+-- Places (destinations within a trip: Tokyo, Nara, Kyoto...)
 CREATE TABLE places (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     trip_id UUID REFERENCES trips(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    lat DECIMAL(10, 8),      -- Para mapas
+    lat DECIMAL(10, 8),      -- maps
     lng DECIMAL(11, 8),
-    start_date DATE,         -- Opcional: si el lugar tiene fechas específicas
+    start_date DATE,         -- Optional: if the place has dates
     end_date DATE,
-    order_index INTEGER DEFAULT 0, -- Para ordenar lugares en el itinerario
+    order_index INTEGER DEFAULT 0, -- To order places in the itinerary
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -56,7 +57,9 @@ CREATE TABLE activities (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Indexes para rendimiento
+-- Indexes for performance
+CREATE INDEX idx_trips_user_id ON trips(user_id);
+CREATE INDEX idx_trips_session_id ON trips(session_id);
 CREATE INDEX idx_expenses_trip_id ON expenses(trip_id);
 CREATE INDEX idx_places_trip_id ON places(trip_id);
 CREATE INDEX idx_activities_place_id ON activities(place_id);

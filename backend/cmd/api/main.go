@@ -11,7 +11,7 @@ import (
 	"syscall"
 	"time"
 
-	httphandlers "backend/internal/http"
+	"backend/internal/http/handlers"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
@@ -33,7 +33,7 @@ func main() {
 	}
 	defer db.Close()
 
-	handlers := httphandlers.NewHandlers(db, cfg)
+	handlers := handlers.NewHandlers(db, cfg)
 
 	router := setupRouter(cfg, handlers)
 
@@ -63,7 +63,7 @@ func main() {
 
 }
 
-func setupRouter(cfg *config.Config, h *httphandlers.Handlers) *chi.Mux {
+func setupRouter(cfg *config.Config, h *handlers.Handlers) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -97,7 +97,7 @@ func setupRouter(cfg *config.Config, h *httphandlers.Handlers) *chi.Mux {
 		w.Write([]byte(`{"status":"healthy","database":"connected"}`))
 	})
 
-	r.Mount("/api/v1", httphandlers.ApiRouter(h))
+	r.Mount("/api/v1", handlers.ApiRouter(h))
 
 	return r
 }
