@@ -1,0 +1,16 @@
+{
+    "dashboard": {
+        "title": "Mis viajes",
+        "subtitle": "Planifica y organiza tus aventuras",
+        "button_new": "Nuevo viaje"
+    },
+    "empty_state": {
+        "title": "Aún no hay viajes",
+        "description": "Empieza a planificar tu primer viaje.",
+        "cta": "Crea tu primera aventura"
+    },
+    "common": {
+        "loading": "Cargando...",
+        "error": "Algo salió mal"
+    }
+}

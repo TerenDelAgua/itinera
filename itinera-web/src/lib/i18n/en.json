@@ -1,0 +1,16 @@
+{
+    "dashboard": {
+        "title": "My trips",
+        "subtitle": "Plan and organize your journeys",
+        "button_new": "New trip"
+    },
+    "empty_state": {
+        "title": "No trips yet",
+        "description": "Start planning your first journey",
+        "cta": "Create your first trip"
+    },
+    "common": {
+        "loading": "Loading...",
+        "error": "Something went wrong"
+    }
+}

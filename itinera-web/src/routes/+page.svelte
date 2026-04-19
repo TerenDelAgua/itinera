@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import { apiFetch } from "$lib/api";
   import type { Trip } from "$lib/types/trip";
+  import { t, locale } from "$lib/i18n/store";
 
   let trips = $state<Trip[]>([]);
   let isLoading = $state(true);
@@ -31,10 +32,10 @@
     <h1
       class="text-[32px] sm:text-4xl font-bold text-teren-text-main tracking-tight"
     >
-      My trips
+      {$t("dashboard.title")}
     </h1>
     <p class="text-teren-text-muted mt-2 text-base sm:text-lg">
-      Plan and organize all your adventures
+      {$t("dashboard.subtitle")}
     </p>
   </div>
 
@@ -43,7 +44,7 @@
     class="bg-teren-primary hover:bg-teren-primary-hover text-white font-medium py-2.5 px-5 rounded-lg shadow-sm hover:shadow-md hover:shadow-orange-200 transition-all duration-200 flex items-center gap-2 active:scale-95 mt-1 sm:mt-0"
   >
     <span class="text-lg leading-none">+</span>
-    <span>New trip</span>
+    <span>{$t("dashboard.button_new")}</span>
   </button>
 </section>
 
@@ -55,7 +56,7 @@
         class="w-10 h-10 border-4 border-teren-primary/30 border-t-teren-primary rounded-full animate-spin"
       ></div>
       <p class="text-teren-text-muted font-medium animate-pulse">
-        Loading adventures...
+        {$t("common.loading")}
       </p>
     </div>
   </div>
@@ -70,20 +71,37 @@
     >
   </div>
 {:else if trips.length === 0}
-  <div
-    class="text-center py-20 bg-teren-surface rounded-xl border border-teren-border shadow-sm"
-  >
-    <div class="text-5xl mb-4">🧳</div>
-    <h3 class="text-xl font-bold text-teren-text-main mb-2">No trips</h3>
-    <p class="text-teren-text-muted mb-6">
-      Start planning your first adventure!
-    </p>
-    <button
-      title="New trip"
-      onclick={handleCreateTrip}
-      class="bg-teren-primary hover:bg-teren-primary-hover text-white font-bold py-3 px-8 rounded-lg shadow-md transition-all active:scale-95"
+  <div class="flex flex-col items-center justify-center py-20 text-center">
+    <div
+      class="w-16 h-16 mb-4 rounded-full bg-teren-surface border border-teren-border flex items-center justify-center"
     >
-      Start your new adventure!
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-8 w-8 text-teren-text-muted opacity-50"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0121 18.382V7.618a1 1 0 01-.553-.894L15 7m0 13V7"
+        />
+      </svg>
+    </div>
+
+    <h3 class="text-xl font-medium text-teren-text-main mb-2">{$t("empty_state.title")}</h3>
+    <p class="text-teren-text-muted max-w-xs mb-8">
+      {$t("empty_state.description")}
+    </p>
+
+    <!-- Botón Secundario (Solo aquí, ya que el header siempre está visible) -->
+    <button
+      onclick={handleCreateTrip}
+      class="text-teren-primary font-semibold hover:text-teren-primary-hover hover:underline transition-all"
+    >
+      {$t("empty_state.cta")} &rarr;
     </button>
   </div>
 {:else}
@@ -174,7 +192,6 @@
           </div>
         </div>
 
-        <!-- Footer Card: Gasto Total (Badge) -->
         <div>
           <span
             class="inline-block bg-teren-primary-subtle text-teren-primary-hover text-[13px] font-bold px-3 py-1 rounded-full uppercase"

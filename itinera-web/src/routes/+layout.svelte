@@ -1,5 +1,11 @@
 <script lang="ts">
   import "../app.css";
+  import { t, locale } from "$lib/i18n/store";
+
+  function toggleLang() {
+    locale.update((lang) => (lang === "en" ? "es" : "en"));
+  }
+
   let { children: childrenProp } = $props();
 </script>
 
@@ -33,7 +39,17 @@
       </div>
 
       <!-- User Menu -->
+
       <div class="flex items-center gap-6">
+        <div class="flex items-center gap-4">
+          <!-- Language Toggle (TEREN Style) -->
+          <button
+            onclick={toggleLang}
+            class="text-sm font-medium text-teren-text-muted hover:text-teren-primary transition px-2 py-1 rounded hover:bg-gray-50 uppercase"
+          >
+            {$locale}
+          </button>
+        </div>
         <div
           class="hidden sm:flex items-center gap-2 text-sm text-teren-text-muted font-medium"
         >
