@@ -1,16 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-teren-primary: #FF8C42;
-  --color-teren-primary-hover: #E06B20;
-  --color-teren-surface: #FAFAFA;
-  --color-teren-text-main: #1A1A1A;
-  --color-teren-text-muted: #6B7280;
+  /* Fondos: Off-white para el cuerpo, White puro para tarjetas */
+  --color-teren-background: #FAFAFA; 
+  --color-teren-surface: #FFFFFF;
   
-  --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  /* Texto: Oscuro profundo para máximo contraste bajo el sol */
+  --color-teren-text-main: #1A1A1A;  
+  --color-teren-text-muted: #6B7280; /* Gris oscuro, legible en exteriores */
+  
+  /* Acento: Naranja Amanecer */
+  --color-teren-primary: #FF8C42;
+  --color-teren-primary-hover: #E06B20; /* Naranja más intenso para hover */
+  --color-teren-primary-subtle: #FFF7ED; /* Fondo muy suave para etiquetas */
+  
+  /* Bordes sutiles */
+  --color-teren-border: #E5E7EB;
+
+  /* Typography */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
-  background-color: var(--color-teren-surface);
-  color: var(--color-teren-text-main);
+  @apply bg-teren-background text-teren-text-main font-sans antialiased;
 }

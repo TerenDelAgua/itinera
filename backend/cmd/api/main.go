@@ -97,7 +97,9 @@ func setupRouter(cfg *config.Config, h *handlers.Handlers) *chi.Mux {
 		w.Write([]byte(`{"status":"healthy","database":"connected"}`))
 	})
 
-	r.Mount("/api/v1", handlers.ApiRouter(h))
+	r.Route("/api/v1", func(router chi.Router) {
+		handlers.RegisterApiRoutes(router, h)
+	})
 
 	return r
 }

@@ -2,16 +2,11 @@ package handlers
 
 import (
 	"backend/internal/http/middleware"
-	"net/http"
 
-	"github.com/go-chi/chi"
-	"github.com/go-chi/cors"
+	"github.com/go-chi/chi/v5"
 )
 
-func ApiRouter(h *Handlers) http.Handler {
-	r := chi.NewRouter()
-
-	r.Use(cors.Handler(cors.Options{AllowedOrigins: []string{"*"}, AllowCredentials: true}))
+func RegisterApiRoutes(r chi.Router, h *Handlers) {
 	r.Use(middleware.SessionMiddleware)                  // ← Siempre activo
 	r.Use(middleware.AuthMiddleware(h.Config.JWTSecret)) // ← Opcional, no bloquea
 
@@ -30,6 +25,4 @@ func ApiRouter(h *Handlers) http.Handler {
 		r.Put("/trips/{id}", h.UpdateTrip)
 		r.Delete("/trips/{id}", h.DeleteTrip)
 	})
-
-	return r
 }

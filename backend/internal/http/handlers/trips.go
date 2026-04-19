@@ -47,8 +47,11 @@ func (h *Handlers) CreateTrip(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) ListTrips(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
-	w.Write([]byte(`{"Message":"endpoint not implemented yet"}`))
+	// TODO: Fetch trips from the database for the current user/session.
+	// For now, return an empty array to show the empty state in the frontend.
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`[]`))
 }
 
 func (h *Handlers) GetTrip(w http.ResponseWriter, r *http.Request) {

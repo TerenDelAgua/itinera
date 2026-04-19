@@ -12,6 +12,7 @@ CREATE TABLE trips (
     user_id UUID REFERENCES users(id) ON DELETE CASCADE, -- NULL for guests
     session_id VARCHAR(255), -- For guests (maps to cookie)
     name VARCHAR(255) NOT NULL,
+    description TEXT,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     base_currency CHAR(3) DEFAULT 'EUR',
