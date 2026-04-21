@@ -37,7 +37,7 @@ func (h *Handlers) CreateTrip(w http.ResponseWriter, r *http.Request) {
 
 	newTrip, err := h.DB.CreateTrip(r.Context(), userID, sessionID, input)
 	if err != nil {
-		http.Error(w, "DB error", http.StatusInternalServerError)
+		http.Error(w, "DB error: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -47,11 +47,34 @@ func (h *Handlers) CreateTrip(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) ListTrips(w http.ResponseWriter, r *http.Request) {
-	// TODO: Fetch trips from the database for the current user/session.
-	// For now, return an empty array to show the empty state in the frontend.
+	// 1. Try authenticated user first
+	var userID *uuid.UUID
+	if uid, ok := r.Context().Value(middleware.ContextKeyUserId{}).(uuid.UUID); ok {
+		userID = &uid
+	}
+
+	// 2. Fallback to guest session
+	var sessionID *string
+	if userID == nil {
+		if sid, ok := r.Context().Value(middleware.ContextKeySessionId{}).(string); ok {
+			sessionID = &sid
+		}
+	}
+
+	if userID == nil && sessionID == nil {
+		http.Error(w, "Identity missing", http.StatusInternalServerError)
+		return
+	}
+
+	trips, err := h.DB.ListTrips(r.Context(), userID, sessionID)
+	if err != nil {
+		http.Error(w, "DB error: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`[]`))
+	json.NewEncoder(w).Encode(trips)
 }
 
 func (h *Handlers) GetTrip(w http.ResponseWriter, r *http.Request) {
