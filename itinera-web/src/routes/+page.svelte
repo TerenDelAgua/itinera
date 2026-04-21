@@ -33,6 +33,18 @@
   function handleCancelCreate() {
     isCreatingTrip = false;
   }
+
+  function formatDate(dateStr: string) {
+    if (!dateStr) return "";
+    // Note: ensure we treat the date string as local date to avoid TZ shifts
+    const [year, month, day] = dateStr.split("-").map(Number);
+    const date = new Date(year, month - 1, day);
+    return new Intl.DateTimeFormat($locale, {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }).format(date);
+  }
 </script>
 
 <!-- Header -->
@@ -60,12 +72,9 @@
   </button>
 </section>
 
-<!-- Create Trip Form -->
 {#if isCreatingTrip}
   <CreateTripForm onsuccess={handleTripCreated} oncancel={handleCancelCreate} />
 {/if}
-
-<!-- Trips grid -->
 {#if isLoading}
   <div class="flex justify-center items-center py-20">
     <div class="flex flex-col items-center gap-3">
@@ -124,7 +133,6 @@
 {:else}
   <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
     {#each trips as trip}
-      <!-- Card Estilo TEREN -->
       <div
         class="group bg-white p-6 rounded-xl border border-gray-200 hover:border-teren-primary/30 shadow-sm hover:shadow-xl hover:shadow-orange-900/5 transition-all duration-300 relative cursor-pointer hover:-translate-y-1"
       >
@@ -159,7 +167,7 @@
 
         <!-- Duración -->
         <p class="text-[15px] text-teren-text-muted mb-5 font-medium">
-          {trip.start_date} - {trip.end_date}
+          {formatDate(trip.start_date)} - {formatDate(trip.end_date)}
         </p>
 
         <!-- Fila Central: Iconos + Datos -->
@@ -186,27 +194,7 @@
             <span>{trip.description || "0"} destinos</span>
           </div>
 
-          <!-- Fechas -->
-          <div class="flex items-center gap-1.5">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="text-gray-400"
-            >
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-            <span>{trip.start_date} - {trip.end_date}</span>
-          </div>
+          
         </div>
 
         <div>
