@@ -2,9 +2,13 @@ package database
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 
 	"backend/internal/models"
 )
@@ -128,38 +132,57 @@ func (db *DB) GetTrip(ctx context.Context, id string, userId *uuid.UUID, session
 	return &trip, nil
 }
 
-func (db *DB) UpdateTrip(ctx context.Context, id string, userId *uuid.UUID, sessionId *string, tripData models.Trip) (*models.Trip, error) {
+func (db *DB) UpdateTrip(ctx context.Context, tripID string, userID *uuid.UUID, sessionID *string, updates map[string]any) (*models.Trip, error) {
+	allowedFields := map[string]bool{
+		"name": true, "start_date": true, "end_date": true,
+		"base_currency": true, "description": true,
+	}
+
+	var setClauses []string
+	var args []any
+	idx := 1
+
+	for key, val := range updates {
+		if !allowedFields[key] {
+			continue // Ignorar campos no permitidos por seguridad
+		}
+		setClauses = append(setClauses, fmt.Sprintf("%s = $%d", key, idx))
+		args = append(args, val)
+		idx++
+	}
+
+	if len(setClauses) == 0 {
+		return nil, errors.New("no valid fields to update")
+	}
+
+	// Ownership check: solo el propietario (user o session) puede editar
+	query := fmt.Sprintf(`
+		UPDATE trips 
+		SET %s 
+		WHERE id = $%d AND (user_id = $%d OR session_id = $%d)
+		RETURNING id, user_id, session_id, name, start_date, end_date, base_currency, description, created_at
+	`, strings.Join(setClauses, ", "), idx, idx+1, idx+2)
+
+	args = append(args, tripID)
+	if userID != nil {
+		args = append(args, userID, nil)
+	} else {
+		args = append(args, nil, sessionID)
+	}
+
 	var trip models.Trip
 	var startDate, endDate, createdAt time.Time
 
-	query := `
-		UPDATE trips
-		SET name = $1, description = $2, start_date = $3, end_date = $4, base_currency = $5
-		WHERE id = $6 AND ((user_id = $7 AND $7 IS NOT NULL) OR (session_id = $8 AND $8 IS NOT NULL))
-		RETURNING id, user_id, session_id, name, description, start_date, end_date, base_currency, created_at
-	`
-
-	err := db.Pool.QueryRow(ctx, query,
-		tripData.Name,
-		tripData.Description,
-		tripData.StartDate,
-		tripData.EndDate,
-		tripData.BaseCurrency,
-		id,
-		userId,
-		sessionId,
-	).Scan(
-		&trip.ID,
-		&trip.UserId,
-		&trip.SessionId,
-		&trip.Name,
-		&trip.Description,
-		&startDate,
-		&endDate,
-		&trip.BaseCurrency,
-		&createdAt,
+	err := db.Pool.QueryRow(ctx, query, args...).Scan(
+		&trip.ID, &trip.UserId, &trip.SessionId, &trip.Name,
+		&startDate, &endDate, &trip.BaseCurrency,
+		&trip.Description, &createdAt,
 	)
+
 	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, errors.New("trip not found or unauthorized")
+		}
 		return nil, err
 	}
 

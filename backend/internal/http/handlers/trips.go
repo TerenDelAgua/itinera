@@ -116,21 +116,28 @@ func (h *Handlers) GetTrip(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) UpdateTrip(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-
-	var input models.Trip
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+	tripID := chi.URLParam(r, "id")
+	if _, err := uuid.Parse(tripID); err != nil {
+		http.Error(w, "Invalid trip ID", http.StatusBadRequest)
 		return
 	}
 
-	// 1. Try authenticated user first
+	// Parse partial update payload
+	var updates map[string]any
+	if err := json.NewDecoder(r.Body).Decode(&updates); err != nil {
+		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
+		return
+	}
+	if len(updates) == 0 {
+		http.Error(w, "No fields to update", http.StatusBadRequest)
+		return
+	}
+
+	// Extract identity (User or Guest)
 	var userID *uuid.UUID
 	if uid, ok := r.Context().Value(middleware.ContextKeyUserId{}).(uuid.UUID); ok {
 		userID = &uid
 	}
-
-	// 2. Fallback to guest session
 	var sessionID *string
 	if userID == nil {
 		if sid, ok := r.Context().Value(middleware.ContextKeySessionId{}).(string); ok {
@@ -138,17 +145,15 @@ func (h *Handlers) UpdateTrip(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if userID == nil && sessionID == nil {
-		http.Error(w, "Identity missing", http.StatusInternalServerError)
-		return
-	}
-
-	updatedTrip, err := h.DB.UpdateTrip(r.Context(), id, userID, sessionID, input)
+	updatedTrip, err := h.DB.UpdateTrip(r.Context(), tripID, userID, sessionID, updates)
 	if err != nil {
-		http.Error(w, "Failed to update trip", http.StatusInternalServerError)
+		if err.Error() == "trip not found or unauthorized" {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+		} else {
+			http.Error(w, "Database error", http.StatusInternalServerError)
+		}
 		return
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(updatedTrip)
