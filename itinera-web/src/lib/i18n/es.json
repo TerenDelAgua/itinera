@@ -32,5 +32,18 @@
         "usd": "Dolar Estadounidense (USD)",
         "jpy": "Yen Japonés (JPY)",
         "gbp": "Libra Esterlina (GBP)"
+    },
+    "detail": {
+        "back": "Volver",
+        "edit": "Editar",
+        "settings": "Ajustes del Viaje",
+        "currency": "Moneda Base",
+        "description": "Descripción y Notas",
+        "no_description": "Aún no hay descripción.",
+        "save": "Guardar Cambios",
+        "places": "Lugares",
+        "places_empty": "Toca para añadir destinos",
+        "expenses": "Gastos",
+        "expenses_empty": "Toca para registrar gastos"
     }
 }

@@ -32,5 +32,18 @@
         "usd": "US Dollar (USD)",
         "jpy": "Japanese Yen (JPY)",
         "gbp": "British Pound (GBP)"
+    },
+    "detail": {
+        "back": "Back",
+        "edit": "Edit",
+        "settings": "Trip Settings",
+        "currency": "Base Currency",
+        "description": "Description & Notes",
+        "no_description": "No description added yet.",
+        "save": "Save Changes",
+        "places": "Places",
+        "places_empty": "Tap to add destinations",
+        "expenses": "Expenses",
+        "expenses_empty": "Tap to track spending"
     }
 }

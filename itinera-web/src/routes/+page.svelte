@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
   import { apiFetch } from "$lib/api";
   import type { Trip } from "$lib/types/trip";
   import { t, locale } from "$lib/i18n/store";
@@ -134,6 +135,10 @@
   <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
     {#each trips as trip}
       <div
+        role="link"
+        tabindex="0"
+        onclick={() => goto(`/trips/${trip.id}`)}
+        onkeydown={(e) => e.key === 'Enter' && goto(`/trips/${trip.id}`)}
         class="group bg-white p-6 rounded-xl border border-gray-200 hover:border-teren-primary/30 shadow-sm hover:shadow-xl hover:shadow-orange-900/5 transition-all duration-300 relative cursor-pointer hover:-translate-y-1"
       >
         <!-- Header Card: Nombre + Menú 3 puntos -->
@@ -145,6 +150,7 @@
           </h3>
           <button
             title="Options"
+            onclick={(e) => e.stopPropagation()}
             class="text-gray-400 hover:text-teren-text-main hover:bg-gray-50 rounded p-1.5 transition-colors -mr-1.5 -mt-1.5 active:scale-95"
           >
             <svg
