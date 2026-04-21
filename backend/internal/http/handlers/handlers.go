@@ -35,12 +35,3 @@ func (h *Handlers) healthCheck(w http.ResponseWriter, r *http.Request) {
 
 // Handler implementations are in separate files (auth.go, trips.go)
 
-func (h *Handlers) UpdateTrip(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
-	w.Write([]byte(`{"Message":"endpoint not implemented yet"}`))
-}
-
-func (h *Handlers) DeleteTrip(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
-	w.Write([]byte(`{"Message":"endpoint not implemented yet"}`))
-}
