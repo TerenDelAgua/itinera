@@ -12,5 +12,25 @@
     "common": {
         "loading": "Loading...",
         "error": "Something went wrong"
+    },
+    "trip_form": {
+        "title": "Create a new trip",
+        "name": "Trip Name",
+        "name_placeholder": "e.g. Summer in Japan",
+        "description": "Description (Optional)",
+        "description_placeholder": "e.g. Exploring Tokyo, Kyoto, and Osaka",
+        "start_date": "Start Date",
+        "end_date": "End Date",
+        "currency": "Base Currency",
+        "cancel": "Cancel",
+        "submit": "Create Trip",
+        "creating": "Creating...",
+        "create_error": "Failed to create trip"
+    },
+    "currencies": {
+        "eur": "Euro (EUR)",
+        "usd": "US Dollar (USD)",
+        "jpy": "Japanese Yen (JPY)",
+        "gbp": "British Pound (GBP)"
     }
 }

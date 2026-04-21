@@ -3,10 +3,12 @@
   import { apiFetch } from "$lib/api";
   import type { Trip } from "$lib/types/trip";
   import { t, locale } from "$lib/i18n/store";
+  import CreateTripForm from "$lib/components/CreateTripForm.svelte";
 
   let trips = $state<Trip[]>([]);
   let isLoading = $state(true);
   let error = $state<string | null>(null);
+  let isCreatingTrip = $state(false);
 
   onMount(async () => {
     try {
@@ -20,7 +22,16 @@
   });
 
   function handleCreateTrip() {
-    console.log("New experience");
+    isCreatingTrip = true;
+  }
+
+  function handleTripCreated(newTrip: Trip) {
+    trips = [newTrip, ...trips];
+    isCreatingTrip = false;
+  }
+
+  function handleCancelCreate() {
+    isCreatingTrip = false;
   }
 </script>
 
@@ -41,12 +52,18 @@
 
   <button
     onclick={handleCreateTrip}
-    class="bg-teren-primary hover:bg-teren-primary-hover text-white font-medium py-2.5 px-5 rounded-lg shadow-sm hover:shadow-md hover:shadow-orange-200 transition-all duration-200 flex items-center gap-2 active:scale-95 mt-1 sm:mt-0"
+    disabled={isCreatingTrip}
+    class="bg-teren-primary hover:bg-teren-primary-hover text-white font-medium py-2.5 px-5 rounded-lg shadow-sm hover:shadow-md hover:shadow-orange-200 transition-all duration-200 flex items-center gap-2 active:scale-95 mt-1 sm:mt-0 disabled:opacity-50 disabled:active:scale-100"
   >
     <span class="text-lg leading-none">+</span>
     <span>{$t("dashboard.button_new")}</span>
   </button>
 </section>
+
+<!-- Create Trip Form -->
+{#if isCreatingTrip}
+  <CreateTripForm onsuccess={handleTripCreated} oncancel={handleCancelCreate} />
+{/if}
 
 <!-- Trips grid -->
 {#if isLoading}
