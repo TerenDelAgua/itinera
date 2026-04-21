@@ -49,19 +49,30 @@
   async function saveField(field: string, value: string) {
     if (!trip) return;
 
+    // Change detection
+    if (trip[field as keyof Trip] === value) return;
+
+    // Basic validation
+    if (field === "name" && !value.trim()) return;
+
+    const payload: Record<string, string> = { [field]: value };
+
     // Optimistic update
     const previousTrip = { ...trip };
-    const updates: Record<string, any> = { [field]: value };
+    // @ts-ignore - Dynamic update for optimistic UI
+    trip[field as keyof Trip] = value;
 
     try {
       const updated = await apiFetch<Trip>(`/trips/${tripId}`, {
         method: "PUT",
-        body: JSON.stringify(updates),
+        body: JSON.stringify(payload),
       });
       trip = updated;
     } catch {
       // Revert if error
+      console.error("Error updating trip");
       trip = previousTrip;
+      // Refresh data to be sure
       loadTrip();
     }
   }
@@ -112,12 +123,12 @@
             type="text"
             bind:value={name}
             onblur={() => {
-              if (name.trim()) saveField("name", name);
+              saveField("name", name);
               isEditingName = false;
             }}
             onkeydown={(e) => {
               if (e.key === "Enter") {
-                if (name.trim()) saveField("name", name);
+                saveField("name", name);
                 isEditingName = false;
               }
             }}

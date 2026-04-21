@@ -173,7 +173,7 @@
 
         <!-- Duración -->
         <p class="text-[15px] text-teren-text-muted mb-5 font-medium">
-          {formatDate(trip.start_date)} - {formatDate(trip.end_date)}
+          <span>{trip.description}</span>
         </p>
 
         <!-- Fila Central: Iconos + Datos -->
@@ -197,7 +197,25 @@
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
               <circle cx="12" cy="10" r="3"></circle>
             </svg>
-            <span>{trip.description || "0"} destinos</span>
+            <span> destinos: "0"</span>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-3.5 w-3.5 opacity-70"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
+            <span>{formatDate(trip.start_date)} - {formatDate(trip.end_date)}</span>
           </div>
 
           
