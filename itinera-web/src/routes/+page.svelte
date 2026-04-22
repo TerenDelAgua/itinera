@@ -6,6 +6,9 @@
   import { t, locale } from "$lib/i18n/store";
   import CreateTripForm from "$lib/components/CreateTripForm.svelte";
 
+  import ExpenseQuickAdd from "$lib/components/ExpenseQuickAdd.svelte";
+  import ExpenseSummaryPills from "$lib/components/ExpenseSummaryPills.svelte";
+
   let trips = $state<Trip[]>([]);
   let isLoading = $state(true);
   let error = $state<string | null>(null);

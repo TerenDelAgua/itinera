@@ -5,6 +5,10 @@
   import { t, locale } from "$lib/i18n/store";
   import type { Trip } from "$lib/types/trip";
   import { page } from "$app/stores";
+  import ExpenseDrawer from '$lib/components/ExpenseDrawer.svelte';
+  import type { Category, CategorySummary, Expense } from "$lib/types";
+  import ExpenseQuickAdd from "$lib/components/ExpenseQuickAdd.svelte";
+  import ExpenseSummaryPills from "$lib/components/ExpenseSummaryPills.svelte";
 
   let tripId = "";
   let trip = $state<Trip | null>(null);
@@ -22,10 +26,30 @@
   let baseCurrency = $state("EUR");
   let description = $state("");
 
+  // Expense states
+  let categories = $state<Category[]>([]);
+  let summary = $state<CategorySummary[]>([]);
+  let expenses = $state<Expense[]>([]);
+  let isDrawerOpen = $state(false);
+
+
   $effect(() => {
     if ($page.params.id) {
       tripId = $page.params.id;
       loadTrip();
+    }
+
+    if(tripId) {
+      Promise.all([
+        apiFetch<Category[]>(`/trips/${tripId}/expenses/categories`).then(data => categories = data),
+        apiFetch<CategorySummary[]>(`/trips/${tripId}/expenses/summary`),
+        apiFetch<Expense[]>(`/trips/${tripId}/expenses`)
+    
+      ]).then(([cats, sum, exps]) => {
+        categories = cats;
+        summary = sum;
+        expenses = exps;
+      })
     }
   });
 
@@ -49,15 +73,12 @@
   async function saveField(field: string, value: string) {
     if (!trip) return;
 
-    // Change detection
     if (trip[field as keyof Trip] === value) return;
 
-    // Basic validation
     if (field === "name" && !value.trim()) return;
 
     const payload: Record<string, string> = { [field]: value };
 
-    // Optimistic update
     const previousTrip = { ...trip };
     // @ts-ignore - Dynamic update for optimistic UI
     trip[field as keyof Trip] = value;
@@ -86,6 +107,16 @@
       month: "short",
       year: "numeric",
     }).format(date);
+  }
+
+  function loadSummary() {
+    apiFetch<CategorySummary[]>(`/trips/${tripId}/expenses/summary`)
+      .then((newSummary) => summary = newSummary);
+  }
+
+  function handleExpenseAdded(newExp: Expense) {
+    expenses = [...expenses, newExp];
+    loadSummary();
   }
 </script>
 
@@ -229,39 +260,32 @@
 
     <!-- Cuadrícula de Secciones -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Gastos -->
-      <button
-        onclick={() => goto(`/trips/${tripId}/expenses`)}
-        class="bg-teren-surface p-8 rounded-2xl border border-teren-border hover:border-teren-primary/30 shadow-sm hover:shadow-xl hover:shadow-orange-900/5 transition-all duration-300 flex flex-col items-center text-center group active:scale-98"
-      >
-        <div
-          class="w-14 h-14 mb-4 rounded-full bg-teren-background border border-teren-border flex items-center justify-center group-hover:bg-teren-primary-subtle transition-colors duration-300"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-7 w-7 text-teren-text-muted group-hover:text-teren-primary transition-colors duration-300"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </div>
-        <h3 class="text-lg font-bold text-teren-text-main mb-1">
-          {$t("detail.expenses")}
-        </h3>
-        <p class="text-2xl font-black text-teren-primary mt-2">
-          0.00 {baseCurrency}
-        </p>
-        <p class="text-xs text-teren-text-muted mt-2 font-medium opacity-70">
-          {$t("detail.expenses_empty")}
-        </p>
-      </button>
+    
+<section class="bg-teren-surface rounded-2xl border border-teren-border p-5 shadow-sm flex flex-col gap-4">
+  <!-- Header: título + total -->
+  <div class="flex items-center justify-between">
+    <h2 class="text-base font-semibold text-teren-text-main tracking-tight">Gastos</h2>
+    <span class="text-xl font-bold text-teren-primary">
+      {(summary || []).reduce((a, b) => a + b.total, 0).toFixed(2)} {trip?.base_currency || 'EUR'}
+    </span>
+  </div>
+
+  <!-- Pills de resumen por categoría -->
+  <ExpenseSummaryPills {categories} {summary} currency={trip?.base_currency || 'EUR'} />
+
+  <!-- Quick add inline -->
+  {#if categories.length > 0}
+    <ExpenseQuickAdd tripId={tripId} {categories} onSuccess={handleExpenseAdded} />
+  {/if}
+
+  <!-- Botón para abrir el drawer con la lista completa -->
+  <button
+    onclick={() => isDrawerOpen = true}
+    class="w-full text-sm font-medium text-teren-text-muted hover:text-teren-primary transition-colors duration-200 py-1 text-center"
+  >
+    Ver todos los gastos →
+  </button>
+</section>
 
       <!-- Lugares -->
       <button
@@ -301,6 +325,15 @@
     </div>
   {/if}
 </div>
+
+<!-- Drawer de Gastos — fuera del flujo, como overlay fijo -->
+<ExpenseDrawer
+  {tripId}
+  {categories}
+  isOpen={isDrawerOpen}
+  onClose={() => isDrawerOpen = false}
+  onRefreshSummary={loadSummary}
+/>
 
 <style>
   .animate-fade-in {
