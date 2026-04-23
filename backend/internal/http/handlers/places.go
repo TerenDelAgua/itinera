@@ -9,6 +9,16 @@ import (
 	"github.com/google/uuid"
 )
 
+func (h *Handlers) GetPlace(w http.ResponseWriter, r *http.Request) {
+	placeID, _ := uuid.Parse(chi.URLParam(r, "placeId"))
+	p, err := h.DB.GetPlace(r.Context(), placeID)
+	if err != nil {
+		http.Error(w, "Place not found", http.StatusNotFound)
+		return
+	}
+	json.NewEncoder(w).Encode(p)
+}
+
 func (h *Handlers) ListPlaces(w http.ResponseWriter, r *http.Request) {
 	tripID, _ := uuid.Parse(chi.URLParam(r, "id"))
 	places, err := h.DB.ListPlacesByTrip(r.Context(), tripID)

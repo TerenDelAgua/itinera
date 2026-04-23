@@ -1,6 +1,7 @@
 
 
-ALTER TABLE places RENAME COLUMN description TO Notes;
+ALTER TABLE places RENAME COLUMN description TO notes;
+ALTER TABLE places RENAME COLUMN lng TO lon;
 ALTER TABLE places DROP COLUMN IF EXISTS order_index;
 
 ALTER TABLE expenses

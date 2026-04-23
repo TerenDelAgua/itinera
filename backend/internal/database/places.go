@@ -3,11 +3,35 @@ package database
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 
 	"backend/internal/models"
 )
+
+func (db *DB) GetPlace(ctx context.Context, placeID uuid.UUID) (*models.Place, error) {
+	var p models.Place
+	var startDate, endDate *time.Time
+	var createdAt time.Time
+	query := `SELECT id, trip_id, name, notes, start_date, end_date, lat, lon, created_at 
+		FROM places WHERE id = $1`
+	err := db.Pool.QueryRow(ctx, query, placeID).
+		Scan(&p.ID, &p.TripID, &p.Name, &p.Notes, &startDate, &endDate, &p.Lat, &p.Lon, &createdAt)
+	if err != nil {
+		return nil, err
+	}
+	if startDate != nil {
+		s := startDate.Format("2006-01-02")
+		p.StartDate = &s
+	}
+	if endDate != nil {
+		e := endDate.Format("2006-01-02")
+		p.EndDate = &e
+	}
+	p.CreatedAt = createdAt.Format(time.RFC3339)
+	return &p, nil
+}
 
 func (db *DB) ListPlacesByTrip(ctx context.Context, tripID uuid.UUID) ([]models.Place, error) {
 	rows, err := db.Pool.Query(ctx, `SELECT id, trip_id, name, notes, start_date, end_date, lat, lon, created_at 
@@ -20,9 +44,20 @@ func (db *DB) ListPlacesByTrip(ctx context.Context, tripID uuid.UUID) ([]models.
 	var places []models.Place
 	for rows.Next() {
 		var p models.Place
-		if err := rows.Scan(&p.ID, &p.TripID, &p.Name, &p.Notes, &p.StartDate, &p.EndDate, &p.Lat, &p.Lon, &p.CreatedAt); err != nil {
+		var startDate, endDate *time.Time
+		var createdAt time.Time
+		if err := rows.Scan(&p.ID, &p.TripID, &p.Name, &p.Notes, &startDate, &endDate, &p.Lat, &p.Lon, &createdAt); err != nil {
 			return nil, err
 		}
+		if startDate != nil {
+			s := startDate.Format("2006-01-02")
+			p.StartDate = &s
+		}
+		if endDate != nil {
+			e := endDate.Format("2006-01-02")
+			p.EndDate = &e
+		}
+		p.CreatedAt = createdAt.Format(time.RFC3339)
 		places = append(places, p)
 	}
 	return places, nil
@@ -31,8 +66,19 @@ func (db *DB) ListPlacesByTrip(ctx context.Context, tripID uuid.UUID) ([]models.
 func (db *DB) CreatePlace(ctx context.Context, tripID uuid.UUID, p models.Place) (*models.Place, error) {
 	query := `INSERT INTO places (trip_id, name, notes, start_date, end_date, lat, lon) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, trip_id, name, notes, start_date, end_date, lat, lon, created_at`
 	var res models.Place
+	var startDate, endDate *time.Time
+	var createdAt time.Time
 	err := db.Pool.QueryRow(ctx, query, tripID, p.Name, p.Notes, p.StartDate, p.EndDate, p.Lat, p.Lon).
-		Scan(&res.ID, &res.TripID, &res.Name, &res.Notes, &res.StartDate, &res.EndDate, &res.Lat, &res.Lon, &res.CreatedAt)
+		Scan(&res.ID, &res.TripID, &res.Name, &res.Notes, &startDate, &endDate, &res.Lat, &res.Lon, &createdAt)
+	if startDate != nil {
+		s := startDate.Format("2006-01-02")
+		res.StartDate = &s
+	}
+	if endDate != nil {
+		e := endDate.Format("2006-01-02")
+		res.EndDate = &e
+	}
+	res.CreatedAt = createdAt.Format(time.RFC3339)
 	return &res, err
 }
 
@@ -56,7 +102,18 @@ func (db *DB) UpdatePlace(ctx context.Context, placeID uuid.UUID, updates map[st
 	args = append(args, placeID)
 
 	var res models.Place
-	err := db.Pool.QueryRow(ctx, query, args...).Scan(&res.ID, &res.TripID, &res.Name, &res.Notes, &res.StartDate, &res.EndDate, &res.Lat, &res.Lon, &res.CreatedAt)
+	var startDate, endDate *time.Time
+	var createdAt time.Time
+	err := db.Pool.QueryRow(ctx, query, args...).Scan(&res.ID, &res.TripID, &res.Name, &res.Notes, &startDate, &endDate, &res.Lat, &res.Lon, &createdAt)
+	if startDate != nil {
+		s := startDate.Format("2006-01-02")
+		res.StartDate = &s
+	}
+	if endDate != nil {
+		e := endDate.Format("2006-01-02")
+		res.EndDate = &e
+	}
+	res.CreatedAt = createdAt.Format(time.RFC3339)
 	return &res, err
 }
 
