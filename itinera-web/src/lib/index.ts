@@ -3,3 +3,4 @@ export type { Place } from "./types/Place";
 export type { Expense, CategorySummary } from "./types/Expense";
 export type { TripExpenseSummary, PlaceSummary } from "./types/Summary";
 export type { Trip } from "./types/Trip";
+export type { Expense_Category } from "./types/Category";
