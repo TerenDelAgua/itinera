@@ -1,8 +1,9 @@
 <script lang="ts">
   import { t } from "$lib/i18n/store";
   import { apiFetch } from "$lib/api";
-  import type { Trip } from "$lib/types/trip";
+  import type { Trip } from "$lib/types/Trip";
   import { fade } from "svelte/transition";
+
 
   let {
     onsuccess,
@@ -13,7 +14,6 @@
   } = $props();
 
   let name = $state("");
-  let description = $state("");
   let startDate = $state("");
   let endDate = $state("");
   

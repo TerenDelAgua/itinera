@@ -3,7 +3,7 @@ export interface Trip {
     user_id?: string;
     session_id?: string;
     name: string;
-    description?: string;
+    note?: string;
     start_date: string;
     end_date: string;
     base_currency: string;

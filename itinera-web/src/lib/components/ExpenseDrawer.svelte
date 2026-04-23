@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { SvelteMap } from 'svelte/reactivity';
   import { fade, fly } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
   import { apiFetch } from '$lib/api';
@@ -51,7 +52,7 @@
   }
 
   let grouped = $derived.by(() => {
-    const groups = new Map<string, Expense[]>();
+    const groups = new SvelteMap<string, Expense[]>();
     for (const exp of expenses) {
       const cat = categories.find(c => c.id === exp.category_id);
       const key = cat ? cat.slug : 'others';
@@ -80,14 +81,14 @@
         {:else if expenses.length === 0}
           <div class="text-center py-12 text-teren-text-muted">No expenses yet.</div>
         {:else}
-          {#each grouped as [slug, items]}
+          {#each grouped as [slug, items] (slug)}
             <section>
               <h3 class="text-sm font-semibold text-teren-text-muted uppercase tracking-wider mb-3 flex items-center gap-2">
                 {emojiMap[slug] || '📦'} {slug.charAt(0).toUpperCase() + slug.slice(1)}
                 <span class="ml-auto font-normal normal-case text-xs">({items.length})</span>
               </h3>
               <div class="space-y-3">
-                {#each items as exp}
+                {#each items as exp (exp.id)}
                   {#if editingId === exp.id}
                     <div class="p-4 bg-teren-background border border-teren-primary/30 rounded-xl shadow-sm space-y-3">
                       <div class="flex flex-wrap gap-3">
@@ -97,7 +98,7 @@
                             bind:value={draft.category_id}
                             class="w-full px-3 py-2 bg-teren-surface border border-teren-border rounded-lg text-sm focus:ring-2 focus:ring-teren-primary/30 outline-none cursor-pointer appearance-none"
                           >
-                            {#each categories as cat}
+                            {#each categories as cat (cat.id)}
                               <option value={cat.id}>{emojiMap[cat.slug] || '📦'} {cat.slug}</option>
                             {/each}
                           </select>

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { t } from '$lib/i18n/store';
   import { apiFetch } from '$lib/api';
   import type { Category, Expense } from '$lib/types';
 
@@ -57,7 +56,7 @@
       bind:value={categoryId}
       class="appearance-none bg-gray-50 border border-teren-border rounded-lg pl-3 pr-8 py-2.5 text-2xl focus:outline-none focus:ring-2 focus:ring-teren-primary/30 focus:border-teren-primary transition-all cursor-pointer"
     >
-      {#each categories as cat}
+      {#each categories as cat (cat.id)}
         <option value={cat.id}>{emojiMap[cat.slug] || '📦'}</option>
       {/each}
     </select>

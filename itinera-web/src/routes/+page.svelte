@@ -2,12 +2,11 @@
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { apiFetch } from "$lib/api";
-  import type { Trip } from "$lib/types/trip";
+  import type { Trip } from "$lib/types/Trip";
   import { t, locale } from "$lib/i18n/store";
   import CreateTripForm from "$lib/components/CreateTripForm.svelte";
 
-  import ExpenseQuickAdd from "$lib/components/ExpenseQuickAdd.svelte";
-  import ExpenseSummaryPills from "$lib/components/ExpenseSummaryPills.svelte";
+
 
   let trips = $state<Trip[]>([]);
   let isLoading = $state(true);
@@ -136,7 +135,7 @@
   </div>
 {:else}
   <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
-    {#each trips as trip}
+    {#each trips as trip (trip.id)}
       <div
         role="link"
         tabindex="0"
