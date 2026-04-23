@@ -7,7 +7,14 @@
 
   let amount = $state('');
   let categoryId = $state(categories[0]?.id || '');
+  let notes = $state('');
   let isSubmitting = $state(false);
+
+  $effect(() => {
+    if (!categoryId && categories.length > 0) {
+      categoryId = categories[0].id;
+    }
+  });
 
   // Mapeo rápido de slugs a emojis para reconocimiento instantáneo
   const emojiMap: Record<string, string> = {
@@ -16,7 +23,7 @@
   };
 
   async function handleSubmit() {
-    if (!amount || parseFloat(amount) <= 0) return;
+    if (!amount || parseFloat(amount) <= 0 || !categoryId) return;
     isSubmitting = true;
     try {
       const exp = await apiFetch<Expense>(`/trips/${tripId}/expenses`, {
@@ -24,12 +31,14 @@
         body: JSON.stringify({
           amount: parseFloat(amount),
           category_id: categoryId,
+          notes: notes,
           date: new Date().toISOString(),
           currency: 'EUR' // Se inyectará dinámicamente desde settings del viaje en v1.1
         })
       });
       onSuccess(exp);
       amount = ''; // Reset rápido para siguiente gasto
+      notes = '';
     } catch {
       // TEREN: Fallback silencioso o toast sutil. No bloquear flujo.
     } finally {
@@ -38,9 +47,11 @@
   }
 </script>
 
-<div class="flex items-center gap-3 bg-teren-surface p-3 rounded-xl border border-teren-border shadow-sm mb-6">
+<div class="flex items-center  bg-teren-surface ">
   
-  <!-- Selector de Categoría (Icono + Dropdown nativo optimizado) -->
+  
+  <div class="flex  gap-2 " >
+    <!-- Selector de Categoría (Icono + Dropdown nativo optimizado) -->
   <div class="relative">
     <select 
       bind:value={categoryId}
@@ -56,31 +67,41 @@
     </div>
   </div>
 
-  <!-- Input Cantidad -->
-  <div class="flex-1 relative">
-    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-teren-text-muted font-bold text-lg">€</span>
-    <input 
-      type="number" 
-      inputmode="decimal"
-      step="0.01"
-      bind:value={amount}
-      onkeydown={(e) => e.key === 'Enter' && handleSubmit()}
-      placeholder="0.00"
-      class="w-full pl-8 pr-4 py-2.5 bg-white border border-teren-border rounded-lg text-teren-text-main font-bold text-lg focus:outline-none focus:ring-2 focus:ring-teren-primary/30 focus:border-teren-primary transition-all placeholder:text-teren-text-muted/50"
-    />
+    <!-- Input Cantidad -->
+    <div class="flex-1 relative">
+       <input 
+        type="number" 
+        inputmode="decimal"
+        step="0.01"
+        bind:value={amount}
+        onkeydown={(e) => e.key === 'Enter' && handleSubmit()}
+        placeholder="0.00"
+        class="w-full pl-3 pr-2 py-2.5 bg-white border border-teren-border rounded-lg text-teren-text-main font-bold text-lg focus:outline-none focus:ring-2 focus:ring-teren-primary/30 focus:border-teren-primary transition-all placeholder:text-teren-text-muted/50"
+      />
+    </div>
+  
+    <!-- Input Notes -->
+    <div class="flex-2 relative">
+      <input 
+        type="text" 
+        bind:value={notes} 
+        placeholder="Nota (opcional)"
+        class="w-full pl-3 pr-4 py-2.5 bg-white border border-teren-border rounded-lg text-teren-text-main text-lg focus:outline-none focus:ring-2 focus:ring-teren-primary/30 focus:border-teren-primary transition-all placeholder:text-teren-text-muted/50"
+        onkeydown={e => e.key === 'Enter' && handleSubmit()} />
+    </div>
+  
+    <!-- Botón Acción -->
+    <button 
+      onclick={handleSubmit}
+      disabled={isSubmitting || !amount}
+      class="bg-teren-primary hover:bg-teren-primary-hover text-white rounded-lg w-11 h-11 flex items-center justify-center shadow-sm active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:active:scale-100">
+      {#if isSubmitting}
+        <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+      {:else}
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+        </svg>
+      {/if}
+    </button>
   </div>
-
-  <!-- Botón Acción -->
-  <button 
-    onclick={handleSubmit}
-    disabled={isSubmitting || !amount}
-    class="bg-teren-primary hover:bg-teren-primary-hover text-white rounded-lg w-11 h-11 flex items-center justify-center shadow-sm active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:active:scale-100">
-    {#if isSubmitting}
-      <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-    {:else}
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-      </svg>
-    {/if}
-  </button>
 </div>
