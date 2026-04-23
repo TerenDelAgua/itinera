@@ -1,353 +1,382 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
-  import { apiFetch } from "$lib/api";
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+  import { apiFetch } from '$lib/api';
   import { t, locale } from "$lib/i18n/store";
-  import type { Trip } from "$lib/types/Trip";
-  import { page } from "$app/stores";
-  import ExpenseDrawer from '$lib/components/ExpenseDrawer.svelte';
-  import type { Category, CategorySummary, Expense } from "$lib/types";
-  import ExpenseQuickAdd from "$lib/components/ExpenseQuickAdd.svelte";
-  import ExpenseSummaryPills from "$lib/components/ExpenseSummaryPills.svelte";
+  import { slide } from 'svelte/transition';
+  import { cubicOut } from 'svelte/easing';
+  import { tweened } from 'svelte/motion';
 
-  let tripId = "";
-  let trip = $state<Trip | null>(null);
+  // Types
+  import type { Place } from '$lib/types/Place';
+  import type { TripExpenseSummary } from '$lib/types/Summary';
+  import type { Expense_Category, Trip } from '$lib/index';
+  
+  // Components
+  import ExpenseQuickAdd from '$lib/components/ExpenseQuickAdd.svelte';
+  import ExpenseDrawer from '$lib/components/ExpenseDrawer.svelte';
+  import ExpenseSummaryPills from "$lib/components/ExpenseSummaryPills.svelte";
+  import ConfirmModal from '$lib/components/ConfirmModal.svelte';
+  import { getCurrencySymbol } from '$lib/utils';
+
+  let tripId = $state('');
+  
+  // State
+  let tripName = $state('');
+  let tripDescription = $state('');
+  let tripDates = $state({ start: '', end: '' });
+  let currency = $state('EUR'); // Default
+  
+  let places = $state<Place[]>([]);
+  let summary = $state<TripExpenseSummary | null>(null);
+  let categories = $state<Expense_Category[]>([]);
+  let animatedGrandTotal = tweened(0, { duration: 600, easing: cubicOut });
+  
+  let isDrawerOpen = $state(false);
   let isLoading = $state(true);
 
-  // States for inline editing
-  let isEditingName = $state(false);
-  let isEditingCurrency = $state(false);
-  let isEditingDescription = $state(false);
-
-  // Form local state (runes)
-  let name = $state("");
-  let startDate = $state("");
-  let endDate = $state("");
-  let baseCurrency = $state("EUR");
-  let description = $state("");
-
-  // Expense states
-  let categories = $state<Category[]>([]);
-  let summary = $state<CategorySummary[]>([]);
-  let expenses = $state<Expense[]>([]);
-  let isDrawerOpen = $state(false);
-
+  let isCreatingPlace = $state(false);
+  let newPlaceDraft = $state({ name: '', start_date: '', end_date: '' });
+  let deletePlaceConfirmId = $state<string | null>(null);
 
   $effect(() => {
-    if ($page.params.id) {
-      tripId = $page.params.id;
-      loadTrip();
-    }
-
-    if(tripId) {
-      Promise.all([
-        apiFetch<Category[]>(`/trips/${tripId}/expenses/categories`).then(data => categories = data),
-        apiFetch<CategorySummary[]>(`/trips/${tripId}/expenses/summary`),
-        apiFetch<Expense[]>(`/trips/${tripId}/expenses`)
-    
-      ]).then(([cats, sum, exps]) => {
-        categories = cats;
-        summary = sum;
-        expenses = exps;
-      })
+    if ($page.url.pathname) {
+      tripId = $page.url.pathname.split('/').pop() || '';
+      loadAllData();
     }
   });
 
-  async function loadTrip() {
+  async function loadAllData() {
+    if (!tripId) return;
     isLoading = true;
     try {
-      const data = await apiFetch<Trip>(`/trips/${tripId}`);
-      trip = data;
-      name = data.name;
-      startDate = data.start_date;
-      endDate = data.end_date;
-      baseCurrency = data.base_currency;
-      description = data.description || "";
-    } catch {
-      goto("/");
+      const [tripData, placesData, summaryData, catsData] = await Promise.all([
+        apiFetch<Trip>(`/trips/${tripId}`),
+        apiFetch<Place[]>(`/trips/${tripId}/places`),
+        apiFetch<TripExpenseSummary>(`/trips/${tripId}/expenses/summary`),
+        apiFetch<Expense_Category[]>(`/trips/${tripId}/expenses/categories`)
+      ]);
+
+      tripName = tripData.name;
+      tripDescription = tripData.description || '';
+      tripDates = { start: tripData.start_date, end: tripData.end_date };
+      currency = tripData.base_currency || 'EUR';
+      
+      places = placesData || [];
+      summary = summaryData;
+      categories = catsData || [];
+      
+      if (summary) {
+        animatedGrandTotal.set(summary.grand_total || 0);
+      }
+    } catch (e) {
+      console.error("Failed to load trip data", e);
     } finally {
       isLoading = false;
     }
   }
 
-  async function saveField(field: string, value: string) {
-    if (!trip) return;
-
-    if (trip[field as keyof Trip] === value) return;
-
-    if (field === "name" && !value.trim()) return;
-
-    const payload: Record<string, string> = { [field]: value };
-
-    const previousTrip = { ...trip };
-    // @ts-ignore - Dynamic update for optimistic UI
-    trip[field as keyof Trip] = value;
-
+  async function saveTripInfo() {
+    if (!tripName) return;
     try {
-      const updated = await apiFetch<Trip>(`/trips/${tripId}`, {
-        method: "PUT",
-        body: JSON.stringify(payload),
+      const payload = {
+        name: tripName,
+        description: tripDescription,
+        start_date: new Date(tripDates.start).toISOString(),
+        end_date: new Date(tripDates.end).toISOString(),
+        base_currency: currency
+      };
+      await apiFetch(`/trips/${tripId}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload)
       });
-      trip = updated;
-    } catch {
-      // Revert if error
-      console.error("Error updating trip");
-      trip = previousTrip;
-      // Refresh data to be sure
-      loadTrip();
+      // reload to sync with summary if currency changed
+      loadAllData();
+    } catch (e) {
+      console.error("Failed to update trip", e);
     }
   }
 
-  function formatDate(dateStr: string) {
-    if (!dateStr) return "";
-    const [year, month, day] = dateStr.split("-").map(Number);
-    const date = new Date(year, month - 1, day);
-    return new Intl.DateTimeFormat($locale, {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    }).format(date);
+  async function createPlace() {
+    if (!newPlaceDraft.name) return;
+    try {
+      const payload: any = { name: newPlaceDraft.name };
+      if (newPlaceDraft.start_date) payload.start_date = new Date(newPlaceDraft.start_date).toISOString();
+      if (newPlaceDraft.end_date) payload.end_date = new Date(newPlaceDraft.end_date).toISOString();
+      
+      await apiFetch(`/trips/${tripId}/places`, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      
+      isCreatingPlace = false;
+      newPlaceDraft = { name: '', start_date: '', end_date: '' };
+      loadAllData();
+    } catch (e) {
+      console.error("Failed to create place", e);
+    }
   }
 
-  function loadSummary() {
-    apiFetch<CategorySummary[]>(`/trips/${tripId}/expenses/summary`)
-      .then((newSummary) => summary = newSummary);
+  function requestDeletePlace(id: string) {
+    deletePlaceConfirmId = id;
   }
 
-  function handleExpenseAdded(newExp: Expense) {
-    expenses = [...expenses, newExp];
-    loadSummary();
+  async function confirmDeletePlace() {
+    if (!deletePlaceConfirmId) return;
+    const id = deletePlaceConfirmId;
+    deletePlaceConfirmId = null;
+    
+    try {
+      await apiFetch(`/trips/${tripId}/places/${id}`, { method: 'DELETE' });
+      loadAllData();
+    } catch (e) {
+      console.error("Failed to delete place", e);
+    }
+  }
+
+  function cancelDeletePlace() {
+    deletePlaceConfirmId = null;
+  }
+
+  const emojiMap: Record<string, string> = {
+    accommodation: '🏨', transport: '🚆', food: '🍔',
+    leisure: '🎟️', shopping: '🛍️', others: '📦'
+  };
+
+  function formatDate(dateStr?: string) {
+    if (!dateStr) return '';
+    return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 </script>
 
-<svelte:head>
-  <title>{trip ? `${name} | Itinera` : $t("common.loading")}</title>
-</svelte:head>
-
-<div class="max-w-3xl mx-auto space-y-8 animate-fade-in">
+<!-- Layout Principal -->
+<div class="min-h-screen bg-teren-background pb-20">
   
-  {#if isLoading}
-    <!-- Skeleton loader compact -->
-    <div class="flex items-center gap-4 animate-pulse">
-      <div class="w-8 h-8 bg-gray-200 rounded-full"></div>
-      <div class="h-10 bg-gray-200 rounded-lg flex-1"></div>
-    </div>
-    <div class="h-48 bg-white border border-teren-border rounded-2xl animate-pulse"></div>
-  {:else if trip}
-    <!-- Cabecera Compacta (Navegación + Título + Moneda) -->
-    <div class="flex items-start gap-3 sm:gap-4">
-      <!-- Botón Volver con Flecha Larga -->
-      <button
-        onclick={() => goto("/")}
-        class="mt-1 p-2 -ml-2 text-teren-text-muted hover:text-teren-text-main transition-all duration-200 group rounded-full hover:bg-gray-100 active:scale-90"
-        aria-label="Volver"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-      </button>
-
-      <!-- Título y Fechas -->
-      <div class="flex-1 min-w-0 pt-0.5">
-        {#if isEditingName}
-          <input
-            type="text"
-            bind:value={name}
-            onblur={() => {
-              saveField("name", name);
-              isEditingName = false;
-            }}
-            onkeydown={(e) => {
-              if (e.key === "Enter") {
-                saveField("name", name);
-                isEditingName = false;
-              }
-            }}
-            class="text-3xl font-bold text-teren-text-main bg-transparent border-b-2 border-teren-primary focus:outline-none w-full tracking-tight"
-            autofocus
-          />
-        {:else}
-          <h1
-            onclick={() => (isEditingName = true)}
-            class="text-3xl font-bold text-teren-text-main tracking-tight cursor-pointer hover:text-teren-primary transition-colors duration-200 truncate"
-            title={name}
-          >
-            {name}
-          </h1>
-        {/if}
-        
-        <div class="flex items-center gap-2 text-teren-text-muted font-medium mt-1">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-3.5 w-3.5 opacity-70"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
+  <!-- Header Fijo (Back + Título) -->
+  <header class="sticky top-0 z-40 bg-teren-background/90 backdrop-blur-md border-b border-teren-border py-2">
+    <div class="max-w-3xl mx-auto px-4 flex items-start justify-between">
+      <div class="flex items-start gap-3 w-full">
+        <button 
+          onclick={() => goto('/')} 
+          class="p-2 -ml-2 mt-0.5 text-teren-text-muted hover:text-teren-text-main hover:bg-gray-100 rounded-lg transition active:scale-95 flex-shrink-0"
+        >
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          <span class="text-xs sm:text-sm">
-            {formatDate(startDate)} — {formatDate(endDate)}
+        </button>
+        <div class="flex-1 min-w-0 flex flex-col gap-1">
+          <div class="flex justify-between items-center">
+            <input 
+              type="text" 
+              bind:value={tripName}   
+              onblur={saveTripInfo}
+              onkeydown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+              placeholder="Trip Name"
+              class="bg-transparent border-none p-0 focus:ring-0 text-xl font-bold text-teren-text-main leading-tight outline-none w-full truncate" 
+            />
+            <select 
+              bind:value={currency} 
+              onchange={saveTripInfo} 
+              class="ml-3 bg-transparent text-sm font-bold text-teren-text-muted hover:text-teren-primary transition-colors border-none focus:ring-0 cursor-pointer outline-none flex-shrink-0"
+            >
+              <option value="EUR">€</option>
+              <option value="USD">$</option>
+              <option value="GBP">£</option>
+              <option value="JPY">¥</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-1.5 text-xs text-teren-text-muted font-medium">
+            <svg class="w-3.5 h-3.5 opacity-70 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <input type="date" bind:value={tripDates.start} onchange={saveTripInfo} class="bg-transparent border-none p-0 focus:ring-0 outline-none cursor-pointer w-auto" />
+            <span class="opacity-70">—</span>
+            <input type="date" bind:value={tripDates.end} onchange={saveTripInfo} class="bg-transparent border-none p-0 focus:ring-0 outline-none cursor-pointer w-auto" />
+          </div>
+          <input 
+            type="text" 
+            bind:value={tripDescription} 
+            onblur={saveTripInfo}
+            onkeydown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+            placeholder="Add a description... (inline edit)"
+            class="bg-transparent border-none p-0 focus:ring-0 text-sm text-teren-text-muted outline-none w-full truncate mt-0.5" 
+          />
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 py-8 space-y-10">
+    
+    {#if isLoading}
+      <!-- Skeleton Loading -->
+      <div class="animate-pulse space-y-6">
+        <div class="h-40 bg-teren-surface rounded-xl border border-teren-border"></div>
+        <div class="h-64 bg-teren-surface rounded-xl border border-teren-border"></div>
+      </div>
+    {:else}
+      
+      <!-- ========================================== -->
+      <!-- 1. GLOBAL EXPENSES CARD -->
+      <!-- ========================================== -->
+      <section class="bg-teren-surface p-6 rounded-xl border border-teren-border shadow-sm">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-lg font-semibold text-teren-text-main tracking-tight">{$t('detail.expenses')}</h2>
+          <!-- Muestra solo el total GLOBAL animado -->
+          <span class="text-2xl font-bold text-teren-primary tabular-nums">
+            {$animatedGrandTotal.toFixed(2)} {getCurrencySymbol(currency)}
           </span>
         </div>
-      </div>
 
-      <!-- Selector de Moneda -->
-      <div class="pt-1">
-        {#if isEditingCurrency}
-          <select
-            bind:value={baseCurrency}
-            onchange={() => {
-              saveField("base_currency", baseCurrency);
-              isEditingCurrency = false;
-            }}
-            onblur={() => (isEditingCurrency = false)}
-            class="bg-white border border-teren-border rounded-lg px-2 py-1 text-xs font-bold text-teren-primary focus:outline-none focus:ring-2 focus:ring-teren-primary/30"
-            autofocus
-          >
-            <option value="EUR">EUR</option>
-            <option value="USD">USD</option>
-            <option value="JPY">JPY</option>
-            <option value="GBP">GBP</option>
-          </select>
+        <!-- Category Pills (Globales) -->
+         <ExpenseSummaryPills {categories} summary={summary?.by_category || []} currency={currency} />
+
+        <!-- {#if summary?.by_category && summary.by_category.length > 0}
+          <div class="flex flex-wrap gap-2 mb-6">
+            {#each summary.by_category as cat (cat.category_id)}
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teren-primary-subtle text-teren-primary-hover rounded-full text-sm font-bold border border-teren-primary/20">
+                {emojiMap[cat.category_id] || '📦'} {cat.total?.toFixed(2) || '0.00'}
+              </span>
+            {/each}
+          </div>
         {:else}
-          <button
-            onclick={() => (isEditingCurrency = true)}
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teren-primary-subtle text-teren-primary-hover rounded-full text-xs font-bold border border-teren-primary/20 hover:border-teren-primary/40 transition-all active:scale-95"
-          >
-            {baseCurrency}
-          </button>
-        {/if}
-      </div>
-    </div>
+          <p class="text-teren-text-muted text-sm mb-6 italic">No global expenses added yet.</p>
+        {/if} -->
 
-    <!-- Descripción -->
-    <section class="group">
-      {#if isEditingDescription}
-        <textarea
-          bind:value={description}
-          onblur={() => {
-            saveField("description", description);
-            isEditingDescription = false;
-          }}
-          class="w-full bg-white border border-teren-border rounded-xl p-4 text-teren-text-main text-base leading-relaxed focus:outline-none focus:ring-2 focus:ring-teren-primary/30 transition-all resize-none"
-          rows="3"
-          autofocus
-          placeholder={$t("trip_form.description_placeholder")}
-        ></textarea>
-      {:else}
-        <div
-          onclick={() => (isEditingDescription = true)}
-          class="cursor-pointer p-4 -m-4 rounded-xl hover:bg-white hover:shadow-sm transition-all duration-200 border border-transparent hover:border-teren-border/50"
+        <!-- Quick Add (Global Context) -->
+        <ExpenseQuickAdd 
+          tripId={tripId} 
+          {categories} 
+          {currency}
+          onSuccess={loadAllData} 
+        />
+
+        <!-- Link al Drawer (Ver todo) -->
+        <button 
+          onclick={() => isDrawerOpen = true} 
+          class="mt-5 text-sm text-teren-text-muted hover:text-teren-primary transition flex items-center gap-1 group"
         >
-          {#if description}
-            <p class="text-teren-text-muted text-base leading-relaxed">
-              {description}
-            </p>
-          {:else}
-            <p class="text-teren-text-muted/50 italic text-sm">
-              {$t("detail.no_description")}
-            </p>
-          {/if}
-        </div>
-      {/if}
-    </section>
-
-    <!-- Cuadrícula de Secciones -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    
-<section class="bg-teren-surface rounded-2xl border border-teren-border p-5 shadow-sm flex flex-col gap-4">
-  <!-- Header: título + total -->
-  <div class="flex items-center justify-between">
-    <h2 class="text-base font-semibold text-teren-text-main tracking-tight">Gastos</h2>
-    <span class="text-xl font-bold text-teren-primary">
-      {(summary || []).reduce((a, b) => a + b.total, 0).toFixed(2)} {trip?.base_currency || 'EUR'}
-    </span>
-  </div>
-
-  <!-- Pills de resumen por categoría -->
-  <ExpenseSummaryPills {categories} {summary} currency={trip?.base_currency || 'EUR'} />
-
-  <!-- Quick add inline -->
-  {#if categories.length > 0}
-    <ExpenseQuickAdd tripId={tripId} {categories} onSuccess={handleExpenseAdded} />
-  {/if}
-
-  <!-- Botón para abrir el drawer con la lista completa -->
-  <button
-    onclick={() => isDrawerOpen = true}
-    class="w-full text-sm font-medium text-teren-text-muted hover:text-teren-primary transition-colors duration-200 py-1 text-center"
-  >
-    Ver todos los gastos →
-  </button>
-</section>
-
-      <!-- Lugares -->
-      <button
-        class="bg-teren-surface p-8 rounded-2xl border border-teren-border hover:border-teren-primary/30 shadow-sm hover:shadow-xl hover:shadow-orange-900/5 transition-all duration-300 flex flex-col items-center text-center group active:scale-98"
-      >
-        <div
-          class="w-14 h-14 mb-4 rounded-full bg-teren-background border border-teren-border flex items-center justify-center group-hover:bg-teren-primary-subtle transition-colors duration-300"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-7 w-7 text-teren-text-muted group-hover:text-teren-primary transition-colors duration-300"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-            />
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-            />
+          {$t('detail.view_all_expenses')} 
+          <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
           </svg>
+        </button>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 2. DESTINATIONS (PLACES) -->
+      <!-- ========================================== -->
+      <section>
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-lg font-semibold text-teren-text-main tracking-tight">{$t('detail.destinations')}</h2>
+          <button 
+            onclick={() => isCreatingPlace = true}
+            class="text-sm font-medium text-teren-primary hover:text-teren-primary-hover transition px-3 py-1.5 rounded-lg hover:bg-teren-primary-subtle active:scale-95"
+          >
+            + {$t('detail.add_destination')}
+          </button>
         </div>
-        <h3 class="text-lg font-bold text-teren-text-main mb-1">
-          {$t("detail.places")}
-        </h3>
-        <p class="text-xs text-teren-text-muted mt-2 font-medium opacity-70">
-          {$t("detail.places_empty")}
-        </p>
-      </button>
-    </div>
-  {/if}
+
+        {#if isCreatingPlace}
+          <div class="mb-4 p-4 bg-teren-background border-2 border-teren-primary/30 rounded-xl space-y-3" transition:slide={{ duration: 250, easing: cubicOut }}>
+            <input 
+              type="text" 
+              bind:value={newPlaceDraft.name} 
+              placeholder="Destination name (e.g. Kyoto)" 
+              class="w-full px-3 py-2 text-sm font-bold bg-white border border-teren-border rounded-lg focus:ring-2 focus:ring-teren-primary/30 outline-none" 
+              autofocus 
+            />
+            <div class="flex gap-3">
+              <div class="flex-1">
+                <label class="block text-xs text-teren-text-muted mb-1 ml-1 font-medium">Start Date (Optional)</label>
+                <input 
+                  type="date" 
+                  bind:value={newPlaceDraft.start_date} 
+                  class="w-full px-3 py-2 text-sm bg-white border border-teren-border rounded-lg focus:ring-2 focus:ring-teren-primary/30 outline-none" 
+                />
+              </div>
+              <div class="flex-1">
+                <label class="block text-xs text-teren-text-muted mb-1 ml-1 font-medium">End Date (Optional)</label>
+                <input 
+                  type="date" 
+                  bind:value={newPlaceDraft.end_date} 
+                  class="w-full px-3 py-2 text-sm bg-white border border-teren-border rounded-lg focus:ring-2 focus:ring-teren-primary/30 outline-none" 
+                />
+              </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+              <button 
+                onclick={() => isCreatingPlace = false} 
+                class="px-4 py-2 text-sm text-teren-text-muted hover:text-teren-text-main hover:bg-gray-100 rounded-lg transition"
+              >
+                Cancel
+              </button>
+              <button 
+                onclick={createPlace} 
+                disabled={!newPlaceDraft.name}
+                class="px-4 py-2 text-sm bg-teren-primary hover:bg-teren-primary-hover text-white font-medium rounded-lg transition active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        {/if}
+
+        {#if !places || places.length === 0}
+          <!-- Empty State: Destinations -->
+          <div class="text-center py-12 bg-teren-surface rounded-xl border border-teren-border border-dashed">
+            <p class="text-teren-text-muted text-sm">{$t('detail.destinations_empty')}</p>
+            <p class="text-xs text-teren-text-muted mt-1">{$t('detail.destinations_empty_sub')}</p>
+          </div>
+        {:else}
+          <!-- Lista de Places -->
+          <div class="space-y-3">
+            {#each places as place (place.id)}
+              <a 
+                href="/trips/{tripId}/places/{place.id}" 
+                class="block bg-teren-surface p-5 rounded-xl border border-teren-border hover:border-teren-primary/30 hover:shadow-md transition-all cursor-pointer group"
+              >
+                <div class="flex justify-between items-center mb-2">
+                  <h3 class="text-lg font-semibold text-teren-text-main group-hover:text-teren-primary-hover transition-colors">{place.name}</h3>
+                  <button 
+                    onclick={(e) => { e.preventDefault(); e.stopPropagation(); requestDeletePlace(place.id); }}
+                    class="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition active:scale-95 flex-shrink-0"
+                    aria-label="Delete place"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+                
+                <p class="text-sm text-teren-text-muted flex items-center gap-2">
+                  <svg class="w-4 h-4 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                  {formatDate(place.start_date)} — {formatDate(place.end_date)}
+                </p>
+              </a>
+            {/each}
+          </div>
+        {/if}
+      </section>
+
+    {/if}
+  </main>
+
+  <!-- Drawer para Gastos Globales -->
+  <ExpenseDrawer 
+    tripId={tripId}
+    {categories}
+    isOpen={isDrawerOpen}
+    onClose={() => isDrawerOpen = false}
+    onRefreshSummary={loadAllData}
+  />
+  
+  <ConfirmModal
+    isOpen={deletePlaceConfirmId !== null}
+    title="Delete Destination"
+    message="Are you sure you want to delete this destination? All associated activities will be lost."
+    confirmText="Delete"
+    cancelText="Cancel"
+    isDestructive={true}
+    onConfirm={confirmDeletePlace}
+    onCancel={cancelDeletePlace}
+  />
 </div>
-
-<!-- Drawer de Gastos — fuera del flujo, como overlay fijo -->
-<ExpenseDrawer
-  {tripId}
-  {categories}
-  isOpen={isDrawerOpen}
-  onClose={() => isDrawerOpen = false}
-  onRefreshSummary={loadSummary}
-/>
-
-<style>
-  .animate-fade-in {
-    animation: fadeIn 0.4s ease-out forwards;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-</style>

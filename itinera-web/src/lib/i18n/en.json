@@ -2,7 +2,9 @@
     "dashboard": {
         "title": "My trips",
         "subtitle": "Plan and organize your journeys",
-        "button_new": "New trip"
+        "button_new": "New trip",
+        "destination": "Destination",
+        "destinations": "Destinations"
     },
     "empty_state": {
         "title": "No trips yet",
@@ -28,10 +30,10 @@
         "create_error": "Failed to create trip"
     },
     "currencies": {
-        "eur": "Euro (EUR)",
-        "usd": "US Dollar (USD)",
-        "jpy": "Japanese Yen (JPY)",
-        "gbp": "British Pound (GBP)"
+        "eur": "Euro (€)",
+        "usd": "Dollar ($)",
+        "jpy": "Yen (¥)",
+        "gbp": "Pound (£)"
     },
     "detail": {
         "back": "Back",
@@ -44,6 +46,15 @@
         "places": "Places",
         "places_empty": "Tap to add destinations",
         "expenses": "Expenses",
-        "expenses_empty": "Tap to track spending"
+        "expenses_empty": "Tap to track spending",
+        "notes_optional": "Note (optional)",
+        "view_all_expenses": "View all global expenses",
+        "destinations": "Destinations",
+        "add_destination": "Add Destination",
+        "destinations_empty": "No destinations added yet.",
+        "destinations_empty_sub": "Add places to organize your expenses by location."
+    },
+    "place": {
+        "view_place_expenses": "View place expenses"
     }
 }

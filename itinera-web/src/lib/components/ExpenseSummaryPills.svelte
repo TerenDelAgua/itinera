@@ -1,6 +1,7 @@
 <script lang="ts">
   import { SvelteMap } from 'svelte/reactivity';
   import type { Category, CategorySummary } from '$lib/types';
+  import { getCurrencySymbol } from '$lib/utils';
   
   let { categories = [], summary = [], currency }: { categories: Category[]; summary: CategorySummary[]; currency: string; } = $props();
 
@@ -16,7 +17,7 @@
           {catMap.get(item.category_id)?.slug === 'food' ? '🍔' : 
            catMap.get(item.category_id)?.slug === 'transport' ? '🚆' : 
            catMap.get(item.category_id)?.slug === 'accommodation' ? '🏨' : '📦'}
-          {item.total.toFixed(2)} {currency}
+          {item.total.toFixed(2)} {getCurrencySymbol(currency)}
         </span>
       {/if}
     {/each}

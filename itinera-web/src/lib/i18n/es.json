@@ -2,7 +2,9 @@
     "dashboard": {
         "title": "Mis viajes",
         "subtitle": "Planifica y organiza tus aventuras",
-        "button_new": "Nuevo viaje"
+        "button_new": "Nuevo viaje",
+        "destination": "destino",
+        "destinations": "destinos"
     },
     "empty_state": {
         "title": "Aún no hay viajes",
@@ -28,10 +30,10 @@
         "create_error": "Error al crear el viaje"
     },
     "currencies": {
-        "eur": "Euro (EUR)",
-        "usd": "Dolar Estadounidense (USD)",
-        "jpy": "Yen Japonés (JPY)",
-        "gbp": "Libra Esterlina (GBP)"
+        "eur": "Euro (€)",
+        "usd": "Dólar ($)",
+        "jpy": "Yen (¥)",
+        "gbp": "Libra (£)"
     },
     "detail": {
         "back": "Volver",
@@ -44,6 +46,15 @@
         "places": "Lugares",
         "places_empty": "Toca para añadir destinos",
         "expenses": "Gastos",
-        "expenses_empty": "Toca para registrar gastos"
+        "expenses_empty": "Toca para registrar gastos",
+        "notes_optional": "Nota (opcional)",
+        "view_all_expenses": "Ver todos los gastos",
+        "destinations": "Destinos",
+        "add_destination": "Añadir Destino",
+        "destinations_empty": "No se han añadido destinos todavía.",
+        "destinations_empty_sub": "Añade lugares para organizar tus gastos por ubicación."
+    },
+    "place": {
+        "view_place_expenses": "Ver gastos del lugar"
     }
 }

@@ -44,7 +44,7 @@
           name: name.trim(),
           start_date: startDate,
           end_date: endDate,
-          base_currency: "EUR", // Default MVP. Configurable later inside trip view
+          base_currency: "€", // Default MVP. Configurable later inside trip view
         }),
       });
       onsuccess(newTrip);

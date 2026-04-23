@@ -2,21 +2,21 @@
 @import "tailwindcss";
 
 @theme {
-  /* Fondos: Off-white para el cuerpo, White puro para tarjetas */
-  --color-teren-background: #FAFAFA; 
-  --color-teren-surface: #FFFFFF;
+  /* Fondos: Off-white cálido (piedra sutil) para el cuerpo, Blanco roto para tarjetas */
+  --color-teren-background: #F5F4F1; /* Warm stone 50/100 */
+  --color-teren-surface: #FCFBFA; /* Ligeramente distinto al blanco puro */
   
-  /* Texto: Oscuro profundo para máximo contraste bajo el sol */
-  --color-teren-text-main: #1A1A1A;  
-  --color-teren-text-muted: #6B7280; /* Gris oscuro, legible en exteriores */
+  /* Texto: Alto contraste para exteriores */
+  --color-teren-text-main: #1C1917;  /* Stone 900 */
+  --color-teren-text-muted: #57534E; /* Stone 600 - Más oscuro que antes para legibilidad bajo el sol */
   
   /* Acento: Naranja Amanecer */
   --color-teren-primary: #FF8C42;
-  --color-teren-primary-hover: #E06B20; /* Naranja más intenso para hover */
-  --color-teren-primary-subtle: #FFF7ED; /* Fondo muy suave para etiquetas */
+  --color-teren-primary-hover: #E06B20;
+  --color-teren-primary-subtle: #FFF7ED;
   
-  /* Bordes sutiles */
-  --color-teren-border: #E5E7EB;
+  /* Bordes sutiles pero visibles */
+  --color-teren-border: #E7E5E4; /* Stone 200 */
 
   /* Typography */
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;

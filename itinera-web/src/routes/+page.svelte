@@ -5,6 +5,7 @@
   import type { Trip } from "$lib/types/Trip";
   import { t, locale } from "$lib/i18n/store";
   import CreateTripForm from "$lib/components/CreateTripForm.svelte";
+  import { getCurrencySymbol } from "$lib/utils";
 
 
 
@@ -141,94 +142,33 @@
         tabindex="0"
         onclick={() => goto(`/trips/${trip.id}`)}
         onkeydown={(e) => e.key === 'Enter' && goto(`/trips/${trip.id}`)}
-        class="group bg-white p-6 rounded-xl border border-gray-200 hover:border-teren-primary/30 shadow-sm hover:shadow-xl hover:shadow-orange-900/5 transition-all duration-300 relative cursor-pointer hover:-translate-y-1"
+        class="group bg-white rounded-xl border border-gray-200 hover:border-teren-primary/30 shadow-sm hover:shadow-xl hover:shadow-orange-900/5 transition-all duration-300 relative cursor-pointer hover:-translate-y-1"
       >
-        <!-- Header Card: Nombre + Menú 3 puntos -->
-        <div class="flex justify-between items-start mb-1">
-          <h3
-            class="text-xl font-bold text-teren-text-main tracking-tight group-hover:text-teren-primary-hover transition-colors"
-          >
-            {trip.name}
-          </h3>
-          <button
-            title="Options"
-            onclick={(e) => e.stopPropagation()}
-            class="text-gray-400 hover:text-teren-text-main hover:bg-gray-50 rounded p-1.5 transition-colors -mr-1.5 -mt-1.5 active:scale-95"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="12" cy="12" r="1"></circle>
-              <circle cx="12" cy="5" r="1"></circle>
-              <circle cx="12" cy="19" r="1"></circle>
-            </svg>
-          </button>
-        </div>
-
-        <!-- Duración -->
-        <p class="text-[15px] text-teren-text-muted mb-5 font-medium">
-          <span>{trip.description}</span>
-        </p>
-
-        <!-- Fila Central: Iconos + Datos -->
-        <div
-          class="flex items-center gap-5 text-[15px] text-gray-500 mb-6 font-medium"
-        >
-          <!-- Destinos -->
-          <div class="flex items-center gap-1.5">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="text-gray-400"
-            >
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-              <circle cx="12" cy="10" r="3"></circle>
-            </svg>
-            <span> destinos: "0"</span>
+        <div class="p-6 flex flex-col h-full min-h-[180px]">
+          <div class="flex justify-between items-start mb-2">
+            <h2 class="text-xl font-bold text-teren-text-main group-hover:text-teren-primary transition-colors line-clamp-1">{trip.name}</h2>
+            <span class="text-lg font-bold text-teren-primary whitespace-nowrap">
+              {getCurrencySymbol(trip.base_currency)} {trip.total_spent?.toFixed(2) || '0.00'}
+            </span>
           </div>
-
-          <div class="flex items-center gap-1.5">
-            <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-3.5 w-3.5 opacity-70"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
-            <span>{formatDate(trip.start_date)} - {formatDate(trip.end_date)}</span>
-          </div>
-
           
-        </div>
+          <p class="text-teren-text-muted text-sm line-clamp-2 mb-6 flex-grow">
+            {trip.description || ''}
+          </p>
 
-        <div>
-          <span
-            class="inline-block bg-teren-primary-subtle text-teren-primary-hover text-[13px] font-bold px-3 py-1 rounded-full uppercase"
-          >
-            {trip.base_currency} 0.00
-          </span>
+          <!-- Info Fila: Fechas y Destinos -->
+            <div class="flex items-center gap-4 text-xs font-bold text-teren-text-muted mt-auto pt-4 border-t border-teren-border/50">
+              <div class="flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                {formatDate(trip.start_date)} - {formatDate(trip.end_date)}
+              </div>
+              {#if trip.place_count > 0}
+                <div class="flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                  {trip.place_count} {trip.place_count === 1 ? $t('dashboard.destination') : $t('dashboard.destinations')}
+                </div>
+              {/if}
+            </div>
         </div>
       </div>
     {/each}
