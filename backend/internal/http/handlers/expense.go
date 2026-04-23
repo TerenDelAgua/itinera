@@ -3,6 +3,7 @@ package handlers
 import (
 	"backend/internal/models"
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -20,19 +21,19 @@ func (h *Handlers) GetCategories(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) CreateExpense(w http.ResponseWriter, r *http.Request) {
-	tripId, _ := uuid.Parse(chi.URLParam(r, "id"))
+	tripID, _ := uuid.Parse(chi.URLParam(r, "id"))
 	var input models.Expense
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
-
 	if input.Amount <= 0 {
 		http.Error(w, "Amount must be positive", http.StatusBadRequest)
 		return
 	}
 
-	exp, err := h.DB.CreateExpense(r.Context(), tripId, input)
+	// Global expense: place_id is nil
+	exp, err := h.DB.CreateExpense(r.Context(), &tripID, nil, input)
 	if err != nil {
 		http.Error(w, "Failed to save", http.StatusInternalServerError)
 		return
@@ -62,4 +63,34 @@ func (h *Handlers) ListExpenses(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(expenses)
+}
+
+func (h *Handlers) DeleteExpense(w http.ResponseWriter, r *http.Request) {
+	expenseId := chi.URLParam(r, "expenseId")
+	if _, err := uuid.Parse(expenseId); err != nil {
+		http.Error(w, "Invalid expense ID", http.StatusBadRequest)
+		return
+	}
+	if _, err := h.DB.Pool.Exec(r.Context(),
+		"DELETE FROM Expenses WHERE id = $1", expenseId); err != nil {
+		http.Error(w, "Failed to delete expense", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+func (h *Handlers) UpdateExpense(w http.ResponseWriter, r *http.Request) {
+	expenseId, _ := uuid.Parse(chi.URLParam(r, "expenseId"))
+	var input models.Expense
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
+	updated, err := h.DB.UpdateExpense(r.Context(), expenseId, input)
+	if err != nil {
+		log.Printf("Error updating expense: %v", err)
+		http.Error(w, "Failed to update", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(updated)
 }

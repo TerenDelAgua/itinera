@@ -56,7 +56,7 @@ func (db *DB) HealthCheck(ctx context.Context) error {
 func (db *DB) QueryRow(ctx context.Context, query string, args ...interface{}) interface {
 	Scan(dest ...interface{}) error
 } {
-	return db.Pool.QueryRow(ctx, query, args)
+	return db.Pool.QueryRow(ctx, query, args...)
 }
 
 func (db *DB) Query(ctx context.Context, query string, args ...interface{}) interface {
