@@ -14,4 +14,8 @@ type Trip struct {
 	EndDate      string     `json:"end_date"`   // ISO format
 	BaseCurrency string     `json:"base_currency"`
 	CreatedAt    string     `json:"created_at"`
+
+	// Summary fields for Dashboard
+	PlaceCount int     `json:"place_count"`
+	TotalSpent float64 `json:"total_spent"`
 }

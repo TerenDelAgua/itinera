@@ -59,7 +59,10 @@ func (db *DB) CreateTrip(ctx context.Context, userId *uuid.UUID, sessionId *stri
 
 func (db *DB) ListTrips(ctx context.Context, userId *uuid.UUID, sessionId *string) ([]models.Trip, error) {
 	query := `
-		SELECT id, user_id, session_id, name, description, start_date, end_date, base_currency, created_at
+		SELECT 
+			id, user_id, session_id, name, description, start_date, end_date, base_currency, created_at,
+			COALESCE((SELECT SUM(amount) FROM expenses WHERE trip_id = trips.id), 0) as total_spent,
+			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count
 		FROM trips
 		WHERE (user_id = $1 AND $1 IS NOT NULL) OR (session_id = $2 AND $2 IS NOT NULL)
 		ORDER BY created_at DESC
@@ -84,6 +87,8 @@ func (db *DB) ListTrips(ctx context.Context, userId *uuid.UUID, sessionId *strin
 			&endDate,
 			&trip.BaseCurrency,
 			&createdAt,
+			&trip.TotalSpent,
+			&trip.PlaceCount,
 		); err != nil {
 			return nil, err
 		}
@@ -105,7 +110,10 @@ func (db *DB) GetTrip(ctx context.Context, id string, userId *uuid.UUID, session
 	var startDate, endDate, createdAt time.Time
 
 	query := `
-		SELECT id, user_id, session_id, name, description, start_date, end_date, base_currency, created_at
+		SELECT 
+			id, user_id, session_id, name, description, start_date, end_date, base_currency, created_at,
+			COALESCE((SELECT SUM(amount) FROM expenses WHERE trip_id = trips.id), 0) as total_spent,
+			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count
 		FROM trips
 		WHERE id = $1 AND ((user_id = $2 AND $2 IS NOT NULL) OR (session_id = $3 AND $3 IS NOT NULL))
 	`
@@ -120,6 +128,8 @@ func (db *DB) GetTrip(ctx context.Context, id string, userId *uuid.UUID, session
 		&endDate,
 		&trip.BaseCurrency,
 		&createdAt,
+		&trip.TotalSpent,
+		&trip.PlaceCount,
 	)
 	if err != nil {
 		return nil, err
