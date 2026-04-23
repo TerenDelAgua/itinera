@@ -10,7 +10,7 @@ import (
 )
 
 func (db *DB) ListPlacesByTrip(ctx context.Context, tripID uuid.UUID) ([]models.Place, error) {
-	rows, err := db.Pool.Query(ctx, `SELECT id, trip_id, name, notes, start_date, end_date, created_at 
+	rows, err := db.Pool.Query(ctx, `SELECT id, trip_id, name, notes, start_date, end_date, lat, lon, created_at 
 		FROM places WHERE trip_id = $1 ORDER BY start_date ASC NULLS LAST, created_at ASC`, tripID)
 	if err != nil {
 		return nil, err
@@ -20,7 +20,7 @@ func (db *DB) ListPlacesByTrip(ctx context.Context, tripID uuid.UUID) ([]models.
 	var places []models.Place
 	for rows.Next() {
 		var p models.Place
-		if err := rows.Scan(&p.ID, &p.TripID, &p.Name, &p.Notes, &p.StartDate, &p.EndDate, &p.CreatedAt); err != nil {
+		if err := rows.Scan(&p.ID, &p.TripID, &p.Name, &p.Notes, &p.StartDate, &p.EndDate, &p.Lat, &p.Lon, &p.CreatedAt); err != nil {
 			return nil, err
 		}
 		places = append(places, p)
@@ -29,10 +29,10 @@ func (db *DB) ListPlacesByTrip(ctx context.Context, tripID uuid.UUID) ([]models.
 }
 
 func (db *DB) CreatePlace(ctx context.Context, tripID uuid.UUID, p models.Place) (*models.Place, error) {
-	query := `INSERT INTO places (trip_id, name, notes, start_date, end_date) VALUES ($1, $2, $3, $4, $5) RETURNING id, trip_id, name, notes, start_date, end_date, created_at`
+	query := `INSERT INTO places (trip_id, name, notes, start_date, end_date, lat, lon) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, trip_id, name, notes, start_date, end_date, lat, lon, created_at`
 	var res models.Place
-	err := db.Pool.QueryRow(ctx, query, tripID, p.Name, p.Notes, p.StartDate, p.EndDate).
-		Scan(&res.ID, &res.TripID, &res.Name, &res.Notes, &res.StartDate, &res.EndDate, &res.CreatedAt)
+	err := db.Pool.QueryRow(ctx, query, tripID, p.Name, p.Notes, p.StartDate, p.EndDate, p.Lat, p.Lon).
+		Scan(&res.ID, &res.TripID, &res.Name, &res.Notes, &res.StartDate, &res.EndDate, &res.Lat, &res.Lon, &res.CreatedAt)
 	return &res, err
 }
 
@@ -52,11 +52,11 @@ func (db *DB) UpdatePlace(ctx context.Context, placeID uuid.UUID, updates map[st
 		return nil, nil
 	}
 
-	query := "UPDATE places SET " + strings.Join(sets, ", ") + " WHERE id = $" + string(rune(i+48)) + " RETURNING id, trip_id, name, notes, start_date, end_date, created_at"
+	query := "UPDATE places SET " + strings.Join(sets, ", ") + " WHERE id = $" + string(rune(i+48)) + " RETURNING id, trip_id, name, notes, start_date, end_date, lat, lon, created_at"
 	args = append(args, placeID)
 
 	var res models.Place
-	err := db.Pool.QueryRow(ctx, query, args...).Scan(&res.ID, &res.TripID, &res.Name, &res.Notes, &res.StartDate, &res.EndDate, &res.CreatedAt)
+	err := db.Pool.QueryRow(ctx, query, args...).Scan(&res.ID, &res.TripID, &res.Name, &res.Notes, &res.StartDate, &res.EndDate, &res.Lat, &res.Lon, &res.CreatedAt)
 	return &res, err
 }
 
