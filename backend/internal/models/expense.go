@@ -22,3 +22,17 @@ type CategorySummary struct {
 	CategoryId uuid.UUID `json:"category_id"`
 	Total      float64   `json:"total"`
 }
+
+type PlaceSummary struct {
+	PlaceId   uuid.UUID `json:"place_id"`
+	PlaceName string    `json:"place_name"`
+	Total     float64   `json:"total"`
+}
+
+type TripExpenseSummary struct {
+	GlobalTotal float64           `json:"global_total"`
+	PlacesTotal float64           `json:"places_total"`
+	GrandTotal  float64           `json:"grand_total"`
+	ByCategory  []CategorySummary `json:"by_category"`
+	ByPlace     []PlaceSummary    `json:"by_place"`
+}

@@ -83,31 +83,56 @@ func (db *DB) GetExpensesByTrip(ctx context.Context, tripId uuid.UUID) ([]models
 
 }
 
-func (db *DB) GetExpensesSummary(ctx context.Context, tripId uuid.UUID) ([]models.CategorySummary, error) {
-	rows, err := db.Pool.Query(
-		ctx,
-		`SELECT
-			category_id,
-			SUM(amount) as total
-		FROM expenses
-		WHERE trip_id=$1
-		GROUP BY category_id`,
-		tripId,
-	)
+func (db *DB) GetExpensesSummary(ctx context.Context, tripId uuid.UUID) (*models.TripExpenseSummary, error) {
+	summary := &models.TripExpenseSummary{
+		ByCategory: []models.CategorySummary{},
+		ByPlace:    []models.PlaceSummary{},
+	}
+
+	// 1. Totals
+	err := db.Pool.QueryRow(ctx, `
+		SELECT 
+			COALESCE(SUM(amount), 0) as grand_total,
+			COALESCE(SUM(amount) FILTER (WHERE place_id IS NULL), 0) as global_total,
+			COALESCE(SUM(amount) FILTER (WHERE place_id IS NOT NULL), 0) as places_total
+		FROM expenses WHERE trip_id = $1`, tripId).
+		Scan(&summary.GrandTotal, &summary.GlobalTotal, &summary.PlacesTotal)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
-	var summaries []models.CategorySummary = []models.CategorySummary{}
-	for rows.Next() {
-		var s models.CategorySummary
-		if err := rows.Scan(&s.CategoryId, &s.Total); err != nil {
-			return nil, err
+	// 2. By Category
+	rowsCat, err := db.Pool.Query(ctx, `
+		SELECT category_id, SUM(amount) FROM expenses 
+		WHERE trip_id = $1 GROUP BY category_id`, tripId)
+	if err == nil {
+		defer rowsCat.Close()
+		for rowsCat.Next() {
+			var s models.CategorySummary
+			if err := rowsCat.Scan(&s.CategoryId, &s.Total); err == nil {
+				summary.ByCategory = append(summary.ByCategory, s)
+			}
 		}
-		summaries = append(summaries, s)
 	}
-	return summaries, nil
+
+	// 3. By Place
+	rowsPlace, err := db.Pool.Query(ctx, `
+		SELECT e.place_id, p.name, SUM(e.amount) 
+		FROM expenses e
+		JOIN places p ON e.place_id = p.id
+		WHERE e.trip_id = $1
+		GROUP BY e.place_id, p.name`, tripId)
+	if err == nil {
+		defer rowsPlace.Close()
+		for rowsPlace.Next() {
+			var s models.PlaceSummary
+			if err := rowsPlace.Scan(&s.PlaceId, &s.PlaceName, &s.Total); err == nil {
+				summary.ByPlace = append(summary.ByPlace, s)
+			}
+		}
+	}
+
+	return summary, nil
 }
 
 func (db *DB) ListGlobalExpenses(ctx context.Context, tripID uuid.UUID) ([]models.Expense, error) {
@@ -137,7 +162,7 @@ func (db *DB) ListPlaceExpenses(ctx context.Context, placeID uuid.UUID) ([]model
 	}
 	defer rows.Close()
 
-	var exps []models.Expense
+	var exps []models.Expense = []models.Expense{}
 	for rows.Next() {
 		var e models.Expense
 		if err := rows.Scan(&e.Id, &e.TripId, &e.PlaceId, &e.Amount, &e.Currency, &e.CategoryId, &e.Notes, &e.Date, &e.CreatedAt); err != nil {
@@ -155,4 +180,23 @@ func (db *DB) UpdateExpense(ctx context.Context, id uuid.UUID, exp models.Expens
 	err := db.Pool.QueryRow(ctx, query, exp.Amount, exp.Date, exp.Notes, exp.CategoryId, id).
 		Scan(&res.Id, &res.TripId, &res.PlaceId, &res.Amount, &res.Currency, &res.CategoryId, &res.Notes, &res.Date, &res.CreatedAt)
 	return &res, err
+}
+func (db *DB) GetPlaceExpensesSummary(ctx context.Context, placeID uuid.UUID) ([]models.CategorySummary, error) {
+	rows, err := db.Pool.Query(ctx, `
+		SELECT category_id, SUM(amount) FROM expenses 
+		WHERE place_id = $1 GROUP BY category_id`, placeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var summaries []models.CategorySummary = []models.CategorySummary{}
+	for rows.Next() {
+		var s models.CategorySummary
+		if err := rows.Scan(&s.CategoryId, &s.Total); err != nil {
+			return nil, err
+		}
+		summaries = append(summaries, s)
+	}
+	return summaries, nil
 }

@@ -32,8 +32,7 @@ func (h *Handlers) CreateExpense(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Global expense: place_id is nil
-	exp, err := h.DB.CreateExpense(r.Context(), &tripID, nil, input)
+	exp, err := h.DB.CreateExpense(r.Context(), &tripID, input.PlaceId, input)
 	if err != nil {
 		http.Error(w, "Failed to save", http.StatusInternalServerError)
 		return
@@ -93,4 +92,26 @@ func (h *Handlers) UpdateExpense(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(updated)
+}
+
+func (h *Handlers) ListPlaceExpenses(w http.ResponseWriter, r *http.Request) {
+	placeId, _ := uuid.Parse(chi.URLParam(r, "placeId"))
+	expenses, err := h.DB.ListPlaceExpenses(r.Context(), placeId)
+	if err != nil {
+		http.Error(w, "DB Error", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(expenses)
+}
+
+func (h *Handlers) GetPlaceExpenseSummary(w http.ResponseWriter, r *http.Request) {
+	placeId, _ := uuid.Parse(chi.URLParam(r, "placeId"))
+	summary, err := h.DB.GetPlaceExpensesSummary(r.Context(), placeId)
+	if err != nil {
+		http.Error(w, "DB Error", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(summary)
 }
