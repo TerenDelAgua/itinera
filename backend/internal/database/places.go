@@ -10,14 +10,14 @@ import (
 	"backend/internal/models"
 )
 
-func (db *DB) GetPlace(ctx context.Context, placeID uuid.UUID) (*models.Place, error) {
+func (db *DB) GetPlace(ctx context.Context, placeId uuid.UUID) (*models.Place, error) {
 	var p models.Place
 	var startDate, endDate *time.Time
 	var createdAt time.Time
 	query := `SELECT id, trip_id, name, notes, start_date, end_date, lat, lon, created_at 
 		FROM places WHERE id = $1`
-	err := db.Pool.QueryRow(ctx, query, placeID).
-		Scan(&p.ID, &p.TripID, &p.Name, &p.Notes, &startDate, &endDate, &p.Lat, &p.Lon, &createdAt)
+	err := db.Pool.QueryRow(ctx, query, placeId).
+		Scan(&p.ID, &p.TripId, &p.Name, &p.Notes, &startDate, &endDate, &p.Lat, &p.Lon, &createdAt)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (db *DB) ListPlacesByTrip(ctx context.Context, tripID uuid.UUID) ([]models.
 		var p models.Place
 		var startDate, endDate *time.Time
 		var createdAt time.Time
-		if err := rows.Scan(&p.ID, &p.TripID, &p.Name, &p.Notes, &startDate, &endDate, &p.Lat, &p.Lon, &createdAt); err != nil {
+		if err := rows.Scan(&p.ID, &p.TripId, &p.Name, &p.Notes, &startDate, &endDate, &p.Lat, &p.Lon, &createdAt); err != nil {
 			return nil, err
 		}
 		if startDate != nil {
@@ -69,7 +69,7 @@ func (db *DB) CreatePlace(ctx context.Context, tripID uuid.UUID, p models.Place)
 	var startDate, endDate *time.Time
 	var createdAt time.Time
 	err := db.Pool.QueryRow(ctx, query, tripID, p.Name, p.Notes, p.StartDate, p.EndDate, p.Lat, p.Lon).
-		Scan(&res.ID, &res.TripID, &res.Name, &res.Notes, &startDate, &endDate, &res.Lat, &res.Lon, &createdAt)
+		Scan(&res.ID, &res.TripId, &res.Name, &res.Notes, &startDate, &endDate, &res.Lat, &res.Lon, &createdAt)
 	if startDate != nil {
 		s := startDate.Format("2006-01-02")
 		res.StartDate = &s
@@ -104,7 +104,7 @@ func (db *DB) UpdatePlace(ctx context.Context, placeID uuid.UUID, updates map[st
 	var res models.Place
 	var startDate, endDate *time.Time
 	var createdAt time.Time
-	err := db.Pool.QueryRow(ctx, query, args...).Scan(&res.ID, &res.TripID, &res.Name, &res.Notes, &startDate, &endDate, &res.Lat, &res.Lon, &createdAt)
+	err := db.Pool.QueryRow(ctx, query, args...).Scan(&res.ID, &res.TripId, &res.Name, &res.Notes, &startDate, &endDate, &res.Lat, &res.Lon, &createdAt)
 	if startDate != nil {
 		s := startDate.Format("2006-01-02")
 		res.StartDate = &s

@@ -142,6 +142,24 @@ func (db *DB) GetTrip(ctx context.Context, id string, userId *uuid.UUID, session
 	return &trip, nil
 }
 
+func (db *DB) GetTripById(ctx context.Context, id uuid.UUID) (*models.Trip, error) {
+	var trip models.Trip
+	var startDate, endDate time.Time
+
+	query := `SELECT id, name, start_date, end_date FROM trips WHERE id = $1`
+
+	err := db.Pool.QueryRow(ctx, query, id).Scan(
+		&trip.ID, &trip.Name, &startDate, &endDate,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	trip.StartDate = startDate.Format("2006-01-02")
+	trip.EndDate = endDate.Format("2006-01-02")
+	return &trip, nil
+}
+
 func (db *DB) UpdateTrip(ctx context.Context, tripID string, userID *uuid.UUID, sessionID *string, updates map[string]any) (*models.Trip, error) {
 	allowedFields := map[string]bool{
 		"name": true, "start_date": true, "end_date": true,
