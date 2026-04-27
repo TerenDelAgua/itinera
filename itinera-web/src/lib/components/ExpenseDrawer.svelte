@@ -4,7 +4,7 @@
   import { apiFetch } from '$lib/api';
   import type { Expense, Category } from '$lib/types';
   import ConfirmModal from './ConfirmModal.svelte';
-  import { getCurrencySymbol } from '$lib/utils';
+  import { getCurrencySymbol, getCategoryEmoji, getCategoryName } from '$lib/utils';
   import { t } from '$lib/i18n/store';
 
   let { tripId, categories, isOpen, onClose, onRefreshSummary, placeId }: { tripId: string; categories: Category[]; isOpen: boolean; onClose: () => void; onRefreshSummary: () => void; placeId?: string; } = $props();
@@ -80,8 +80,6 @@
     }
     return Array.from(groups.entries());
   });
-
-  const emojiMap: Record<string, string> = { accommodation: '🏨', transport: '🚆', food: '🍔', leisure: '🎟️', shopping: '🛍️', others: '📦' };
 </script>
 
 {#if isOpen}
@@ -103,7 +101,7 @@
           {#each grouped as [slug, items] (slug)}
             <section>
               <h3 class="text-sm font-semibold text-teren-text-muted uppercase tracking-wider mb-3 flex items-center gap-2">
-                {emojiMap[slug] || '📦'} {slug.charAt(0).toUpperCase() + slug.slice(1)}
+                {getCategoryEmoji(slug)} {getCategoryName(slug)}
                 <span class="ml-auto font-normal normal-case text-xs">({items.length})</span>
               </h3>
               <div class="space-y-3">
@@ -160,9 +158,9 @@
         <div class="flex gap-3 flex-1 min-w-0">
           <!-- Icono con Tooltip -->
           <span class="text-xl select-none relative group/icon flex-shrink-0">
-            {emojiMap[slug] || '📦'}
+            {getCategoryEmoji(slug)}
             <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-teren-text-main text-white text-xs rounded opacity-0 group-hover/icon:opacity-100 transition pointer-events-none whitespace-nowrap z-10">
-              {slug.charAt(0).toUpperCase() + slug.slice(1)}
+              {getCategoryName(slug)}
             </span>
           </span>
           

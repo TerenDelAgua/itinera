@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { apiFetch } from '$lib/api';
-  import { t, locale } from "$lib/i18n/store";
+  import { t } from "$lib/i18n/store";
   import { slide } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
   import { tweened } from 'svelte/motion';
@@ -62,7 +62,10 @@
       tripDates = { start: tripData.start_date, end: tripData.end_date };
       currency = tripData.base_currency || 'EUR';
       
-      places = placesData || [];
+      places = (placesData || []).map(p => ({
+        ...p,
+        total_expenses: summaryData.by_place?.find(s => s.place_id === p.id)?.total || 0
+      }));
       summary = summaryData;
       categories = catsData || [];
       
@@ -117,7 +120,7 @@
     }
   }
 
-  function requestDeletePlace(id: string) {
+function requestDeletePlace(id: string) {
     deletePlaceConfirmId = id;
   }
 
@@ -138,10 +141,6 @@
     deletePlaceConfirmId = null;
   }
 
-  const emojiMap: Record<string, string> = {
-    accommodation: '🏨', transport: '🚆', food: '🍔',
-    leisure: '🎟️', shopping: '🛍️', others: '📦'
-  };
 
   function formatDate(dateStr?: string) {
     if (!dateStr) return '';
@@ -328,32 +327,45 @@
           </div>
         {:else}
           <!-- Lista de Places -->
-          <div class="space-y-3">
-            {#each places as place (place.id)}
-              <a 
-                href="/trips/{tripId}/places/{place.id}" 
-                class="block bg-teren-surface p-5 rounded-xl border border-teren-border hover:border-teren-primary/30 hover:shadow-md transition-all cursor-pointer group"
-              >
-                <div class="flex justify-between items-center mb-2">
-                  <h3 class="text-lg font-semibold text-teren-text-main group-hover:text-teren-primary-hover transition-colors">{place.name}</h3>
-                  <button 
-                    onclick={(e) => { e.preventDefault(); e.stopPropagation(); requestDeletePlace(place.id); }}
-                    class="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition active:scale-95 flex-shrink-0"
-                    aria-label="Delete place"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                </div>
-                
-                <p class="text-sm text-teren-text-muted flex items-center gap-2">
-                  <svg class="w-4 h-4 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                  {formatDate(place.start_date)} — {formatDate(place.end_date)}
-                </p>
-              </a>
-            {/each}
-          </div>
+<div class="space-y-3">
+  {#each places as place (place.id)}
+    <a href="/trips/{tripId}/places/{place.id}" class="group block bg-teren-surface p-5 rounded-xl border border-teren-border hover:border-teren-primary/30 hover:shadow-md transition-all cursor-pointer relative">
+      
+      <!-- Contenido Principal -->
+      <div class="flex justify-between items-start">
+        <div>
+          <h3 class="text-lg font-semibold text-teren-text-main group-hover:text-teren-primary-hover transition-colors">
+            {place.name}
+          </h3>
+          <p class="text-sm text-teren-text-muted mt-1 flex items-center gap-2">
+            <svg class="w-4 h-4 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            {formatDate(place.start_date)} — {place.end_date ? formatDate(place.end_date) : 'No end'}
+
+            {#if place.total_expenses && place.total_expenses > 0}
+              <span class="opacity-30">•</span>
+              <span class="font-bold text-teren-primary">
+                {place.total_expenses.toFixed(2)} {getCurrencySymbol(currency)}
+              </span>
+            {/if}
+          </p>
+        </div>
+      </div>
+
+      <!-- Botón Borrar (Aparece en Hover) -->
+      <button 
+        onclick={(e) => { e.preventDefault(); e.stopPropagation(); requestDeletePlace(place.id); }}
+        class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition active:scale-95"
+        aria-label="Delete place"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </button>
+    </a>
+  {/each}
+</div>
         {/if}
       </section>
 

@@ -2,7 +2,7 @@
   import { apiFetch } from '$lib/api';
   import type { Expense, Category } from '$lib/types';
   import { t } from '$lib/i18n/store';
-  import { getCurrencySymbol } from '$lib/utils';
+  import { getCurrencySymbol, getCategoryEmoji, getCategoryName } from '$lib/utils';
 
   let { tripId, categories, onSuccess, placeId, currency = 'EUR' }: { tripId: string; categories: Category[]; onSuccess: (exp: Expense) => void; placeId?: string; currency?: string; } = $props();
 
@@ -11,10 +11,12 @@
   let notes = $state('');
   let isSubmitting = $state(false);
 
-  const emojiMap: Record<string, string> = {
-    accommodation: '🏨', transport: '🚆', food: '🍔',
-    leisure: '🎟️', shopping: '🛍️', others: '📦'
-  };
+  // Initialize categoryId when categories are loaded
+  $effect(() => {
+    if (!categoryId && categories.length > 0) {
+      categoryId = categories[0].id;
+    }
+  });
 
   async function handleSubmit() {
     if (!amount || parseFloat(amount) <= 0 || !categoryId) return;
@@ -43,10 +45,10 @@
   <!-- Glowing effect en el hover (muy sutil) -->
   <div class="absolute -inset-0.5 bg-gradient-to-r from-teren-primary/0 via-teren-primary/10 to-teren-primary/0 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
   
-  <div class="relative bg-teren-surface rounded-2xl border border-teren-border/80 shadow-sm focus-within:border-teren-primary/50 focus-within:ring-4 focus-within:ring-teren-primary/10 transition-all overflow-hidden p-1">
+  <div class="relative bg-teren-surface rounded-2xl border border-teren-border/80 shadow-sm focus-within:border-teren-primary/50 focus-within:ring-4 focus-within:ring-teren-primary/10 transition-all overflow-hidden p-1 flex flex-col sm:flex-row sm:items-stretch">
     
     <!-- Fila Superior: Categoría y Cantidad -->
-    <div class="flex items-stretch h-14 bg-teren-surface">
+    <div class="flex items-stretch h-14 bg-teren-surface sm:border-r sm:border-teren-border/50">
       <!-- Selector de Categoría (Solo Emoji visualmente) -->
       <div class="relative flex items-center justify-center w-16 hover:bg-teren-background transition-colors cursor-pointer border-r border-teren-border/50">
         <select 
@@ -54,14 +56,16 @@
           class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         >
           {#each categories as cat (cat.id)}
-            <option value={cat.id}>{cat.name}</option>
+            <option value={cat.id}>{getCategoryEmoji(cat.slug)} {getCategoryName(cat.slug)}</option>
           {/each}
         </select>
-        <span class="text-2xl pointer-events-none">{emojiMap[categories.find(c => c.id === categoryId)?.slug || ''] || '📦'}</span>
+        <span class="text-2xl pointer-events-none">
+          {getCategoryEmoji(categories.find(c => c.id === categoryId)?.slug)}
+        </span>
       </div>
 
       <!-- Input de Cantidad -->
-      <div class="flex-1 relative flex items-center ml-2">
+      <div class="flex-1 sm:flex-none sm:w-36 relative flex items-center ml-2">
         <span class="absolute left-3 text-teren-text-muted font-bold text-lg pointer-events-none select-none">{getCurrencySymbol(currency)}</span>
         <input 
           type="number" 
@@ -75,10 +79,10 @@
       </div>
     </div>
 
-    <div class="mx-4 h-px bg-teren-border/50"></div>
+    <div class="mx-4 h-px bg-teren-border/50 sm:hidden"></div>
 
     <!-- Fila Inferior: Notas y Botón -->
-    <div class="flex items-center h-14 bg-teren-background/50 pl-4 pr-2 py-2">
+    <div class="flex-1 flex items-center h-14 bg-teren-background/50 sm:bg-transparent pl-4 pr-2 py-2 sm:py-0">
       <input 
         type="text" 
         bind:value={notes} 

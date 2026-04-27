@@ -7,4 +7,5 @@ export interface Place {
     end_date: string;
     lat: number;
     lon: number;
+    total_expenses?: number;
 }
