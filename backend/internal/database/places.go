@@ -6,17 +6,26 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"backend/internal/models"
 )
 
-func (db *DB) GetPlace(ctx context.Context, placeId uuid.UUID) (*models.Place, error) {
+type PlaceRepository struct {
+	Pool *pgxpool.Pool
+}
+
+func NewPlaceRepository(pool *pgxpool.Pool) *PlaceRepository {
+	return &PlaceRepository{Pool: pool}
+}
+
+func (r *PlaceRepository) GetPlace(ctx context.Context, placeId uuid.UUID) (*models.Place, error) {
 	var p models.Place
 	var startDate, endDate *time.Time
 	var createdAt time.Time
 	query := `SELECT id, trip_id, name, notes, start_date, end_date, lat, lon, created_at 
 		FROM places WHERE id = $1`
-	err := db.Pool.QueryRow(ctx, query, placeId).
+	err := r.Pool.QueryRow(ctx, query, placeId).
 		Scan(&p.ID, &p.TripId, &p.Name, &p.Notes, &startDate, &endDate, &p.Lat, &p.Lon, &createdAt)
 	if err != nil {
 		return nil, err
@@ -33,8 +42,8 @@ func (db *DB) GetPlace(ctx context.Context, placeId uuid.UUID) (*models.Place, e
 	return &p, nil
 }
 
-func (db *DB) ListPlacesByTrip(ctx context.Context, tripID uuid.UUID) ([]models.Place, error) {
-	rows, err := db.Pool.Query(ctx, `SELECT id, trip_id, name, notes, start_date, end_date, lat, lon, created_at 
+func (r *PlaceRepository) ListPlacesByTrip(ctx context.Context, tripID uuid.UUID) ([]models.Place, error) {
+	rows, err := r.Pool.Query(ctx, `SELECT id, trip_id, name, notes, start_date, end_date, lat, lon, created_at 
 		FROM places WHERE trip_id = $1 ORDER BY start_date ASC NULLS LAST, created_at ASC`, tripID)
 	if err != nil {
 		return nil, err
@@ -63,12 +72,12 @@ func (db *DB) ListPlacesByTrip(ctx context.Context, tripID uuid.UUID) ([]models.
 	return places, nil
 }
 
-func (db *DB) CreatePlace(ctx context.Context, tripID uuid.UUID, p models.Place) (*models.Place, error) {
+func (r *PlaceRepository) CreatePlace(ctx context.Context, tripID uuid.UUID, p models.Place) (*models.Place, error) {
 	query := `INSERT INTO places (trip_id, name, notes, start_date, end_date, lat, lon) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, trip_id, name, notes, start_date, end_date, lat, lon, created_at`
 	var res models.Place
 	var startDate, endDate *time.Time
 	var createdAt time.Time
-	err := db.Pool.QueryRow(ctx, query, tripID, p.Name, p.Notes, p.StartDate, p.EndDate, p.Lat, p.Lon).
+	err := r.Pool.QueryRow(ctx, query, tripID, p.Name, p.Notes, p.StartDate, p.EndDate, p.Lat, p.Lon).
 		Scan(&res.ID, &res.TripId, &res.Name, &res.Notes, &startDate, &endDate, &res.Lat, &res.Lon, &createdAt)
 	if startDate != nil {
 		s := startDate.Format("2006-01-02")
@@ -82,7 +91,7 @@ func (db *DB) CreatePlace(ctx context.Context, tripID uuid.UUID, p models.Place)
 	return &res, err
 }
 
-func (db *DB) UpdatePlace(ctx context.Context, placeID uuid.UUID, updates map[string]any) (*models.Place, error) {
+func (r *PlaceRepository) UpdatePlace(ctx context.Context, placeID uuid.UUID, updates map[string]any) (*models.Place, error) {
 	allowed := map[string]bool{"name": true, "notes": true, "start_date": true, "end_date": true}
 	var sets []string
 	var args []any
@@ -104,7 +113,7 @@ func (db *DB) UpdatePlace(ctx context.Context, placeID uuid.UUID, updates map[st
 	var res models.Place
 	var startDate, endDate *time.Time
 	var createdAt time.Time
-	err := db.Pool.QueryRow(ctx, query, args...).Scan(&res.ID, &res.TripId, &res.Name, &res.Notes, &startDate, &endDate, &res.Lat, &res.Lon, &createdAt)
+	err := r.Pool.QueryRow(ctx, query, args...).Scan(&res.ID, &res.TripId, &res.Name, &res.Notes, &startDate, &endDate, &res.Lat, &res.Lon, &createdAt)
 	if startDate != nil {
 		s := startDate.Format("2006-01-02")
 		res.StartDate = &s
@@ -117,7 +126,7 @@ func (db *DB) UpdatePlace(ctx context.Context, placeID uuid.UUID, updates map[st
 	return &res, err
 }
 
-func (db *DB) DeletePlace(ctx context.Context, placeID uuid.UUID) error {
-	_, err := db.Pool.Exec(ctx, "DELETE FROM places WHERE id = $1", placeID)
+func (r *PlaceRepository) DeletePlace(ctx context.Context, placeID uuid.UUID) error {
+	_, err := r.Pool.Exec(ctx, "DELETE FROM places WHERE id = $1", placeID)
 	return err
 }

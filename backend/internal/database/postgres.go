@@ -10,11 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type DB struct {
-	Pool *pgxpool.Pool
-}
-
-func NewPostgress(cfg *config.Config) (*DB, error) {
+func NewPostgress(cfg *config.Config) (*pgxpool.Pool, error) {
 	config, err := pgxpool.ParseConfig(cfg.DatabaseURL)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to parse database config: %w", err)
@@ -32,7 +28,7 @@ func NewPostgress(cfg *config.Config) (*DB, error) {
 		if err == nil {
 			if err = pool.Ping(context.Background()); err == nil {
 				log.Println("✅ Database connection establshed")
-				return &DB{Pool: pool}, nil
+				return pool, nil
 			}
 		}
 		log.Printf(" Database not ready (attempt %d/10), retrying in 2s...: %v", i+1, err)
@@ -40,31 +36,4 @@ func NewPostgress(cfg *config.Config) (*DB, error) {
 	}
 
 	return nil, fmt.Errorf("Failed to connect to database after 10 attempts: %w", err)
-}
-
-func (db *DB) Close() {
-	if db.Pool != nil {
-		db.Pool.Close()
-		log.Println("🔌 Database connection closed")
-	}
-}
-
-func (db *DB) HealthCheck(ctx context.Context) error {
-	return db.Pool.Ping(ctx)
-}
-
-func (db *DB) QueryRow(ctx context.Context, query string, args ...interface{}) interface {
-	Scan(dest ...interface{}) error
-} {
-	return db.Pool.QueryRow(ctx, query, args...)
-}
-
-func (db *DB) Query(ctx context.Context, query string, args ...interface{}) interface {
-	Close()
-	Err() error
-	Next() bool
-	Scan(dest ...interface{}) error
-} {
-	rows, _ := db.Pool.Query(ctx, query, args...)
-	return rows
 }

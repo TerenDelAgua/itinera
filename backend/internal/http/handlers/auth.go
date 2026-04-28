@@ -38,7 +38,7 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.DB.CreateUser(r.Context(), input.Email, input.Password)
+	user, err := h.AuthRepo.CreateUser(r.Context(), input.Email, input.Password)
 	if err != nil {
 		http.Error(w, "Email already exists or DB error", http.StatusConflict)
 		return
@@ -60,7 +60,7 @@ func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.DB.GetUserByEmail(r.Context(), input.Email)
+	user, err := h.AuthRepo.GetUserByEmail(r.Context(), input.Email)
 	if err != nil {
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
@@ -88,7 +88,7 @@ func (h *Handlers) UpgradeSession(w http.ResponseWriter, r *http.Request) {
 	sessionIdRaw := r.Context().Value(middleware.ContextKeySessionId{})
 	sessionId, _ := sessionIdRaw.(string)
 
-	if err := h.DB.UpgradeTrips(r.Context(), sessionId, userId); err != nil {
+	if err := h.AuthRepo.UpgradeTrips(r.Context(), sessionId, userId); err != nil {
 		http.Error(w, "Migration failed", http.StatusInternalServerError)
 	}
 

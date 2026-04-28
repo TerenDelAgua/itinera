@@ -11,7 +11,7 @@ import (
 
 func (h *Handlers) GetPlace(w http.ResponseWriter, r *http.Request) {
 	placeID, _ := uuid.Parse(chi.URLParam(r, "placeId"))
-	p, err := h.DB.GetPlace(r.Context(), placeID)
+	p, err := h.PlacesRepo.GetPlace(r.Context(), placeID)
 	if err != nil {
 		http.Error(w, "Place not found", http.StatusNotFound)
 		return
@@ -21,7 +21,7 @@ func (h *Handlers) GetPlace(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) ListPlaces(w http.ResponseWriter, r *http.Request) {
 	tripID, _ := uuid.Parse(chi.URLParam(r, "id"))
-	places, err := h.DB.ListPlacesByTrip(r.Context(), tripID)
+	places, err := h.PlacesRepo.ListPlacesByTrip(r.Context(), tripID)
 	if err != nil {
 		http.Error(w, "DB Error", http.StatusInternalServerError)
 		return
@@ -37,7 +37,7 @@ func (h *Handlers) CreatePlace(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p, err := h.DB.CreatePlace(r.Context(), tripID, input)
+	p, err := h.PlacesRepo.CreatePlace(r.Context(), tripID, input)
 	if err != nil {
 		http.Error(w, "Create failed", http.StatusInternalServerError)
 		return
@@ -56,7 +56,7 @@ func (h *Handlers) UpdatePlace(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p, err := h.DB.UpdatePlace(r.Context(), placeID, updates)
+	p, err := h.PlacesRepo.UpdatePlace(r.Context(), placeID, updates)
 	if err != nil {
 		http.Error(w, "Update failed", http.StatusInternalServerError)
 		return
@@ -66,7 +66,7 @@ func (h *Handlers) UpdatePlace(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) DeletePlace(w http.ResponseWriter, r *http.Request) {
 	placeID, _ := uuid.Parse(chi.URLParam(r, "placeId"))
-	if err := h.DB.DeletePlace(r.Context(), placeID); err != nil {
+	if err := h.PlacesRepo.DeletePlace(r.Context(), placeID); err != nil {
 		http.Error(w, "Delete failed", http.StatusInternalServerError)
 		return
 	}

@@ -7,14 +7,29 @@ import (
 )
 
 type Handlers struct {
-	DB     *database.DB
-	Config *config.Config
+	TripsRepo    *database.TripRepository
+	PlacesRepo   *database.PlaceRepository
+	ExpensesRepo *database.ExpenseRepository
+	AuthRepo     *database.AuthRepository
+	ActivityRepo *database.ActivityRepository
+	Config       *config.Config
 }
 
-func NewHandlers(db *database.DB, cfg *config.Config) *Handlers {
+func NewHandlers(
+	tripsRepo *database.TripRepository,
+	placesRepo *database.PlaceRepository,
+	expensesRepo *database.ExpenseRepository,
+	authRepo *database.AuthRepository,
+	activityRepo *database.ActivityRepository,
+	cfg *config.Config,
+) *Handlers {
 	return &Handlers{
-		DB:     db,
-		Config: cfg,
+		TripsRepo:    tripsRepo,
+		PlacesRepo:   placesRepo,
+		ExpensesRepo: expensesRepo,
+		AuthRepo:     authRepo,
+		ActivityRepo: activityRepo,
+		Config:       cfg,
 	}
 }
 
@@ -22,16 +37,3 @@ func (h *Handlers) healthCheck(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"Message":"Service is running"}`))
 }
-
-// func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
-// 	w.WriteHeader(http.StatusNotImplemented)
-// 	w.Write([]byte(`{"Message":"endpoint not implemented yet"}`))
-// }
-
-// func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
-// 	w.WriteHeader(http.StatusNotImplemented)
-// 	w.Write([]byte(`{"Message":"endpoint not implemented yet"}`))
-// }
-
-// Handler implementations are in separate files (auth.go, trips.go)
-

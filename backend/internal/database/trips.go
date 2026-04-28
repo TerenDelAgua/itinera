@@ -9,11 +9,20 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-
+	"github.com/jackc/pgx/v5/pgxpool"
+	
 	"backend/internal/models"
 )
 
-func (db *DB) CreateTrip(ctx context.Context, userId *uuid.UUID, sessionId *string, tripData models.Trip) (*models.Trip, error) {
+type TripRepository struct {
+	Pool *pgxpool.Pool
+}
+
+func NewTripRepository(pool *pgxpool.Pool) *TripRepository {
+	return &TripRepository{Pool: pool}
+}
+
+func (r *TripRepository) CreateTrip(ctx context.Context, userId *uuid.UUID, sessionId *string, tripData models.Trip) (*models.Trip, error) {
 
 	var newTrip models.Trip
 	var startDate, endDate, createdAt time.Time
@@ -26,7 +35,7 @@ func (db *DB) CreateTrip(ctx context.Context, userId *uuid.UUID, sessionId *stri
 		id, user_id, session_id, name, description, start_date, end_date, base_currency, created_at
 	`
 
-	err := db.Pool.QueryRow(ctx, query,
+	err := r.Pool.QueryRow(ctx, query,
 		userId,
 		sessionId,
 		tripData.Name,
@@ -57,7 +66,7 @@ func (db *DB) CreateTrip(ctx context.Context, userId *uuid.UUID, sessionId *stri
 	return &newTrip, nil
 }
 
-func (db *DB) ListTrips(ctx context.Context, userId *uuid.UUID, sessionId *string) ([]models.Trip, error) {
+func (r *TripRepository) ListTrips(ctx context.Context, userId *uuid.UUID, sessionId *string) ([]models.Trip, error) {
 	query := `
 		SELECT 
 			id, user_id, session_id, name, description, start_date, end_date, base_currency, created_at,
@@ -67,7 +76,7 @@ func (db *DB) ListTrips(ctx context.Context, userId *uuid.UUID, sessionId *strin
 		WHERE (user_id = $1 AND $1 IS NOT NULL) OR (session_id = $2 AND $2 IS NOT NULL)
 		ORDER BY created_at DESC
 	`
-	rows, err := db.Pool.Query(ctx, query, userId, sessionId)
+	rows, err := r.Pool.Query(ctx, query, userId, sessionId)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +114,7 @@ func (db *DB) ListTrips(ctx context.Context, userId *uuid.UUID, sessionId *strin
 	return trips, nil
 }
 
-func (db *DB) GetTrip(ctx context.Context, id string, userId *uuid.UUID, sessionId *string) (*models.Trip, error) {
+func (r *TripRepository) GetTrip(ctx context.Context, id string, userId *uuid.UUID, sessionId *string) (*models.Trip, error) {
 	var trip models.Trip
 	var startDate, endDate, createdAt time.Time
 
@@ -118,7 +127,7 @@ func (db *DB) GetTrip(ctx context.Context, id string, userId *uuid.UUID, session
 		WHERE id = $1 AND ((user_id = $2 AND $2 IS NOT NULL) OR (session_id = $3 AND $3 IS NOT NULL))
 	`
 
-	err := db.Pool.QueryRow(ctx, query, id, userId, sessionId).Scan(
+	err := r.Pool.QueryRow(ctx, query, id, userId, sessionId).Scan(
 		&trip.ID,
 		&trip.UserId,
 		&trip.SessionId,
@@ -142,13 +151,13 @@ func (db *DB) GetTrip(ctx context.Context, id string, userId *uuid.UUID, session
 	return &trip, nil
 }
 
-func (db *DB) GetTripById(ctx context.Context, id uuid.UUID) (*models.Trip, error) {
+func (r *TripRepository) GetTripById(ctx context.Context, id uuid.UUID) (*models.Trip, error) {
 	var trip models.Trip
 	var startDate, endDate time.Time
 
 	query := `SELECT id, name, start_date, end_date FROM trips WHERE id = $1`
 
-	err := db.Pool.QueryRow(ctx, query, id).Scan(
+	err := r.Pool.QueryRow(ctx, query, id).Scan(
 		&trip.ID, &trip.Name, &startDate, &endDate,
 	)
 	if err != nil {
@@ -160,7 +169,7 @@ func (db *DB) GetTripById(ctx context.Context, id uuid.UUID) (*models.Trip, erro
 	return &trip, nil
 }
 
-func (db *DB) UpdateTrip(ctx context.Context, tripID string, userID *uuid.UUID, sessionID *string, updates map[string]any) (*models.Trip, error) {
+func (r *TripRepository) UpdateTrip(ctx context.Context, tripID string, userID *uuid.UUID, sessionID *string, updates map[string]any) (*models.Trip, error) {
 	allowedFields := map[string]bool{
 		"name": true, "start_date": true, "end_date": true,
 		"base_currency": true, "description": true,
@@ -201,7 +210,7 @@ func (db *DB) UpdateTrip(ctx context.Context, tripID string, userID *uuid.UUID, 
 	var trip models.Trip
 	var startDate, endDate, createdAt time.Time
 
-	err := db.Pool.QueryRow(ctx, query, args...).Scan(
+	err := r.Pool.QueryRow(ctx, query, args...).Scan(
 		&trip.ID, &trip.UserId, &trip.SessionId, &trip.Name,
 		&startDate, &endDate, &trip.BaseCurrency,
 		&trip.Description, &createdAt,
@@ -221,13 +230,13 @@ func (db *DB) UpdateTrip(ctx context.Context, tripID string, userID *uuid.UUID, 
 	return &trip, nil
 }
 
-func (db *DB) DeleteTrip(ctx context.Context, id string, userId *uuid.UUID, sessionId *string) error {
+func (r *TripRepository) DeleteTrip(ctx context.Context, id string, userId *uuid.UUID, sessionId *string) error {
 	query := `
 		DELETE FROM trips
 		WHERE id = $1 AND ((user_id = $2 AND $2 IS NOT NULL) OR (session_id = $3 AND $3 IS NOT NULL))
 	`
 
-	res, err := db.Pool.Exec(ctx, query, id, userId, sessionId)
+	res, err := r.Pool.Exec(ctx, query, id, userId, sessionId)
 	if err != nil {
 		return err
 	}

@@ -27,15 +27,21 @@ func main() {
 	cfg := config.Load()
 	cfg.LogSummary()
 
-	db, err := database.NewPostgress(cfg)
+	pool, err := database.NewPostgress(cfg)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
-	defer db.Close()
+	defer pool.Close()
 
-	handlers := handlers.NewHandlers(db, cfg)
+	tripsRepo := database.NewTripRepository(pool)
+	placesRepo := database.NewPlaceRepository(pool)
+	expensesRepo := database.NewExpenseRepository(pool)
+	authRepo := database.NewAuthRepository(pool)
+	activityRepo := database.NewActivityRepository(pool)
 
-	router := setupRouter(cfg, handlers)
+	h := handlers.NewHandlers(tripsRepo, placesRepo, expensesRepo, authRepo, activityRepo, cfg)
+
+	router := setupRouter(cfg, h)
 
 	server := &http.Server{
 		Addr:    ":" + cfg.Port,
@@ -88,7 +94,7 @@ func setupRouter(cfg *config.Config, h *handlers.Handlers) *chi.Mux {
 		ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 		defer cancel()
 
-		if err := h.DB.HealthCheck(ctx); err != nil {
+		if err := h.TripsRepo.Pool.Ping(ctx); err != nil {
 			w.WriteHeader(http.StatusServiceUnavailable)
 			w.Write([]byte(`{"status":"unhealthy","database":"disconnected"}`))
 			return

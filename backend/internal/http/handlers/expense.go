@@ -12,7 +12,7 @@ import (
 
 func (h *Handlers) GetCategories(w http.ResponseWriter, r *http.Request) {
 
-	cats, err := h.DB.GetCategories(r.Context())
+	cats, err := h.ExpensesRepo.GetCategories(r.Context())
 	if err != nil {
 		http.Error(w, "DB Error", http.StatusInternalServerError)
 		return
@@ -32,7 +32,7 @@ func (h *Handlers) CreateExpense(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	exp, err := h.DB.CreateExpense(r.Context(), &tripID, input.PlaceId, input)
+	exp, err := h.ExpensesRepo.CreateExpense(r.Context(), &tripID, input.PlaceId, input)
 	if err != nil {
 		http.Error(w, "Failed to save", http.StatusInternalServerError)
 		return
@@ -45,7 +45,7 @@ func (h *Handlers) CreateExpense(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) GetExpenseSummary(w http.ResponseWriter, r *http.Request) {
 	tripId, _ := uuid.Parse(chi.URLParam(r, "id"))
-	summary, err := h.DB.GetExpensesSummary(r.Context(), tripId)
+	summary, err := h.ExpensesRepo.GetExpensesSummary(r.Context(), tripId)
 	if err != nil {
 		http.Error(w, "DB Error", http.StatusInternalServerError)
 		return
@@ -55,7 +55,7 @@ func (h *Handlers) GetExpenseSummary(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) ListExpenses(w http.ResponseWriter, r *http.Request) {
 	tripId, _ := uuid.Parse(chi.URLParam(r, "id"))
-	expenses, err := h.DB.GetExpensesByTrip(r.Context(), tripId)
+	expenses, err := h.ExpensesRepo.GetExpensesByTrip(r.Context(), tripId)
 	if err != nil {
 		http.Error(w, "DB Error", http.StatusInternalServerError)
 		return
@@ -70,7 +70,7 @@ func (h *Handlers) DeleteExpense(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid expense ID", http.StatusBadRequest)
 		return
 	}
-	if _, err := h.DB.Pool.Exec(r.Context(),
+	if _, err := h.ExpensesRepo.Pool.Exec(r.Context(),
 		"DELETE FROM Expenses WHERE id = $1", expenseId); err != nil {
 		http.Error(w, "Failed to delete expense", http.StatusInternalServerError)
 		return
@@ -84,7 +84,7 @@ func (h *Handlers) UpdateExpense(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
-	updated, err := h.DB.UpdateExpense(r.Context(), expenseId, input)
+	updated, err := h.ExpensesRepo.UpdateExpense(r.Context(), expenseId, input)
 	if err != nil {
 		log.Printf("Error updating expense: %v", err)
 		http.Error(w, "Failed to update", http.StatusInternalServerError)
@@ -96,7 +96,7 @@ func (h *Handlers) UpdateExpense(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) ListPlaceExpenses(w http.ResponseWriter, r *http.Request) {
 	placeId, _ := uuid.Parse(chi.URLParam(r, "placeId"))
-	expenses, err := h.DB.ListPlaceExpenses(r.Context(), placeId)
+	expenses, err := h.ExpensesRepo.ListPlaceExpenses(r.Context(), placeId)
 	if err != nil {
 		http.Error(w, "DB Error", http.StatusInternalServerError)
 		return
@@ -107,7 +107,7 @@ func (h *Handlers) ListPlaceExpenses(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) GetPlaceExpenseSummary(w http.ResponseWriter, r *http.Request) {
 	placeId, _ := uuid.Parse(chi.URLParam(r, "placeId"))
-	summary, err := h.DB.GetPlaceExpensesSummary(r.Context(), placeId)
+	summary, err := h.ExpensesRepo.GetPlaceExpensesSummary(r.Context(), placeId)
 	if err != nil {
 		http.Error(w, "DB Error", http.StatusInternalServerError)
 		return
