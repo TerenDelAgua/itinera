@@ -155,10 +155,10 @@ func (r *TripRepository) GetTripById(ctx context.Context, id uuid.UUID) (*models
 	var trip models.Trip
 	var startDate, endDate time.Time
 
-	query := `SELECT id, name, start_date, end_date FROM trips WHERE id = $1`
+	query := `SELECT id, name, start_date, end_date, base_currency FROM trips WHERE id = $1`
 
 	err := r.Pool.QueryRow(ctx, query, id).Scan(
-		&trip.ID, &trip.Name, &startDate, &endDate,
+		&trip.ID, &trip.Name, &startDate, &endDate, &trip.BaseCurrency,
 	)
 	if err != nil {
 		return nil, err

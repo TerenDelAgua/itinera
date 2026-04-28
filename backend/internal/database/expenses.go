@@ -45,12 +45,21 @@ func (r *ExpenseRepository) GetCategories(ctx context.Context) ([]models.Expense
 }
 
 func (r *ExpenseRepository) CreateExpense(ctx context.Context, tripID, placeID *uuid.UUID, exp models.Expense) (*models.Expense, error) {
-	query := `INSERT INTO expenses (trip_id, place_id, amount, currency, category_id, notes, date) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, trip_id, place_id, amount, currency, category_id, notes, date, created_at`
+	query := `INSERT INTO expenses (trip_id, place_id, amount, original_amount, original_currency, exchange_rate, conversion_date, currency, category_id, notes, date) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
+		RETURNING id, trip_id, place_id, amount, original_amount, original_currency, exchange_rate, conversion_date, currency, category_id, notes, date, created_at`
 
 	var res models.Expense
-	err := r.Pool.QueryRow(ctx, query, tripID, placeID, exp.Amount, exp.Currency, exp.CategoryId, exp.Notes, exp.Date).
-		Scan(&res.Id, &res.TripId, &res.PlaceId, &res.Amount, &res.Currency, &res.CategoryId, &res.Notes, &res.Date, &res.CreatedAt)
+	err := r.Pool.QueryRow(ctx, query, 
+		tripID, placeID, 
+		exp.Amount, exp.OriginalAmount, exp.OriginalCurrency, exp.ExchangeRate, exp.ConversionDate,
+		exp.Currency, exp.CategoryId, exp.Notes, exp.Date,
+	).
+		Scan(
+			&res.Id, &res.TripId, &res.PlaceId, 
+			&res.Amount, &res.OriginalAmount, &res.OriginalCurrency, &res.ExchangeRate, &res.ConversionDate,
+			&res.Currency, &res.CategoryId, &res.Notes, &res.Date, &res.CreatedAt,
+		)
 	return &res, err
 }
 func (r *ExpenseRepository) GetExpensesByTrip(ctx context.Context, tripId uuid.UUID) ([]models.Expense, error) {
@@ -59,8 +68,13 @@ func (r *ExpenseRepository) GetExpensesByTrip(ctx context.Context, tripId uuid.U
 		`SELECT
 			id,
 			trip_id,
+			place_id,
 			category_id,
 			amount,
+			original_amount,
+			original_currency,
+			exchange_rate,
+			conversion_date,
 			currency,
 			notes,
 			date,
@@ -80,8 +94,9 @@ func (r *ExpenseRepository) GetExpensesByTrip(ctx context.Context, tripId uuid.U
 	for rows.Next() {
 		var e models.Expense
 		if err := rows.Scan(
-			&e.Id, &e.TripId,
+			&e.Id, &e.TripId, &e.PlaceId,
 			&e.CategoryId, &e.Amount,
+			&e.OriginalAmount, &e.OriginalCurrency, &e.ExchangeRate, &e.ConversionDate,
 			&e.Currency, &e.Notes,
 			&e.Date, &e.CreatedAt); err != nil {
 			return nil, err
@@ -145,7 +160,7 @@ func (r *ExpenseRepository) GetExpensesSummary(ctx context.Context, tripId uuid.
 }
 
 func (r *ExpenseRepository) ListGlobalExpenses(ctx context.Context, tripID uuid.UUID) ([]models.Expense, error) {
-	rows, err := r.Pool.Query(ctx, `SELECT id, trip_id, place_id, amount, currency, category_id, notes, date, created_at 
+	rows, err := r.Pool.Query(ctx, `SELECT id, trip_id, place_id, amount, original_amount, original_currency, exchange_rate, conversion_date, currency, category_id, notes, date, created_at 
 		FROM expenses WHERE trip_id = $1 AND place_id IS NULL ORDER BY date DESC`, tripID)
 	if err != nil {
 		return nil, err
@@ -155,7 +170,7 @@ func (r *ExpenseRepository) ListGlobalExpenses(ctx context.Context, tripID uuid.
 	var exps []models.Expense
 	for rows.Next() {
 		var e models.Expense
-		if err := rows.Scan(&e.Id, &e.TripId, &e.PlaceId, &e.Amount, &e.Currency, &e.CategoryId, &e.Notes, &e.Date, &e.CreatedAt); err != nil {
+		if err := rows.Scan(&e.Id, &e.TripId, &e.PlaceId, &e.Amount, &e.OriginalAmount, &e.OriginalCurrency, &e.ExchangeRate, &e.ConversionDate, &e.Currency, &e.CategoryId, &e.Notes, &e.Date, &e.CreatedAt); err != nil {
 			return nil, err
 		}
 		exps = append(exps, e)
@@ -164,7 +179,7 @@ func (r *ExpenseRepository) ListGlobalExpenses(ctx context.Context, tripID uuid.
 }
 
 func (r *ExpenseRepository) ListPlaceExpenses(ctx context.Context, placeID uuid.UUID) ([]models.Expense, error) {
-	rows, err := r.Pool.Query(ctx, `SELECT id, trip_id, place_id, amount, currency, category_id, notes, date, created_at 
+	rows, err := r.Pool.Query(ctx, `SELECT id, trip_id, place_id, amount, original_amount, original_currency, exchange_rate, conversion_date, currency, category_id, notes, date, created_at 
 		FROM expenses WHERE place_id = $1 ORDER BY date DESC`, placeID)
 	if err != nil {
 		return nil, err
@@ -174,7 +189,7 @@ func (r *ExpenseRepository) ListPlaceExpenses(ctx context.Context, placeID uuid.
 	var exps []models.Expense = []models.Expense{}
 	for rows.Next() {
 		var e models.Expense
-		if err := rows.Scan(&e.Id, &e.TripId, &e.PlaceId, &e.Amount, &e.Currency, &e.CategoryId, &e.Notes, &e.Date, &e.CreatedAt); err != nil {
+		if err := rows.Scan(&e.Id, &e.TripId, &e.PlaceId, &e.Amount, &e.OriginalAmount, &e.OriginalCurrency, &e.ExchangeRate, &e.ConversionDate, &e.Currency, &e.CategoryId, &e.Notes, &e.Date, &e.CreatedAt); err != nil {
 			return nil, err
 		}
 		exps = append(exps, e)
@@ -182,12 +197,14 @@ func (r *ExpenseRepository) ListPlaceExpenses(ctx context.Context, placeID uuid.
 	return exps, nil
 }
 func (r *ExpenseRepository) UpdateExpense(ctx context.Context, id uuid.UUID, exp models.Expense) (*models.Expense, error) {
-	query := `UPDATE expenses SET amount = $1, date = $2, notes = $3, category_id = $4 
-		WHERE id = $5 
-		RETURNING id, trip_id, place_id, amount, currency, category_id, notes, date, created_at`
+	query := `UPDATE expenses SET amount = $1, original_amount = $2, original_currency = $3, exchange_rate = $4, conversion_date = $5, date = $6, notes = $7, category_id = $8 
+		WHERE id = $9 
+		RETURNING id, trip_id, place_id, amount, original_amount, original_currency, exchange_rate, conversion_date, currency, category_id, notes, date, created_at`
 	var res models.Expense
-	err := r.Pool.QueryRow(ctx, query, exp.Amount, exp.Date, exp.Notes, exp.CategoryId, id).
-		Scan(&res.Id, &res.TripId, &res.PlaceId, &res.Amount, &res.Currency, &res.CategoryId, &res.Notes, &res.Date, &res.CreatedAt)
+	err := r.Pool.QueryRow(ctx, query, 
+		exp.Amount, exp.OriginalAmount, exp.OriginalCurrency, exp.ExchangeRate, exp.ConversionDate, 
+		exp.Date, exp.Notes, exp.CategoryId, id).
+		Scan(&res.Id, &res.TripId, &res.PlaceId, &res.Amount, &res.OriginalAmount, &res.OriginalCurrency, &res.ExchangeRate, &res.ConversionDate, &res.Currency, &res.CategoryId, &res.Notes, &res.Date, &res.CreatedAt)
 	return &res, err
 }
 func (r *ExpenseRepository) GetPlaceExpensesSummary(ctx context.Context, placeID uuid.UUID) ([]models.CategorySummary, error) {

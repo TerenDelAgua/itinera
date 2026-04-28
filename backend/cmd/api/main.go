@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"backend/internal/http/handlers"
+	"backend/internal/services"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
@@ -39,7 +40,10 @@ func main() {
 	authRepo := database.NewAuthRepository(pool)
 	activityRepo := database.NewActivityRepository(pool)
 
-	h := handlers.NewHandlers(tripsRepo, placesRepo, expensesRepo, authRepo, activityRepo, cfg)
+	exchangeRateSvc := services.NewExchangeRateService(pool)
+	expenseSvc := services.NewExpenseService(tripsRepo, expensesRepo, exchangeRateSvc)
+
+	h := handlers.NewHandlers(tripsRepo, placesRepo, expensesRepo, authRepo, activityRepo, expenseSvc, cfg)
 
 	router := setupRouter(cfg, h)
 

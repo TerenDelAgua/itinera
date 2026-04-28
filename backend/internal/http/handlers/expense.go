@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"backend/internal/models"
+	"backend/internal/services"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -22,19 +23,22 @@ func (h *Handlers) GetCategories(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) CreateExpense(w http.ResponseWriter, r *http.Request) {
 	tripID, _ := uuid.Parse(chi.URLParam(r, "id"))
-	var input models.Expense
+
+	var input services.CreateExpenseInput
+
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
+
 	if input.Amount <= 0 {
 		http.Error(w, "Amount must be positive", http.StatusBadRequest)
 		return
 	}
 
-	exp, err := h.ExpensesRepo.CreateExpense(r.Context(), &tripID, input.PlaceId, input)
+	exp, err := h.ExpenseSvc.CalculateAndCreateExpense(r.Context(), tripID, input)
 	if err != nil {
-		http.Error(w, "Failed to save", http.StatusInternalServerError)
+		http.Error(w, "Failed to create expense: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 

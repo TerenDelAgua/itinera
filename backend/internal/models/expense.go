@@ -7,15 +7,21 @@ import (
 )
 
 type Expense struct {
-	Id         uuid.UUID  `json:"id"`
-	TripId     uuid.UUID  `json:"trip_id"`
-	PlaceId    *uuid.UUID `json:"place_id"`
-	Amount     float64    `json:"amount"`
-	Currency   string     `json:"currency"`
-	CategoryId uuid.UUID  `json:"category_id"`
-	Notes      string     `json:"notes"`
-	Date       time.Time  `json:"date"`
-	CreatedAt  time.Time  `json:"created_at"`
+	Id      uuid.UUID  `json:"id"`
+	TripId  uuid.UUID  `json:"trip_id"`
+	PlaceId *uuid.UUID `json:"place_id"`
+
+	Amount           float64   `json:"amount"`
+	OriginalAmount   float64   `json:"original_amount"`
+	OriginalCurrency string    `json:"original_currency"`
+	ExchangeRate     float64   `json:"exchange_rate"`
+	ConversionDate   time.Time `json:"conversion_date"`
+
+	Currency   string    `json:"currency"`
+	CategoryId uuid.UUID `json:"category_id"`
+	Notes      string    `json:"notes"`
+	Date       time.Time `json:"date"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 type CategorySummary struct {
