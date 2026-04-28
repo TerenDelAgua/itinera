@@ -13,7 +13,18 @@
     },
     "common": {
         "loading": "Loading...",
-        "error": "Something went wrong"
+        "error": "Something went wrong",
+        "try_again": "Try again",
+        "today": "Today",
+        "today_short": "TODAY",
+        "tomorrow": "Tomorrow",
+        "tomorrow_short": "TMRW",
+        "next": "Next",
+        "delete": "Delete",
+        "save": "Save",
+        "add": "Add",
+        "cancel": "Cancel",
+        "done": "Done"
     },
     "trip_form": {
         "title": "Create a new trip",
@@ -48,13 +59,44 @@
         "expenses": "Expenses",
         "expenses_empty": "Tap to track spending",
         "notes_optional": "Note (optional)",
-        "view_all_expenses": "View all global expenses",
+        "view_all_expenses": "View All",
         "destinations": "Destinations",
         "add_destination": "Add Destination",
         "destinations_empty": "No destinations added yet.",
         "destinations_empty_sub": "Add places to organize your expenses by location."
     },
     "place": {
-        "view_place_expenses": "View place expenses"
+        "view_place_expenses": "View place expenses",
+        "local": "Local",
+        "no_date": "No date",
+        "days": "days",
+        "day": "day",
+        "no_expenses": "No local expenses yet.",
+        "view_history": "View All"
+    },
+    "itinerary": {
+        "title": "Itinerary",
+        "agenda": "Agenda",
+        "view_all": "View All",
+        "next_activity": "Next",
+        "no_activities": "No upcoming activities planned.",
+        "add_activity": "Add Activity",
+        "title_placeholder": "Title (e.g., TeamLab)",
+        "notes_placeholder": "Notes (optional)",
+        "adding": "Adding...",
+        "add_to_agenda": "Add to Agenda",
+        "local_activity": "Local Activity",
+        "empty_state": "No activities added yet."
+    },
+    "confirm": {
+        "delete_place_title": "Delete Destination",
+        "delete_place_message": "Are you sure you want to delete this destination? All associated activities will be lost.",
+        "delete_expense_title": "Delete Expense",
+        "delete_expense_message": "Are you sure you want to delete this expense? This action cannot be undone."
+    },
+    "place_form": {
+        "name_placeholder": "Destination name (e.g. Kyoto)",
+        "start_date": "Start Date (Optional)",
+        "end_date": "End Date (Optional)"
     }
 }

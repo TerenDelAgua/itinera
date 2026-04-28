@@ -129,7 +129,7 @@
       <input 
         type="text" 
         bind:value={draft.notes} 
-        placeholder="Nota..." 
+        placeholder={$t('detail.notes_optional')} 
         class="w-full px-2 py-1.5 text-xs bg-white border border-teren-border rounded focus:ring-2 focus:ring-teren-primary/30 outline-none" 
         onkeydown={e => e.key === 'Enter' && saveEdit(exp.id)} 
       />
@@ -138,13 +138,13 @@
           onclick={() => editingId = null} 
           class="px-3 py-1.5 text-xs text-teren-text-muted hover:text-teren-text-main hover:bg-gray-100 rounded transition"
         >
-          Cancel
+          {$t('common.cancel')}
         </button>
         <button 
           onclick={() => saveEdit(exp.id)} 
           class="px-3 py-1.5 text-xs bg-teren-primary hover:bg-teren-primary-hover text-white font-medium rounded transition active:scale-95"
         >
-          Done
+          {$t('common.done')}
         </button>
       </div>
     </div>
@@ -206,10 +206,10 @@
   
   <ConfirmModal
     isOpen={deleteConfirmId !== null}
-    title="Eliminar gasto"
-    message="¿Estás seguro de que quieres eliminar este gasto? Esta acción no se puede deshacer."
-    confirmText="Eliminar"
-    cancelText="Cancelar"
+    title={$t('confirm.delete_expense_title')}
+    message={$t('confirm.delete_expense_message')}
+    confirmText={$t('common.delete')}
+    cancelText={$t('common.cancel')}
     isDestructive={true}
     onConfirm={confirmDeletion}
     onCancel={cancelDeletion}

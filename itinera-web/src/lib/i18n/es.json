@@ -13,7 +13,18 @@
     },
     "common": {
         "loading": "Cargando...",
-        "error": "Algo salió mal"
+        "error": "Algo salió mal",
+        "try_again": "Reintentar",
+        "today": "Hoy",
+        "today_short": "HOY",
+        "tomorrow": "Mañana",
+        "tomorrow_short": "MAÑ",
+        "next": "Siguiente",
+        "delete": "Eliminar",
+        "save": "Guardar",
+        "add": "Añadir",
+        "cancel": "Cancelar",
+        "done": "Hecho"
     },
     "trip_form": {
         "title": "Crear un nuevo viaje",
@@ -48,13 +59,44 @@
         "expenses": "Gastos",
         "expenses_empty": "Toca para registrar gastos",
         "notes_optional": "Nota (opcional)",
-        "view_all_expenses": "Ver todos los gastos",
+        "view_all_expenses": "Ver Todos",
         "destinations": "Destinos",
         "add_destination": "Añadir Destino",
         "destinations_empty": "No se han añadido destinos todavía.",
         "destinations_empty_sub": "Añade lugares para organizar tus gastos por ubicación."
     },
     "place": {
-        "view_place_expenses": "Ver gastos del lugar"
+        "view_place_expenses": "Ver gastos del lugar",
+        "local": "Local",
+        "no_date": "Sin fecha",
+        "days": "días",
+        "day": "día",
+        "no_expenses": "Aún no hay gastos locales.",
+        "view_history": "Ver Todos"
+    },
+    "itinerary": {
+        "title": "Itinerario",
+        "agenda": "Agenda",
+        "view_all": "Ver todo",
+        "next_activity": "Siguiente",
+        "no_activities": "No hay actividades próximas planificadas.",
+        "add_activity": "Añadir actividad",
+        "title_placeholder": "Título (ej. TeamLab)",
+        "notes_placeholder": "Notas (opcional)",
+        "adding": "Añadiendo...",
+        "add_to_agenda": "Añadir a la agenda",
+        "local_activity": "Actividad local",
+        "empty_state": "Aún no hay actividades añadidas."
+    },
+    "confirm": {
+        "delete_place_title": "Eliminar destino",
+        "delete_place_message": "¿Estás seguro de que quieres eliminar este destino? Se perderán todas las actividades asociadas.",
+        "delete_expense_title": "Eliminar gasto",
+        "delete_expense_message": "¿Estás seguro de que quieres eliminar este gasto? Esta acción no se puede deshacer."
+    },
+    "place_form": {
+        "name_placeholder": "Nombre del destino (ej. Kioto)",
+        "start_date": "Fecha de inicio (Opcional)",
+        "end_date": "Fecha de fin (Opcional)"
     }
 }

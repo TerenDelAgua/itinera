@@ -25,3 +25,9 @@
 body {
   @apply bg-teren-background text-teren-text-main font-sans antialiased;
 }
+
+/* Hide native browser calendar icons */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}

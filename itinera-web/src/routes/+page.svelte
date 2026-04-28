@@ -6,6 +6,7 @@
   import { t, locale } from "$lib/i18n/store";
   import CreateTripForm from "$lib/components/CreateTripForm.svelte";
   import { getCurrencySymbol } from "$lib/utils";
+  import { formatDisplayDate } from "$lib/utils/date";
 
 
 
@@ -39,15 +40,7 @@
   }
 
   function formatDate(dateStr: string) {
-    if (!dateStr) return "";
-    // Note: ensure we treat the date string as local date to avoid TZ shifts
-    const [year, month, day] = dateStr.split("-").map(Number);
-    const date = new Date(year, month - 1, day);
-    return new Intl.DateTimeFormat($locale, {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    }).format(date);
+    return formatDisplayDate(dateStr, $t, $locale);
   }
 </script>
 
@@ -94,10 +87,10 @@
   <div
     class="text-center py-12 bg-red-50 rounded-xl border border-red-100 text-red-700"
   >
-    <p class="font-medium">⚠️ {error}</p>
+    <p class="font-medium">{$t('common.error')}: {error}</p>
     <button
       onclick={() => window.location.reload()}
-      class="mt-4 text-sm underline hover:text-red-800">Try again</button
+      class="mt-4 text-sm underline hover:text-red-800">{$t('common.try_again')}</button
     >
   </div>
 {:else if trips.length === 0}
@@ -147,7 +140,7 @@
         <div class="p-6 flex flex-col h-full min-h-[180px]">
           <div class="flex justify-between items-start mb-2">
             <h2 class="text-xl font-bold text-teren-text-main group-hover:text-teren-primary transition-colors line-clamp-1">{trip.name}</h2>
-            <span class="text-lg font-bold text-teren-primary whitespace-nowrap">
+            <span class="text-lg font-bold whitespace-nowrap {(trip.total_spent || 0) > 0 ? 'text-teren-primary' : 'text-sm text-teren-text-muted opacity-40'}">
               {getCurrencySymbol(trip.base_currency)} {trip.total_spent?.toFixed(2) || '0.00'}
             </span>
           </div>

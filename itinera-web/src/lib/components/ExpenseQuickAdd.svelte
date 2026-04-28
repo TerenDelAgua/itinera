@@ -87,13 +87,13 @@
         type="text" 
         bind:value={notes} 
         placeholder={$t('detail.notes_optional')}
-        class="flex-1 bg-transparent border-none p-0 text-sm h-11 focus:ring-0 placeholder:text-teren-text-muted/60 text-teren-text-main"
+        class="flex-1 min-w-0 bg-transparent border-none p-0 text-sm h-11 focus:ring-0 placeholder:text-teren-text-muted/60 text-teren-text-main"
         onkeydown={e => e.key === 'Enter' && handleSubmit()} 
       />
       <button 
         onclick={handleSubmit} 
         disabled={isSubmitting || !amount}
-        class="ml-3 bg-teren-primary hover:bg-teren-primary-hover text-white h-11 px-6 rounded-xl font-bold shadow-sm active:scale-95 transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center"
+        class="ml-3 flex-shrink-0 bg-teren-primary hover:bg-teren-primary-hover text-white h-11 px-4 sm:px-6 rounded-xl font-bold shadow-sm active:scale-95 transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center"
       >
         {#if isSubmitting}
           <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
