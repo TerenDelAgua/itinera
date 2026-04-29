@@ -51,7 +51,7 @@ func (s *ExchangeRateService) GetRate(ctx context.Context, baseCurrency, targetC
 }
 
 func (s *ExchangeRateService) getCachedRate(ctx context.Context, base, target string) (float64, bool, error) {
-	query := `SELECT rate, fetcched_at 
+	query := `SELECT rate, fetched_at 
 		FROM exchange_rates_cache
 		WHERE base_currency = $1 
 			AND target_currency = $2

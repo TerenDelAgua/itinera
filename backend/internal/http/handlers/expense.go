@@ -23,12 +23,27 @@ func (h *Handlers) GetCategories(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) CreateExpense(w http.ResponseWriter, r *http.Request) {
 	tripID, _ := uuid.Parse(chi.URLParam(r, "id"))
+	placeIDParam := chi.URLParam(r, "placeId")
 
 	var input services.CreateExpenseInput
 
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
+	}
+
+	if placeIDParam != "" {
+		if _, err := uuid.Parse(placeIDParam); err != nil {
+			http.Error(w, "Invalid place ID", http.StatusBadRequest)
+			return
+		}
+
+		if input.PlaceID != nil && *input.PlaceID != "" && *input.PlaceID != placeIDParam {
+			http.Error(w, "Place ID mismatch", http.StatusBadRequest)
+			return
+		}
+
+		input.PlaceID = &placeIDParam
 	}
 
 	if input.Amount <= 0 {

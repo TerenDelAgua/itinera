@@ -39,6 +39,7 @@ func RegisterApiRoutes(r chi.Router, h *Handlers) {
 		r.Delete("/trips/{id}/expenses/{expenseId}", h.DeleteExpense)
 
 		r.Get("/trips/{id}/places/{placeId}/expenses", h.ListPlaceExpenses)
+		r.Post("/trips/{id}/places/{placeId}/expenses", h.CreateExpense)
 		r.Get("/trips/{id}/places/{placeId}/expenses/summary", h.GetPlaceExpenseSummary)
 
 		//Activities

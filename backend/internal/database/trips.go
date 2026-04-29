@@ -23,16 +23,22 @@ func NewTripRepository(pool *pgxpool.Pool) *TripRepository {
 }
 
 func (r *TripRepository) CreateTrip(ctx context.Context, userId *uuid.UUID, sessionId *string, tripData models.Trip) (*models.Trip, error) {
+	if tripData.BaseCurrency == "" {
+		tripData.BaseCurrency = "EUR"
+	}
+	if tripData.DefaultExpenseCurrency == "" {
+		tripData.DefaultExpenseCurrency = tripData.BaseCurrency
+	}
 
 	var newTrip models.Trip
 	var startDate, endDate, createdAt time.Time
 
 	query := `
 	INSERT INTO trips (
-		user_id, session_id, name, description, start_date, end_date, base_currency
-	) VALUES ($1, $2, $3, $4, $5, $6, $7)
+		user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency
+	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 	RETURNING 
-		id, user_id, session_id, name, description, start_date, end_date, base_currency, created_at
+		id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, created_at
 	`
 
 	err := r.Pool.QueryRow(ctx, query,
@@ -43,6 +49,7 @@ func (r *TripRepository) CreateTrip(ctx context.Context, userId *uuid.UUID, sess
 		tripData.StartDate,
 		tripData.EndDate,
 		tripData.BaseCurrency,
+		tripData.DefaultExpenseCurrency,
 	).Scan(
 		&newTrip.ID,
 		&newTrip.UserId,
@@ -52,6 +59,7 @@ func (r *TripRepository) CreateTrip(ctx context.Context, userId *uuid.UUID, sess
 		&startDate,
 		&endDate,
 		&newTrip.BaseCurrency,
+		&newTrip.DefaultExpenseCurrency,
 		&createdAt,
 	)
 	if err != nil {
@@ -69,7 +77,7 @@ func (r *TripRepository) CreateTrip(ctx context.Context, userId *uuid.UUID, sess
 func (r *TripRepository) ListTrips(ctx context.Context, userId *uuid.UUID, sessionId *string) ([]models.Trip, error) {
 	query := `
 		SELECT 
-			id, user_id, session_id, name, description, start_date, end_date, base_currency, created_at,
+			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, created_at,
 			COALESCE((SELECT SUM(amount) FROM expenses WHERE trip_id = trips.id), 0) as total_spent,
 			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count
 		FROM trips
@@ -95,6 +103,7 @@ func (r *TripRepository) ListTrips(ctx context.Context, userId *uuid.UUID, sessi
 			&startDate,
 			&endDate,
 			&trip.BaseCurrency,
+			&trip.DefaultExpenseCurrency,
 			&createdAt,
 			&trip.TotalSpent,
 			&trip.PlaceCount,
@@ -120,7 +129,7 @@ func (r *TripRepository) GetTrip(ctx context.Context, id string, userId *uuid.UU
 
 	query := `
 		SELECT 
-			id, user_id, session_id, name, description, start_date, end_date, base_currency, created_at,
+			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, created_at,
 			COALESCE((SELECT SUM(amount) FROM expenses WHERE trip_id = trips.id), 0) as total_spent,
 			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count
 		FROM trips
@@ -136,6 +145,7 @@ func (r *TripRepository) GetTrip(ctx context.Context, id string, userId *uuid.UU
 		&startDate,
 		&endDate,
 		&trip.BaseCurrency,
+		&trip.DefaultExpenseCurrency,
 		&createdAt,
 		&trip.TotalSpent,
 		&trip.PlaceCount,
@@ -155,10 +165,10 @@ func (r *TripRepository) GetTripById(ctx context.Context, id uuid.UUID) (*models
 	var trip models.Trip
 	var startDate, endDate time.Time
 
-	query := `SELECT id, name, start_date, end_date, base_currency FROM trips WHERE id = $1`
+	query := `SELECT id, name, start_date, end_date, base_currency, default_expense_currency FROM trips WHERE id = $1`
 
 	err := r.Pool.QueryRow(ctx, query, id).Scan(
-		&trip.ID, &trip.Name, &startDate, &endDate, &trip.BaseCurrency,
+		&trip.ID, &trip.Name, &startDate, &endDate, &trip.BaseCurrency, &trip.DefaultExpenseCurrency,
 	)
 	if err != nil {
 		return nil, err
@@ -172,7 +182,7 @@ func (r *TripRepository) GetTripById(ctx context.Context, id uuid.UUID) (*models
 func (r *TripRepository) UpdateTrip(ctx context.Context, tripID string, userID *uuid.UUID, sessionID *string, updates map[string]any) (*models.Trip, error) {
 	allowedFields := map[string]bool{
 		"name": true, "start_date": true, "end_date": true,
-		"base_currency": true, "description": true,
+		"base_currency": true, "description": true, "default_expense_currency": true,
 	}
 
 	var setClauses []string
@@ -197,7 +207,7 @@ func (r *TripRepository) UpdateTrip(ctx context.Context, tripID string, userID *
 		UPDATE trips 
 		SET %s 
 		WHERE id = $%d AND (user_id = $%d OR session_id = $%d)
-		RETURNING id, user_id, session_id, name, start_date, end_date, base_currency, description, created_at
+		RETURNING id, user_id, session_id, name, start_date, end_date, base_currency, default_expense_currency, description, created_at
 	`, strings.Join(setClauses, ", "), idx, idx+1, idx+2)
 
 	args = append(args, tripID)
@@ -212,7 +222,7 @@ func (r *TripRepository) UpdateTrip(ctx context.Context, tripID string, userID *
 
 	err := r.Pool.QueryRow(ctx, query, args...).Scan(
 		&trip.ID, &trip.UserId, &trip.SessionId, &trip.Name,
-		&startDate, &endDate, &trip.BaseCurrency,
+		&startDate, &endDate, &trip.BaseCurrency, &trip.DefaultExpenseCurrency,
 		&trip.Description, &createdAt,
 	)
 

@@ -65,9 +65,13 @@ func (s *ExpenseService) CalculateAndCreateExpense(ctx context.Context, tripID u
 	}
 
 	// 3. Formateo y Mapeo de datos
-	parsedDate, err := time.Parse("2006-01-02", input.Date)
+	// Intentar parsear como ISO8601/RFC3339 primero, luego fallback a YYYY-MM-DD
+	parsedDate, err := time.Parse(time.RFC3339, input.Date)
 	if err != nil {
-		return nil, fmt.Errorf("invalid date format: %w", err)
+		parsedDate, err = time.Parse("2006-01-02", input.Date)
+		if err != nil {
+			return nil, fmt.Errorf("invalid date format (expected RFC3339 or YYYY-MM-DD): %w", err)
+		}
 	}
 
 	var placeUUID *uuid.UUID
@@ -88,10 +92,15 @@ func (s *ExpenseService) CalculateAndCreateExpense(ctx context.Context, tripID u
 		ExchangeRate:     rate,
 		ConversionDate:   time.Now(),
 		Currency:         targetCurrency,
-		CategoryId:       uuid.MustParse(input.CategoryID),
 		Notes:            input.Notes,
 		Date:             parsedDate,
 	}
+
+	catID, err := uuid.Parse(input.CategoryID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid category id: %w", err)
+	}
+	newExpense.CategoryId = catID
 
 	// 4. Persistencia
 	exp, err := s.ExpensesRepo.CreateExpense(ctx, &tripID, placeUUID, newExpense)

@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -23,10 +24,10 @@ func (r *PlaceRepository) GetPlace(ctx context.Context, placeId uuid.UUID) (*mod
 	var p models.Place
 	var startDate, endDate *time.Time
 	var createdAt time.Time
-	query := `SELECT id, trip_id, name, notes, start_date, end_date, lat, lon, created_at 
+	query := `SELECT id, trip_id, name, notes, start_date, end_date, lat, lon, default_expense_currency, created_at 
 		FROM places WHERE id = $1`
 	err := r.Pool.QueryRow(ctx, query, placeId).
-		Scan(&p.ID, &p.TripId, &p.Name, &p.Notes, &startDate, &endDate, &p.Lat, &p.Lon, &createdAt)
+		Scan(&p.ID, &p.TripId, &p.Name, &p.Notes, &startDate, &endDate, &p.Lat, &p.Lon, &p.DefaultExpenseCurrency, &createdAt)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +44,7 @@ func (r *PlaceRepository) GetPlace(ctx context.Context, placeId uuid.UUID) (*mod
 }
 
 func (r *PlaceRepository) ListPlacesByTrip(ctx context.Context, tripID uuid.UUID) ([]models.Place, error) {
-	rows, err := r.Pool.Query(ctx, `SELECT id, trip_id, name, notes, start_date, end_date, lat, lon, created_at 
+	rows, err := r.Pool.Query(ctx, `SELECT id, trip_id, name, notes, start_date, end_date, lat, lon, default_expense_currency, created_at 
 		FROM places WHERE trip_id = $1 ORDER BY start_date ASC NULLS LAST, created_at ASC`, tripID)
 	if err != nil {
 		return nil, err
@@ -55,7 +56,7 @@ func (r *PlaceRepository) ListPlacesByTrip(ctx context.Context, tripID uuid.UUID
 		var p models.Place
 		var startDate, endDate *time.Time
 		var createdAt time.Time
-		if err := rows.Scan(&p.ID, &p.TripId, &p.Name, &p.Notes, &startDate, &endDate, &p.Lat, &p.Lon, &createdAt); err != nil {
+		if err := rows.Scan(&p.ID, &p.TripId, &p.Name, &p.Notes, &startDate, &endDate, &p.Lat, &p.Lon, &p.DefaultExpenseCurrency, &createdAt); err != nil {
 			return nil, err
 		}
 		if startDate != nil {
@@ -73,12 +74,12 @@ func (r *PlaceRepository) ListPlacesByTrip(ctx context.Context, tripID uuid.UUID
 }
 
 func (r *PlaceRepository) CreatePlace(ctx context.Context, tripID uuid.UUID, p models.Place) (*models.Place, error) {
-	query := `INSERT INTO places (trip_id, name, notes, start_date, end_date, lat, lon) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, trip_id, name, notes, start_date, end_date, lat, lon, created_at`
+	query := `INSERT INTO places (trip_id, name, notes, start_date, end_date, lat, lon, default_expense_currency) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id, trip_id, name, notes, start_date, end_date, lat, lon, default_expense_currency, created_at`
 	var res models.Place
 	var startDate, endDate *time.Time
 	var createdAt time.Time
-	err := r.Pool.QueryRow(ctx, query, tripID, p.Name, p.Notes, p.StartDate, p.EndDate, p.Lat, p.Lon).
-		Scan(&res.ID, &res.TripId, &res.Name, &res.Notes, &startDate, &endDate, &res.Lat, &res.Lon, &createdAt)
+	err := r.Pool.QueryRow(ctx, query, tripID, p.Name, p.Notes, p.StartDate, p.EndDate, p.Lat, p.Lon, p.DefaultExpenseCurrency).
+		Scan(&res.ID, &res.TripId, &res.Name, &res.Notes, &startDate, &endDate, &res.Lat, &res.Lon, &res.DefaultExpenseCurrency, &createdAt)
 	if startDate != nil {
 		s := startDate.Format("2006-01-02")
 		res.StartDate = &s
@@ -92,13 +93,13 @@ func (r *PlaceRepository) CreatePlace(ctx context.Context, tripID uuid.UUID, p m
 }
 
 func (r *PlaceRepository) UpdatePlace(ctx context.Context, placeID uuid.UUID, updates map[string]any) (*models.Place, error) {
-	allowed := map[string]bool{"name": true, "notes": true, "start_date": true, "end_date": true}
+	allowed := map[string]bool{"name": true, "notes": true, "start_date": true, "end_date": true, "default_expense_currency": true}
 	var sets []string
 	var args []any
 	i := 1
 	for k, v := range updates {
 		if allowed[k] {
-			sets = append(sets, k+" = $"+string(rune(i+48))) // $1, $2...
+			sets = append(sets, fmt.Sprintf("%s = $%d", k, i))
 			args = append(args, v)
 			i++
 		}
@@ -107,13 +108,17 @@ func (r *PlaceRepository) UpdatePlace(ctx context.Context, placeID uuid.UUID, up
 		return nil, nil
 	}
 
-	query := "UPDATE places SET " + strings.Join(sets, ", ") + " WHERE id = $" + string(rune(i+48)) + " RETURNING id, trip_id, name, notes, start_date, end_date, lat, lon, created_at"
+	query := fmt.Sprintf(
+		"UPDATE places SET %s WHERE id = $%d RETURNING id, trip_id, name, notes, start_date, end_date, lat, lon, default_expense_currency, created_at",
+		strings.Join(sets, ", "),
+		i,
+	)
 	args = append(args, placeID)
 
 	var res models.Place
 	var startDate, endDate *time.Time
 	var createdAt time.Time
-	err := r.Pool.QueryRow(ctx, query, args...).Scan(&res.ID, &res.TripId, &res.Name, &res.Notes, &startDate, &endDate, &res.Lat, &res.Lon, &createdAt)
+	err := r.Pool.QueryRow(ctx, query, args...).Scan(&res.ID, &res.TripId, &res.Name, &res.Notes, &startDate, &endDate, &res.Lat, &res.Lon, &res.DefaultExpenseCurrency, &createdAt)
 	if startDate != nil {
 		s := startDate.Format("2006-01-02")
 		res.StartDate = &s
