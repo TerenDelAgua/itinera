@@ -8,6 +8,7 @@
   import { tweened } from 'svelte/motion';
   import { untrack } from 'svelte';
   import { formatDisplayDate, formatDate } from '$lib/utils/date';
+  import { COMMON_CURRENCIES } from '$lib/types/Currency';
 
   // Types
   import type { Place } from '$lib/types/Place';
@@ -31,7 +32,8 @@
   let tripName = $state('');
   let tripDescription = $state('');
   let tripDates = $state({ start: '', end: '' });
-  let currency = $state('EUR'); // Default
+  let baseCurrency = $state('EUR');
+  let tripDefaultCurrency = $state('EUR');
   
   let places = $state<Place[]>([]);
   let summary = $state<TripExpenseSummary | null>(null);
@@ -45,6 +47,7 @@
   let isMobileExpenseOpen = $state(false);
   let newPlaceDraft = $state({ name: '', start_date: '', end_date: '' });
   let deletePlaceConfirmId = $state<string | null>(null);
+  let isEditingCurrency = $state(false);
 
   let activities = $state<Activity[]>([]);
   let isAgendaOpen = $state(false);
@@ -74,7 +77,8 @@
       tripName = tripData.name;
       tripDescription = tripData.description || '';
       tripDates = { start: tripData.start_date, end: tripData.end_date };
-      currency = tripData.base_currency || 'EUR';
+      baseCurrency = tripData.base_currency || 'EUR';
+      tripDefaultCurrency = tripData.default_expense_currency || tripData.base_currency || 'EUR';
       
       places = (placesData || []).map(p => ({
         ...p,
@@ -102,7 +106,8 @@
         description: tripDescription,
         start_date: new Date(tripDates.start).toISOString(),
         end_date: new Date(tripDates.end).toISOString(),
-        base_currency: currency
+        base_currency: baseCurrency,
+        default_expense_currency: tripDefaultCurrency
       };
       await apiFetch(`/trips/${tripId}`, {
         method: 'PUT',
@@ -132,6 +137,24 @@
       loadAllData();
     } catch (e) {
       console.error("Failed to create place", e);
+    }
+  }
+
+  async function updateTripCurrency(code: string) {
+    try {
+      tripDefaultCurrency = code;
+      isEditingCurrency = false;
+
+      await apiFetch(`/trips/${tripId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ default_expense_currency: code })
+      })
+
+    } catch (e) {
+      console.error("Failed to update trip currency", e);
+      tripDefaultCurrency = baseCurrency;
+    } finally {
+      isEditingCurrency = false;
     }
   }
 
@@ -171,6 +194,7 @@ function requestDeletePlace(id: string) {
       <div class="flex items-start gap-3 w-full">
         <button 
           onclick={() => goto('/')} 
+          aria-label={$t('detail.back')}
           class="p-2 -ml-2 mt-0.5 text-teren-text-muted hover:text-teren-text-main hover:bg-gray-100 rounded-lg transition active:scale-95 flex-shrink-0"
         >
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -178,7 +202,7 @@ function requestDeletePlace(id: string) {
           </svg>
         </button>
         <div class="flex-1 min-w-0 flex flex-col gap-1">
-          <div class="flex justify-between items-center">
+          <div class="flex items-center">
             <input 
               type="text" 
               bind:value={tripName}   
@@ -187,20 +211,8 @@ function requestDeletePlace(id: string) {
               placeholder={$t('trip_form.name')}
               class="bg-transparent border-none p-0 focus:ring-0 text-xl font-bold text-teren-text-main leading-tight outline-none w-full truncate" 
             />
-            <div class="relative ml-3">
-              <select 
-                bind:value={currency} 
-                onchange={saveTripInfo} 
-                class="appearance-none bg-teren-primary-subtle text-teren-primary border border-teren-primary/20 rounded-full px-2.5 py-0.5 text-[10px] font-bold cursor-pointer hover:bg-teren-primary hover:text-white transition-all outline-none"
-              >
-                <option value="EUR">EUR</option>
-                <option value="USD">USD</option>
-                <option value="GBP">GBP</option>
-                <option value="JPY">JPY</option>
-              </select>
-            </div>
           </div>
-          <div class="flex items-center gap-1.5 text-xs text-teren-text-muted font-medium">
+          <div class="flex flex-wrap items-center gap-2 text-xs text-teren-text-muted font-medium">
             <svg class="w-3.5 h-3.5 opacity-70 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             
             <div class="relative flex items-center">
@@ -214,6 +226,34 @@ function requestDeletePlace(id: string) {
               <span class="text-teren-text-main">{formatDate(tripDates.end, $locale)}</span>
               <input type="date" bind:value={tripDates.end} onchange={saveTripInfo} class="absolute inset-0 opacity-0 cursor-pointer w-full" />
             </div>
+
+            <!-- Configuración de Moneda (Inline) -->
+  <!-- <div class="relative group">
+    <button 
+      onclick={() => isEditingCurrency = !isEditingCurrency}
+      class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-teren-surface border border-teren-border text-teren-text-muted hover:border-teren-primary/50 hover:text-teren-text-main transition-all"
+    >
+      <span class="font-medium">Gastos en:</span>
+      <span class="font-bold text-teren-text-main">{tripDefaultCurrency}</span>
+      <svg class="w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+      </svg>
+    </button>
+
+    {#if isEditingCurrency}
+      <div class="absolute top-full left-0 mt-2 w-32 bg-teren-surface border border-teren-border rounded-lg shadow-xl z-50 p-1 flex flex-col gap-1 animate-in fade-in slide-in-from-top-2">
+        {#each COMMON_CURRENCIES as c (c.code)}
+          <button 
+            onclick={() => updateTripCurrency(c.code)}
+            class="text-left px-3 py-1.5 text-sm rounded hover:bg-teren-primary-subtle hover:text-teren-primary transition-colors {tripDefaultCurrency === c.code ? 'bg-teren-primary-subtle text-teren-primary font-bold' : ''}"
+          >
+            {c.code} {c.symbol}
+          </button>
+        {/each}
+      </div>
+    {/if}
+  </div> -->
+  
           </div>
           <input 
             type="text" 
@@ -237,7 +277,6 @@ function requestDeletePlace(id: string) {
         <div class="h-64 bg-teren-surface rounded-xl border border-teren-border"></div>
       </div>
     {:else}
-      
       <!-- ========================================== -->
       <!-- 1. GLOBAL EXPENSES CARD -->
       <!-- ========================================== -->
@@ -254,14 +293,14 @@ function requestDeletePlace(id: string) {
           </div>
           <div class="flex items-center">
             <span class="text-3xl sm:text-2xl font-bold text-teren-primary tabular-nums leading-none">
-              {$animatedGrandTotal.toFixed(2)} {getCurrencySymbol(currency)}
+              {$animatedGrandTotal.toFixed(2)} {getCurrencySymbol(baseCurrency)}
             </span>
           </div>
         </div>
 
         <!-- Category Pills (Globales) -->
-         <ExpenseSummaryPills {categories} summary={summary?.by_category || []} currency={currency} />
-
+         <ExpenseSummaryPills {categories} summary={summary?.by_category || []} currency={baseCurrency} />
+        
         <!-- {#if summary?.by_category && summary.by_category.length > 0}
           <div class="flex flex-wrap gap-2 mb-6">
             {#each summary.by_category as cat (cat.category_id)}
@@ -279,7 +318,8 @@ function requestDeletePlace(id: string) {
           <ExpenseQuickAdd 
             tripId={tripId} 
             {categories} 
-            {currency}
+            baseCurrency={baseCurrency}
+            insertionCurrency={tripDefaultCurrency}
             onSuccess={loadAllData} 
           />
         </div>
@@ -290,7 +330,8 @@ function requestDeletePlace(id: string) {
             <ExpenseQuickAdd 
               tripId={tripId} 
               {categories} 
-              {currency}
+              baseCurrency={baseCurrency}
+              insertionCurrency={tripDefaultCurrency}
               onSuccess={() => { loadAllData(); isMobileExpenseOpen = false; }} 
             />
           </div>
@@ -335,17 +376,18 @@ function requestDeletePlace(id: string) {
         {#if isCreatingPlace}
           <div class="mb-4 p-4 bg-teren-background border-2 border-teren-primary/30 rounded-xl space-y-3" transition:slide={{ duration: 250, easing: cubicOut }}>
             <input 
+              id="new-place-name"
               type="text" 
               bind:value={newPlaceDraft.name} 
               placeholder={$t('place_form.name_placeholder')} 
               class="w-full px-3 py-2 text-sm font-bold bg-white border border-teren-border rounded-lg focus:ring-2 focus:ring-teren-primary/30 outline-none" 
-              autofocus 
               onkeydown={e => e.key === 'Enter' && createPlace()}
             />
             <div class="flex flex-wrap gap-3 items-end">
               <div class="w-[calc(50%-0.375rem)] sm:flex-1 min-w-0">
-                <label class="block text-xs text-teren-text-muted mb-1 ml-1 font-medium">{$t('place_form.start_date')}</label>
+                <label for="new-place-start-date" class="block text-xs text-teren-text-muted mb-1 ml-1 font-medium">{$t('place_form.start_date')}</label>
                 <input 
+                  id="new-place-start-date"
                   type="date" 
                   bind:value={newPlaceDraft.start_date} 
                   class="w-full min-w-0 px-2 sm:px-3 py-2 text-sm bg-white border border-teren-border rounded-lg focus:ring-2 focus:ring-teren-primary/30 outline-none" 
@@ -353,8 +395,9 @@ function requestDeletePlace(id: string) {
                 />
               </div>
               <div class="w-[calc(50%-0.375rem)] sm:flex-1 min-w-0">
-                <label class="block text-xs text-teren-text-muted mb-1 ml-1 font-medium">{$t('place_form.end_date')}</label>
+                <label for="new-place-end-date" class="block text-xs text-teren-text-muted mb-1 ml-1 font-medium">{$t('place_form.end_date')}</label>
                 <input 
+                  id="new-place-end-date"
                   type="date" 
                   bind:value={newPlaceDraft.end_date} 
                   class="w-full min-w-0 px-2 sm:px-3 py-2 text-sm bg-white border border-teren-border rounded-lg focus:ring-2 focus:ring-teren-primary/30 outline-none" 
@@ -398,9 +441,16 @@ function requestDeletePlace(id: string) {
           
           <!-- Contenido Principal -->
           <div class="flex flex-col gap-1">
-            <h3 class="text-lg font-semibold text-teren-text-main group-hover:text-teren-primary-hover transition-colors pr-8">
-              {place.name}
-            </h3>
+            <div class="flex items-center gap-2 pr-8">
+              <h3 class="text-lg font-semibold text-teren-text-main group-hover:text-teren-primary-hover transition-colors">
+                {place.name}
+              </h3>
+              {#if place.default_expense_currency}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-teren-primary-subtle text-teren-primary text-[11px] font-bold border border-teren-primary/15">
+                  {place.default_expense_currency}
+                </span>
+              {/if}
+            </div>
             
             <div class="flex justify-between items-center">
               <div class="text-sm text-teren-text-muted flex items-center gap-1.5">
@@ -413,7 +463,7 @@ function requestDeletePlace(id: string) {
               {#if place.total_expenses !== undefined}
                 <div class="text-right pl-2">
                   <span class="font-bold {place.total_expenses > 0 ? 'text-teren-primary' : 'text-[11px] text-teren-text-muted opacity-50'}">
-                    {place.total_expenses.toFixed(2)} {getCurrencySymbol(currency)}
+                    {place.total_expenses.toFixed(2)} {getCurrencySymbol(baseCurrency)}
                   </span>
                 </div>
               {/if}

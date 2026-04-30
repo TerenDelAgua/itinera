@@ -12,8 +12,8 @@ export function formatDate(dateStr: string | undefined | null, locale: string = 
     const formatYMD = (d: Date) => d.toISOString().split('T')[0];
     const targetYMD = targetDate.toISOString().split('T')[0];
 
-    if (targetYMD === formatYMD(today)) return 'TODAY';
-    if (targetYMD === formatYMD(tomorrow)) return 'TOMORROW';
+    if (targetYMD === formatYMD(today)) return 'Today';
+    if (targetYMD === formatYMD(tomorrow)) return 'Tomorrow';
 
     return new Intl.DateTimeFormat(locale, {
         day: "2-digit",

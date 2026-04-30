@@ -3,6 +3,7 @@
   import { apiFetch } from "$lib/api";
   import type { Trip } from "$lib/types/Trip";
   import { fade } from "svelte/transition";
+  import CurrencySelector from "$lib/components/currency/CurrencySelector.svelte";
 
 
   let {
@@ -16,6 +17,8 @@
   let name = $state("");
   let startDate = $state("");
   let endDate = $state("");
+  let baseCurrency = $state("EUR");
+  let defaultExpenseCurrency = $state("EUR");
   
   let isSubmitting = $state(false);
   let error = $state<string | null>(null);
@@ -44,7 +47,8 @@
           name: name.trim(),
           start_date: startDate,
           end_date: endDate,
-          base_currency: "€", // Default MVP. Configurable later inside trip view
+          base_currency: baseCurrency,
+          default_expense_currency: defaultExpenseCurrency
         }),
       });
       onsuccess(newTrip);
@@ -83,27 +87,59 @@
         bind:value={name}
         placeholder={$t("trip_form.name_placeholder")}
         required
-        autofocus
          class="w-full px-4 py-2.5 bg-surface-base border border-border-subtle rounded-lg text-text-main placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
       />
     </div>
 
     <div class="grid grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium text-teren-text-main mb-1.5">{$t("trip_form.start_date")}</label>
+        <label for="trip-start-date" class="block text-sm font-medium text-teren-text-main mb-1.5">{$t("trip_form.start_date")}</label>
         <input 
+          id="trip-start-date"
           type="date" 
           bind:value={startDate} 
           class="w-full px-4 py-2.5 bg-surface-base border border-border-subtle rounded-lg text-text-main placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" 
         />
       </div>
       <div>
-        <label class="block text-sm font-medium text-teren-text-main mb-1.5">{$t("trip_form.end_date")}</label>
+        <label for="trip-end-date" class="block text-sm font-medium text-teren-text-main mb-1.5">{$t("trip_form.end_date")}</label>
         <input 
+          id="trip-end-date"
           type="date" 
           bind:value={endDate} 
           class="w-full px-4 py-2.5 bg-white border border-teren-border rounded-lg focus:outline-none focus:ring-2 focus:ring-teren-primary/30 focus:border-teren-primary transition-colors text-teren-text-main" 
         />
+      </div>
+    </div>
+
+    <div class="bg-surface-base border border-border-subtle rounded-xl p-3 sm:p-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <label class="block">
+          <span class="block text-sm font-medium text-teren-text-main mb-1.5">{$t("trip_form.currency")}</span>
+          <CurrencySelector
+            value={baseCurrency}
+            onchange={(code) => {
+              if (!code) return;
+              const previousBase = baseCurrency;
+              baseCurrency = code;
+              if (defaultExpenseCurrency === previousBase) {
+                defaultExpenseCurrency = code;
+              }
+            }}
+            widthClass="w-full"
+          />
+        </label>
+
+        <label class="block">
+          <span class="block text-sm font-medium text-teren-text-main mb-1.5">{$t("trip_form.expense_currency")}</span>
+          <CurrencySelector
+            value={defaultExpenseCurrency}
+            onchange={(code) => {
+              if (code) defaultExpenseCurrency = code;
+            }}
+            widthClass="w-full"
+          />
+        </label>
       </div>
     </div>
 

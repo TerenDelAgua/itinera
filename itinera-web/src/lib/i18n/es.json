@@ -23,6 +23,7 @@
         "delete": "Eliminar",
         "save": "Guardar",
         "add": "Añadir",
+        "inherit": "Heredar",
         "cancel": "Cancelar",
         "done": "Hecho"
     },
@@ -35,6 +36,7 @@
         "start_date": "Fecha de Inicio",
         "end_date": "Fecha de Fin",
         "currency": "Moneda Base",
+        "expense_currency": "Moneda de Gasto",
         "cancel": "Cancelar",
         "submit": "Crear Viaje",
         "creating": "Creando...",
@@ -51,6 +53,11 @@
         "edit": "Editar",
         "settings": "Ajustes del Viaje",
         "currency": "Moneda Base",
+        "summary_currency": "Moneda del resumen",
+        "default_expense_currency": "Moneda por defecto",
+        "summary_currency_short": "Resumen",
+        "expense_currency_short": "Gasto",
+        "currency_settings_help": "Los totales se muestran en {currency}. El alta rápida se abre en la moneda que más usas.",
         "description": "Descripción y Notas",
         "no_description": "Aún no hay descripción.",
         "save": "Guardar Cambios",
@@ -68,6 +75,8 @@
     "place": {
         "view_place_expenses": "Ver gastos del lugar",
         "local": "Local",
+        "default_expense_currency": "Moneda por defecto",
+        "currency_help": "Este lugar usa {currency} para el alta rápida. Si la heredas, seguirá la moneda por defecto del viaje.",
         "no_date": "Sin fecha",
         "days": "días",
         "day": "día",
@@ -98,5 +107,8 @@
         "name_placeholder": "Nombre del destino (ej. Kioto)",
         "start_date": "Fecha de inicio (Opcional)",
         "end_date": "Fecha de fin (Opcional)"
+    },
+    "expenses": {
+        "notes_placeholder": "Notas (opcional)..."
     }
 }

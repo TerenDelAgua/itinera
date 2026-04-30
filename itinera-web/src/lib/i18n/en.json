@@ -23,6 +23,7 @@
         "delete": "Delete",
         "save": "Save",
         "add": "Add",
+        "inherit": "Inherit",
         "cancel": "Cancel",
         "done": "Done"
     },
@@ -35,6 +36,7 @@
         "start_date": "Start Date",
         "end_date": "End Date",
         "currency": "Base Currency",
+        "expense_currency": "Expense Currency",
         "cancel": "Cancel",
         "submit": "Create Trip",
         "creating": "Creating...",
@@ -51,6 +53,11 @@
         "edit": "Edit",
         "settings": "Trip Settings",
         "currency": "Base Currency",
+        "summary_currency": "Summary currency",
+        "default_expense_currency": "Default expense currency",
+        "summary_currency_short": "Summary",
+        "expense_currency_short": "Spend",
+        "currency_settings_help": "Summary totals stay in {currency}. Quick add opens in the currency you use most.",
         "description": "Description & Notes",
         "no_description": "No description added yet.",
         "save": "Save Changes",
@@ -68,6 +75,8 @@
     "place": {
         "view_place_expenses": "View place expenses",
         "local": "Local",
+        "default_expense_currency": "Default expense currency",
+        "currency_help": "This place uses {currency} for quick add. Leave it inherited to follow the trip default.",
         "no_date": "No date",
         "days": "days",
         "day": "day",
@@ -98,5 +107,8 @@
         "name_placeholder": "Destination name (e.g. Kyoto)",
         "start_date": "Start Date (Optional)",
         "end_date": "End Date (Optional)"
+    },
+    "expenses": {
+        "notes_placeholder": "Notes (optional)..."
     }
 }

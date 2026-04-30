@@ -19,7 +19,7 @@ export const locale = writable<Locale>('en');
 const messages: Record<Locale, Messages> = { en, es };
 
 export const t = derived(locale, ($locale) => {
-    return (key: TranslationKeys<Messages>) => {
+    return (key: TranslationKeys<Messages>, vars?: Record<string, string | number>) => {
         const keys = (key as string).split('.');
         let text = messages[$locale] as any;
 
@@ -27,6 +27,13 @@ export const t = derived(locale, ($locale) => {
             if (text && text[k] !== undefined) text = text[k];
             else return key as string;
         }
-        return text as string;
+
+        if (typeof text !== 'string' || !vars) {
+            return text as string;
+        }
+
+        return Object.entries(vars).reduce((result, [name, value]) => {
+            return result.replaceAll(`{${name}}`, String(value));
+        }, text);
     };
 });
