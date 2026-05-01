@@ -18,6 +18,11 @@
   /* Bordes sutiles pero visibles */
   --color-teren-border: #E7E5E4; /* Stone 200 */
 
+  /* Errores (TEREN DS 3.9) */
+  --color-error-base: #DC2626;
+  --color-error-subtle: #FEF2F2;
+  --color-error-hover: #B91C1C;
+
   /* Typography */
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }

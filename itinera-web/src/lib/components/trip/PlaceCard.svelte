@@ -84,7 +84,7 @@
     </div>
 
     <button
-      class="p-2 text-teren-text-muted hover:text-teren-error hover:bg-teren-error/5 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+      class="p-2 text-teren-text-muted hover:text-error-base hover:bg-error-subtle rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
       onclick={(e) => {
         e.stopPropagation();
         onDelete(place.id);

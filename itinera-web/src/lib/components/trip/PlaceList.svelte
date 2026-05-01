@@ -182,12 +182,12 @@
               {/if}
             </div>
 
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-start gap-2">
               <div
-                class="text-sm text-teren-text-muted flex items-center gap-1.5"
+                class="text-sm text-teren-text-muted flex items-start gap-1.5 min-w-0"
               >
                 <svg
-                  class="w-4 h-4 opacity-60"
+                  class="w-4 h-4 flex-shrink-0 opacity-60 mt-0.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -199,7 +199,7 @@
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                <span
+                <span class="leading-snug"
                   >{formatSmartDate(place.start_date)} — {place.end_date
                     ? formatSmartDate(place.end_date)
                     : "No end"}</span
@@ -207,7 +207,7 @@
               </div>
 
               {#if place.total_expenses !== undefined}
-                <div class="text-right pl-2">
+                <div class="text-right pl-2 flex-shrink-0 whitespace-nowrap">
                   <span
                     class="font-bold {place.total_expenses > 0
                       ? 'text-teren-primary'
@@ -227,7 +227,7 @@
               e.stopPropagation();
               onRequestDelete(place.id);
             }}
-            class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition active:scale-95"
+            class="absolute top-3 right-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-error-base/70 hover:text-error-base p-2 rounded-lg hover:bg-error-subtle transition active:scale-95"
             aria-label="Delete place"
           >
             <svg

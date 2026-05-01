@@ -25,7 +25,15 @@ export async function apiFetch<T>(
         if (response.status === 401 || response.status === 403) {
             localStorage.removeItem('session_token');
         }
-        throw new Error(`API Error: ${response.statusText}`);
+        let errorMessage = response.statusText;
+        try {
+            const bodyText = await response.text();
+            if (bodyText) {
+                // Remove trailing newlines from backend responses like `http.Error`
+                errorMessage = bodyText.trim();
+            }
+        } catch (e) {}
+        throw new Error(errorMessage);
     }
 
     const text = await response.text();

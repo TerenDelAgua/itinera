@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from "$app/stores";
+  import { goto } from "$app/navigation";
   import { apiFetch } from "$lib/api";
   import { t } from "$lib/i18n/store";
   import { cubicOut } from "svelte/easing";
@@ -18,8 +19,8 @@
   import type { Activity } from "$lib/types/Activity";
   import ItineraryDrawer from "$lib/components/itinerary/ItineraryDrawer.svelte";
   import UpcomingActivityCard from "$lib/components/itinerary/UpcomingActivityCard.svelte";
-  import TripHeader from "$lib/components/trip/TripHeader.svelte";
-  import TripExpensesCard from "$lib/components/trip/TripExpensesCard.svelte";
+  import DetailHeader from "$lib/components/trip/DetailHeader.svelte";
+  import ExpensesSummaryCard from "$lib/components/trip/ExpensesSummaryCard.svelte";
   import PlaceList from "$lib/components/trip/PlaceList.svelte";
 
   let tripId = $state("");
@@ -167,14 +168,15 @@
 </script>
 
 <div class="min-h-screen bg-teren-background pb-20">
-  <TripHeader
-    bind:tripName
-    bind:tripDescription
-    bind:tripStartDate
-    bind:tripEndDate
-    {tripDefaultCurrency}
+  <DetailHeader
+    bind:name={tripName}
+    bind:description={tripDescription}
+    bind:startDate={tripStartDate}
+    bind:endDate={tripEndDate}
+    defaultCurrency={tripDefaultCurrency}
     onSave={saveTripInfo}
     onUpdateCurrency={updateTripCurrency}
+    onBack={() => goto("/")}
   />
 
   <main class="max-w-3xl mx-auto px-4 py-8 space-y-12">
@@ -192,14 +194,16 @@
       <!-- ========================================== -->
       <!-- 1. GLOBAL EXPENSES CARD -->
       <!-- ========================================== -->
-      <TripExpensesCard
+      <ExpensesSummaryCard
         {tripId}
         {categories}
-        {summary}
+        categorySummary={summary?.by_category || []}
         {baseCurrency}
         {tripDefaultCurrency}
         {effectiveCurrency}
         grandTotalValue={$animatedGrandTotal}
+        tripStart={tripStartDate}
+        tripEnd={tripEndDate}
         onRefresh={loadAllData}
         onOpenDrawer={() => (isDrawerOpen = true)}
       />
@@ -207,14 +211,12 @@
       <!-- ========================================== -->
       <!-- 2. ACTIVITIES SECTION -->
       <!-- ========================================== -->
-      <!-- <UpcomingActivityCard
-        {tripId}
-        {activities}
-        onOpenDrawer={() => (isAgendaOpen = true)}
-        onRefresh={loadAllData} -->
+
       <UpcomingActivityCard
         {activities}
         {tripId}
+        tripStart={tripStartDate}
+        tripEnd={tripEndDate}
         defaultDate={initialActivityDate}
         onRefresh={loadAllData}
         onOpenDrawer={() => (isAgendaOpen = true)}
@@ -256,6 +258,8 @@
   <ItineraryDrawer
     isOpen={isAgendaOpen}
     {tripId}
+    tripStart={tripStartDate}
+    tripEnd={tripEndDate}
     {activities}
     defaultDate={initialActivityDate}
     onRefresh={refreshActivities}

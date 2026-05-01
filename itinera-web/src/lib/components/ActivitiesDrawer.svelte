@@ -4,6 +4,7 @@
   import { activityApi } from '$lib/api/activity';
   import { SvelteMap } from 'svelte/reactivity';
   import { t } from '$lib/i18n/store';
+  import ActivityQuickAdd from './itinerary/ActivityQuickAdd.svelte';
 
   let {
     isOpen,
@@ -11,7 +12,9 @@
     placeId = undefined,
     activities,
     onRefresh,
-    onClose
+    onClose,
+    tripStart,
+    tripEnd
   }: {
     isOpen: boolean;
     tripId: string;
@@ -19,6 +22,8 @@
     activities: Activity[];
     onRefresh: () => void;
     onClose: () => void;
+    tripStart?: string;
+    tripEnd?: string;
   } = $props();
 
   // Group activities by date
@@ -110,6 +115,19 @@
         {#if activities.length === 0}
           <div class="text-center py-10 text-teren-text-muted text-sm">{$t('itinerary.empty_state')}</div>
         {/if}
+      </div>
+
+      <!-- Footer: Quick Add (Mirroring Itinerary Style) -->
+      <div class="px-6 py-4 border-t border-teren-border bg-white shrink-0">
+        <ActivityQuickAdd
+          {tripId}
+          {tripStart}
+          {tripEnd}
+          defaultDate={activities.length > 0 ? activities[0].date : undefined}
+          onSuccess={() => {
+            onRefresh();
+          }}
+        />
       </div>
     </div>
   </div>

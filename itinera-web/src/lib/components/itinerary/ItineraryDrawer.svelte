@@ -10,9 +10,11 @@
   import { activityApi } from "$lib/api/activity";
   import { t } from "$lib/i18n/store";
 
-  let { isOpen, tripId, activities = [], defaultDate, onRefresh, onClose } = $props<{
+  let { isOpen, tripId, tripStart, tripEnd, activities = [], defaultDate, onRefresh, onClose } = $props<{
     isOpen: boolean;
     tripId: string;
+    tripStart?: string;
+    tripEnd?: string;
     activities: Activity[];
     defaultDate?: string;
     onRefresh: () => void;
@@ -192,6 +194,8 @@
                     <div class="py-3" transition:slide>
                       <ActivityQuickAdd
                         {tripId}
+                        {tripStart}
+                        {tripEnd}
                         {activity}
                         onCancel={() => (editingActivityId = null)}
                         onSuccess={() => {
@@ -247,7 +251,7 @@
                           e.stopPropagation();
                           activityToDelete = activity;
                         }}
-                        class="p-2 text-red-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                        class="p-2 text-error-base/70 hover:text-error-base hover:bg-error-subtle rounded-lg transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                         aria-label="Delete activity"
                       >
                         <svg
@@ -303,6 +307,8 @@
           >
             <ActivityQuickAdd
               {tripId}
+              {tripStart}
+              {tripEnd}
               {defaultDate}
               onSuccess={() => {
                 showQuickAdd = false;

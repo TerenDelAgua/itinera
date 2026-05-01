@@ -113,5 +113,12 @@
     },
     "expenses": {
         "notes_placeholder": "Notas (opcional)..."
+    },
+    "errors": {
+        "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
+        "date_out_of_bounds": "La fecha debe estar entre {tripStart} y {tripEnd}.",
+        "required_fields": "Por favor, completa todos los campos requeridos.",
+        "trip_not_found": "No hemos podido encontrar este viaje.",
+        "invalid_place": "El destino seleccionado no es válido."
     }
 }

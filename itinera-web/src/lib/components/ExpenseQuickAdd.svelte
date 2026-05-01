@@ -1,8 +1,11 @@
 <script lang="ts">
   import { apiFetch } from "$lib/api";
   import type { Expense, Category } from "$lib/types";
-  import { t } from "$lib/i18n/store";
+  import { t, locale } from "$lib/i18n/store";
   import { getCategoryEmoji } from "$lib/utils";
+  import { getFriendlyErrorMessage } from "$lib/utils/errorMapper";
+  import { fly } from "svelte/transition";
+  import { cubicOut } from "svelte/easing";
   import { COMMON_CURRENCIES } from "$lib/types/Currency";
 
   let {
@@ -12,6 +15,8 @@
     placeId,
     baseCurrency = "EUR",
     insertionCurrency = "EUR",
+    tripStart,
+    tripEnd
   }: {
     tripId: string;
     categories: Category[];
@@ -19,12 +24,15 @@
     placeId?: string;
     baseCurrency?: string;
     insertionCurrency?: string;
+    tripStart?: string;
+    tripEnd?: string;
   } = $props();
 
   let amount = $state("");
   let categoryId = $state("");
   let notes = $state("");
   let isSubmitting = $state(false);
+  let errorMessage = $state<string | null>(null);
   const effectiveInsertionCurrency = $derived(
     insertionCurrency || baseCurrency || "EUR",
   );
@@ -67,18 +75,75 @@
       onSuccess(exp);
       amount = "";
       notes = "";
+      errorMessage = null;
       currency = effectiveInsertionCurrency;
     } catch (error) {
-      console.error("Error al agregar gasto:", error);
+      const formatOptions: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', timeZone: 'UTC' };
+      const parseYMD = (s: string) => {
+        const [y, m, d] = s.split('-').map(Number);
+        return new Date(Date.UTC(y, m - 1, d));
+      };
+      
+      const startFormatted = tripStart ? new Intl.DateTimeFormat($locale, formatOptions).format(parseYMD(tripStart)) : "...";
+      const endFormatted = tripEnd ? new Intl.DateTimeFormat($locale, formatOptions).format(parseYMD(tripEnd)) : "...";
+
+      errorMessage = getFriendlyErrorMessage(error, {
+        tripStart: startFormatted,
+        tripEnd: endFormatted,
+      });
     } finally {
       isSubmitting = false;
     }
   }
 </script>
 
-<div
-  class="bg-teren-surface rounded-xl border border-teren-border shadow-sm overflow-hidden transition-all duration-300 focus-within:ring-2 focus-within:ring-teren-primary/30 focus-within:border-teren-primary focus-within:shadow-md"
->
+<div class="flex flex-col gap-2">
+  {#if errorMessage}
+    <div
+      class="bg-error-subtle border border-error-base/20 rounded-xl p-3 flex items-start gap-3 shadow-sm"
+      transition:fly={{ y: -5, duration: 200, easing: cubicOut }}
+    >
+      <div
+        class="flex-shrink-0 w-5 h-5 flex items-center justify-center rounded-full bg-error-base/10 text-error-base mt-0.5"
+      >
+        <svg
+          class="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-semibold text-error-base leading-tight">
+          {errorMessage}
+        </p>
+      </div>
+      <button
+        onclick={() => (errorMessage = null)}
+        class="text-error-base/40 hover:text-error-base transition-colors p-1 -mr-1"
+        aria-label="Dismiss error"
+      >
+        <svg
+          class="w-4 h-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  {/if}
+
+  <div
+    class="bg-teren-surface rounded-xl border border-teren-border shadow-sm overflow-hidden transition-all duration-300 focus-within:ring-2 focus-within:ring-teren-primary/30 focus-within:border-teren-primary focus-within:shadow-md"
+  >
   <!-- FILA 1: Herramientas Financieras (Categoría | Divisa | Cantidad | Acción) -->
   <div class="flex items-stretch divide-x divide-teren-border">
     <!-- 1. Selector de Categoría -->
@@ -158,5 +223,6 @@
         {/if}
       </button>
     </div>
+  </div>
   </div>
 </div>

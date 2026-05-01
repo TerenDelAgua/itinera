@@ -4,28 +4,38 @@
   import { t } from "$lib/i18n/store";
   import { getCurrencySymbol } from "$lib/utils";
   import type { Expense_Category } from "$lib/types/Category";
-  import type { TripExpenseSummary } from "$lib/types/Summary";
+  import type { CategorySummary } from "$lib/types/Summary";
   import ExpenseSummaryPills from "$lib/components/ExpenseSummaryPills.svelte";
   import ExpenseQuickAdd from "$lib/components/ExpenseQuickAdd.svelte";
 
   let {
     tripId,
+    placeId,
     categories,
-    summary,
+    categorySummary,
     baseCurrency,
     tripDefaultCurrency,
     effectiveCurrency,
     grandTotalValue,
+    titleBadge,
+    isHighlighted = false,
+    tripStart,
+    tripEnd,
     onRefresh,
     onOpenDrawer,
   } = $props<{
     tripId: string;
+    placeId?: string;
     categories: Expense_Category[];
-    summary: TripExpenseSummary | null;
+    categorySummary: CategorySummary[];
     baseCurrency: string;
     tripDefaultCurrency: string;
     effectiveCurrency: string;
     grandTotalValue: number;
+    titleBadge?: string;
+    isHighlighted?: boolean;
+    tripStart?: string;
+    tripEnd?: string;
     onRefresh: () => void;
     onOpenDrawer: () => void;
   }>();
@@ -34,14 +44,19 @@
 </script>
 
 <section
-  class="bg-teren-surface p-6 rounded-xl border border-teren-border shadow-sm"
+  class="bg-teren-surface p-6 rounded-xl border border-teren-border shadow-sm {isHighlighted ? 'border-l-4 border-l-teren-primary' : ''}"
 >
   <div
     class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-3 sm:gap-0"
   >
     <div class="flex justify-between items-center">
-      <h2 class="text-lg font-semibold text-teren-text-main tracking-tight">
+      <h2 class="text-lg font-semibold text-teren-text-main tracking-tight flex items-center gap-2">
         {$t("detail.expenses")}
+        {#if titleBadge}
+          <span class="text-xs font-bold text-teren-primary bg-white px-2 py-0.5 rounded-full border border-teren-primary/20 shadow-sm">
+            {titleBadge}
+          </span>
+        {/if}
       </h2>
       <button
         onclick={() => (isMobileExpenseOpen = !isMobileExpenseOpen)}
@@ -62,15 +77,18 @@
 
   <ExpenseSummaryPills
     {categories}
-    summary={summary?.by_category || []}
+    summary={categorySummary}
     currency={baseCurrency}
   />
 
   <div class="hidden sm:block mt-6">
     <ExpenseQuickAdd
       {tripId}
+      {placeId}
       {categories}
       {baseCurrency}
+      {tripStart}
+      {tripEnd}
       insertionCurrency={effectiveCurrency}
       onSuccess={onRefresh}
     />
@@ -84,8 +102,11 @@
     >
       <ExpenseQuickAdd
         {tripId}
+        {placeId}
         {categories}
         {baseCurrency}
+        {tripStart}
+        {tripEnd}
         insertionCurrency={tripDefaultCurrency}
         onSuccess={() => {
           onRefresh();

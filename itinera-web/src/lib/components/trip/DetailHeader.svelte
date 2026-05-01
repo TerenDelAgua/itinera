@@ -1,35 +1,46 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
   import { t, locale } from "$lib/i18n/store";
   import { formatDate } from "$lib/utils/date";
   import CurrencySelector from "$lib/components/currency/CurrencySelector.svelte";
 
   let {
-    tripName = $bindable(),
-    tripDescription = $bindable(),
-    tripStartDate = $bindable(),
-    tripEndDate = $bindable(),
-    tripDefaultCurrency,
+    name = $bindable(),
+    description = $bindable(),
+    startDate = $bindable(),
+    endDate = $bindable(),
+    defaultCurrency,
+    currencyFallbackLabel,
+    allowInheritCurrency = false,
+    iconType = "trip",
+    durationLabel,
+    hideDescription = false,
     onSave,
     onUpdateCurrency,
+    onBack,
   } = $props<{
-    tripName: string;
-    tripDescription: string;
-    tripStartDate: string;
-    tripEndDate: string;
-    tripDefaultCurrency: string;
+    name: string;
+    description: string;
+    startDate: string;
+    endDate: string;
+    defaultCurrency: string;
+    currencyFallbackLabel?: string;
+    allowInheritCurrency?: boolean;
+    iconType?: "trip" | "place";
+    durationLabel?: string;
+    hideDescription?: boolean;
     onSave: () => void;
     onUpdateCurrency: (code?: string) => void;
+    onBack: () => void;
   }>();
 </script>
 
 <header
-  class="sticky top-0 z-40 bg-teren-background/90 backdrop-blur-md border-b border-teren-border py-2"
+  class="bg-teren-background border-b border-teren-border py-4"
 >
   <div class="max-w-3xl mx-auto px-4 flex items-start justify-between">
     <div class="flex items-start gap-3 w-full">
       <button
-        onclick={() => goto("/")}
+        onclick={onBack}
         aria-label={$t("detail.back")}
         class="p-2 -ml-2 mt-0.5 text-teren-text-muted hover:text-teren-text-main hover:bg-gray-100 rounded-lg transition active:scale-95 flex-shrink-0"
       >
@@ -48,10 +59,31 @@
         </svg>
       </button>
       <div class="flex-1 min-w-0 flex flex-col gap-1">
-        <div class="flex items-center">
+        <div class="flex items-center gap-2">
+          {#if iconType === "place"}
+            <svg
+              class="w-5 h-5 text-teren-primary flex-shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+          {/if}
           <input
             type="text"
-            bind:value={tripName}
+            bind:value={name}
             onblur={onSave}
             onkeydown={(e) => e.key === "Enter" && e.currentTarget.blur()}
             placeholder={$t("trip_form.name")}
@@ -59,7 +91,7 @@
           />
         </div>
         <div
-          class="flex flex-wrap items-center gap-2 text-xs text-teren-text-muted font-medium"
+          class="flex flex-wrap items-center gap-2 text-xs text-teren-text-muted font-medium mt-1"
         >
           <svg
             class="w-3.5 h-3.5 opacity-70 flex-shrink-0"
@@ -77,11 +109,11 @@
           <div class="relative flex items-center cursor-pointer group">
             <span
               class="text-teren-text-main group-hover:text-teren-primary transition"
-              >{formatDate(tripStartDate, $locale)}</span
+              >{formatDate(startDate, $locale)}</span
             >
             <input
               type="date"
-              bind:value={tripStartDate}
+              bind:value={startDate}
               onchange={onSave}
               class="absolute inset-0 opacity-0 cursor-pointer w-full h-full pointer-events-auto"
             />
@@ -92,32 +124,41 @@
           <div class="relative flex items-center cursor-pointer group">
             <span
               class="text-teren-text-main group-hover:text-teren-primary transition"
-              >{formatDate(tripEndDate, $locale)}</span
+              >{formatDate(endDate, $locale)}</span
             >
             <input
               type="date"
-              bind:value={tripEndDate}
+              bind:value={endDate}
               onchange={onSave}
               class="absolute inset-0 opacity-0 cursor-pointer w-full h-full pointer-events-auto"
             />
           </div>
 
+          {#if durationLabel}
+            <span class="opacity-70 mx-1">·</span>
+            <span class="text-teren-text-main font-medium">{durationLabel}</span>
+          {/if}
+
           <div class="relative">
             <CurrencySelector
-              value={tripDefaultCurrency || ""}
+              value={defaultCurrency || ""}
+              fallbackLabel={currencyFallbackLabel}
+              allowInherit={allowInheritCurrency}
               onSave={onUpdateCurrency}
             />
           </div>
         </div>
 
-        <input
-          type="text"
-          bind:value={tripDescription}
-          onblur={onSave}
-          onkeydown={(e) => e.key === "Enter" && e.currentTarget.blur()}
-          placeholder={$t("detail.description")}
-          class="bg-transparent border-none p-0 focus:ring-0 text-sm text-teren-text-muted outline-none w-full truncate mt-0.5 italic"
-        />
+        {#if !hideDescription}
+          <input
+            type="text"
+            bind:value={description}
+            onblur={onSave}
+            onkeydown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+            placeholder={$t("detail.description")}
+            class="bg-transparent border-none p-0 focus:ring-0 text-sm text-teren-text-muted outline-none w-full truncate mt-0.5 italic"
+          />
+        {/if}
       </div>
     </div>
   </div>

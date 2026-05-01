@@ -113,5 +113,12 @@
     },
     "expenses": {
         "notes_placeholder": "Notes (optional)..."
+    },
+    "errors": {
+        "generic": "Something went wrong. Please try again.",
+        "date_out_of_bounds": "The date must be between {tripStart} and {tripEnd}.",
+        "required_fields": "Please complete all required fields.",
+        "trip_not_found": "We couldn't find this trip.",
+        "invalid_place": "The selected destination is invalid."
     }
 }

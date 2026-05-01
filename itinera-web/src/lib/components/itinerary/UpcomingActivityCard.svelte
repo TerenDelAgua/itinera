@@ -6,9 +6,11 @@
   import ActivityQuickAdd from "./ActivityQuickAdd.svelte";
   import { t } from "$lib/i18n/store";
 
-  let { activities, tripId, defaultDate, onRefresh, onOpenDrawer } = $props<{
+  let { activities, tripId, tripStart, tripEnd, defaultDate, onRefresh, onOpenDrawer } = $props<{
     activities: Activity[];
     tripId: string;
+    tripStart?: string;
+    tripEnd?: string;
     defaultDate?: string;
     onRefresh: () => void;
     onOpenDrawer: () => void;
@@ -30,7 +32,7 @@
 
 <div
   class="bg-white p-5 rounded-xl border border-teren-border shadow-sm flex flex-col gap-4"
-  transition:fly={{ y: -10, duration: 250, easing: "ease-out" }}
+  transition:fly={{ y: -10, duration: 250, easing: cubicOut }}
 >
   <!-- Header: Título + ADD (Top-Right) -->
   <div
@@ -51,10 +53,12 @@
   {#if showQuickAdd}
     <div
       class="mb-2"
-      transition:fly={{ y: -10, duration: 200, easing: "ease-out" }}
+      transition:fly={{ y: -10, duration: 200, easing: cubicOut }}
     >
       <ActivityQuickAdd
         {tripId}
+        {tripStart}
+        {tripEnd}
         {defaultDate}
         onSuccess={() => {
           showQuickAdd = false;

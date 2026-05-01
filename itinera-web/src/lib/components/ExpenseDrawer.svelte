@@ -256,10 +256,10 @@
 													</div>
 												</div>
 
-												<!-- Botón Delete (solo hover) -->
+												<!-- Botón Delete (solo hover en desktop) -->
 												<button
 													onclick={(e) => e.stopPropagation() || requestDelete(exp.id)}
-													class="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition active:scale-95 flex-shrink-0"
+													class="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-error-base/70 hover:text-error-base p-1.5 rounded-lg hover:bg-error-subtle transition active:scale-95 flex-shrink-0"
 													aria-label="Delete"
 												>
 													<svg
