@@ -15,7 +15,7 @@ func (h *Handlers) ListActivities(w http.ResponseWriter, r *http.Request) {
 	tripId := chi.URLParam(r, "trip_id")
 	id, err := uuid.Parse(tripId)
 	if err != nil {
-		http.Error(w, "Invalid trip Idd", http.StatusBadRequest)
+		http.Error(w, "Invalid trip ID", http.StatusBadRequest)
 		return
 	}
 
@@ -61,7 +61,16 @@ func (h *Handlers) CreateActivity(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if input.Date < trip.StartDate || input.Date > trip.EndDate {
+	tripStart := trip.StartDate
+	if len(tripStart) > 10 {
+		tripStart = tripStart[:10]
+	}
+	tripEnd := trip.EndDate
+	if len(tripEnd) > 10 {
+		tripEnd = tripEnd[:10]
+	}
+
+	if input.Date < tripStart || input.Date > tripEnd {
 		http.Error(w, "Activity date must be within trip dates", http.StatusBadRequest)
 		return
 	}

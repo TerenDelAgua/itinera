@@ -24,7 +24,7 @@ func (r *PlaceRepository) GetPlace(ctx context.Context, placeId uuid.UUID) (*mod
 	var p models.Place
 	var startDate, endDate *time.Time
 	var createdAt time.Time
-	query := `SELECT id, trip_id, name, notes, start_date, end_date, lat, lon, default_expense_currency, created_at 
+	query := `SELECT id, trip_id, name, COALESCE(notes, ''), start_date, end_date, lat, lon, default_expense_currency, created_at 
 		FROM places WHERE id = $1`
 	err := r.Pool.QueryRow(ctx, query, placeId).
 		Scan(&p.ID, &p.TripId, &p.Name, &p.Notes, &startDate, &endDate, &p.Lat, &p.Lon, &p.DefaultExpenseCurrency, &createdAt)
@@ -44,7 +44,7 @@ func (r *PlaceRepository) GetPlace(ctx context.Context, placeId uuid.UUID) (*mod
 }
 
 func (r *PlaceRepository) ListPlacesByTrip(ctx context.Context, tripID uuid.UUID) ([]models.Place, error) {
-	rows, err := r.Pool.Query(ctx, `SELECT id, trip_id, name, notes, start_date, end_date, lat, lon, default_expense_currency, created_at 
+	rows, err := r.Pool.Query(ctx, `SELECT id, trip_id, name, COALESCE(notes, ''), start_date, end_date, lat, lon, default_expense_currency, created_at 
 		FROM places WHERE trip_id = $1 ORDER BY start_date ASC NULLS LAST, created_at ASC`, tripID)
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func (r *PlaceRepository) ListPlacesByTrip(ctx context.Context, tripID uuid.UUID
 }
 
 func (r *PlaceRepository) CreatePlace(ctx context.Context, tripID uuid.UUID, p models.Place) (*models.Place, error) {
-	query := `INSERT INTO places (trip_id, name, notes, start_date, end_date, lat, lon, default_expense_currency) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id, trip_id, name, notes, start_date, end_date, lat, lon, default_expense_currency, created_at`
+	query := `INSERT INTO places (trip_id, name, notes, start_date, end_date, lat, lon, default_expense_currency) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id, trip_id, name, COALESCE(notes, ''), start_date, end_date, lat, lon, default_expense_currency, created_at`
 	var res models.Place
 	var startDate, endDate *time.Time
 	var createdAt time.Time
@@ -109,7 +109,7 @@ func (r *PlaceRepository) UpdatePlace(ctx context.Context, placeID uuid.UUID, up
 	}
 
 	query := fmt.Sprintf(
-		"UPDATE places SET %s WHERE id = $%d RETURNING id, trip_id, name, notes, start_date, end_date, lat, lon, default_expense_currency, created_at",
+		"UPDATE places SET %s WHERE id = $%d RETURNING id, trip_id, name, COALESCE(notes, ''), start_date, end_date, lat, lon, default_expense_currency, created_at",
 		strings.Join(sets, ", "),
 		i,
 	)
