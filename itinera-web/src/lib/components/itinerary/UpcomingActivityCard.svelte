@@ -4,6 +4,7 @@
   import { cubicOut } from "svelte/easing";
   import { getRelativeDateLabel } from "$lib/utils";
   import ActivityQuickAdd from "./ActivityQuickAdd.svelte";
+  import { t } from "$lib/i18n/store";
 
   let { activities, tripId, defaultDate, onRefresh, onOpenDrawer } = $props<{
     activities: Activity[];
@@ -35,12 +36,14 @@
   <div
     class="flex justify-between items-center pb-2 border-b border-teren-border/50"
   >
-    <h3 class="text-lg font-semibold text-teren-text-main">Agenda</h3>
+    <h3 class="text-lg font-semibold text-teren-text-main">
+      {$t("itinerary.title")}
+    </h3>
     <button
       onclick={() => (showQuickAdd = !showQuickAdd)}
       class="text-sm font-medium text-teren-primary hover:text-teren-primary-hover transition px-3 py-1.5 rounded-lg bg-teren-primary-subtle active:scale-95 flex-shrink-0"
     >
-      + Add
+      + {$t("itinerary.add")}
     </button>
   </div>
 
@@ -117,9 +120,6 @@
     <!-- Empty State -->
     <div class="text-center py-6">
       <p class="text-sm text-teren-text-muted">No upcoming activities.</p>
-      <p class="text-xs text-teren-text-muted mt-1 opacity-60">
-        Plan your first activity
-      </p>
     </div>
 
     <!-- View All (Bottom-Left) -->

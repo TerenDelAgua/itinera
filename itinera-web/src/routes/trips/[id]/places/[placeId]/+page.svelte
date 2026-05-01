@@ -6,8 +6,7 @@
   import { cubicOut } from "svelte/easing";
   import { untrack } from "svelte";
   import { t, locale } from "$lib/i18n/store";
-  import { formatDisplayDate, formatDate } from "$lib/utils/date";
-  import UpcomingActivityCard from "$lib/components/upcomingActivityCard.svelte";
+  import { formatDate } from "$lib/utils";
   import ActivitiesDrawer from "$lib/components/ActivitiesDrawer.svelte";
   import { activityApi } from "$lib/api/activity";
 
@@ -20,6 +19,7 @@
   import ExpenseDrawer from "$lib/components/ExpenseDrawer.svelte";
   import ExpenseSummaryPills from "$lib/components/ExpenseSummaryPills.svelte";
   import CurrencySelector from "$lib/components/currency/CurrencySelector.svelte";
+  import UpcomingActivityCard from "$lib/components/itinerary/upcomingActivityCard.svelte";
   import type { Activity } from "$lib/types/Activity";
 
   let tripId = $state("");
@@ -86,11 +86,6 @@
     } finally {
       isLoading = false;
     }
-  }
-
-  function formatSmartDate(dateStr?: string) {
-    if (!dateStr) return $t("place.no_date");
-    return formatDisplayDate(dateStr, $t, $locale);
   }
 
   function calculateDuration(start?: string, end?: string) {
@@ -201,17 +196,16 @@
               >{formatDate(place?.start_date, $locale)} - {formatDate(
                 place?.end_date,
                 $locale,
-              )} - {calculateDuration(place?.start_date, place?.end_date)}</span
+              )} · {calculateDuration(place?.start_date, place?.end_date)}</span
             >
-            <CurrencySelector
-              value={place?.default_expense_currency || ""}
-              onchange={savePlaceCurrency}
-              allowInherit={true}
-              inheritLabel={`${$t("common.inherit")} (${tripDefaultCurrency})`}
-              label={$t("detail.expense_currency_short")}
-              compact={true}
-              widthClass="w-auto"
-            />
+            <div class="relative">
+              <CurrencySelector
+                value={place?.default_expense_currency || ""}
+                allowInherit={true}
+                fallbackLabel={`${$t("common.inherit")} (${tripDefaultCurrency})`}
+                onSave={savePlaceCurrency}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -283,7 +277,7 @@
             {placeId}
             {categories}
             baseCurrency={tripBaseCurrency}
-            defaultCurrency={effectivePlaceCurrency}
+            insertionCurrency={effectivePlaceCurrency}
             onSuccess={loadAllData}
           />
         </div>
@@ -298,7 +292,7 @@
               {placeId}
               {categories}
               baseCurrency={tripBaseCurrency}
-              defaultCurrency={effectivePlaceCurrency}
+              insertionCurrency={effectivePlaceCurrency}
               onSuccess={() => {
                 loadAllData();
                 isMobileExpenseOpen = false;

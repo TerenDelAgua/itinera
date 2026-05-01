@@ -95,7 +95,8 @@
         "adding": "Adding...",
         "add_to_agenda": "Add to Agenda",
         "local_activity": "Local Activity",
-        "empty_state": "No activities added yet."
+        "empty_state": "No activities added yet.",
+        "add": "Add"
     },
     "confirm": {
         "delete_place_title": "Delete Destination",
