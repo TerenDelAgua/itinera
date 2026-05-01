@@ -8,7 +8,7 @@ export const activityApi = {
         apiFetch<Activity>(`/trips/${tripId}/activities`, { method: 'POST', body: JSON.stringify(data) }),
 
     update: (tripId: string, id: string, data: Partial<Activity>) =>
-        apiFetch<Activity>(`/trips/${tripId}/activities/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+        apiFetch<Activity>(`/trips/${tripId}/activities/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
 
     delete: (tripId: string, id: string) =>
         apiFetch(`/trips/${tripId}/activities/${id}`, { method: 'DELETE' }),

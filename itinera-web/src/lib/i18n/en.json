@@ -101,7 +101,9 @@
         "delete_place_title": "Delete Destination",
         "delete_place_message": "Are you sure you want to delete this destination? All associated activities will be lost.",
         "delete_expense_title": "Delete Expense",
-        "delete_expense_message": "Are you sure you want to delete this expense? This action cannot be undone."
+        "delete_expense_message": "Are you sure you want to delete this expense? This action cannot be undone.",
+        "delete_activity_title": "Delete Activity",
+        "delete_activity_message": "Are you sure you want to delete this activity?"
     },
     "place_form": {
         "name_placeholder": "Destination name (e.g. Kyoto)",

@@ -27,3 +27,17 @@ export function getCategoryName(slug: string | undefined): string {
   if (!slug) return 'Other';
   return slug.charAt(0).toUpperCase() + slug.slice(1);
 }
+
+
+export function getRelativeDateLabel(dateStr: string): string {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(dateStr);
+  target.setHours(0, 0, 0, 0);
+  const diffDays = Math.round((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Tomorrow';
+  if (diffDays === -1) return 'Yesterday';
+  return target.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+}

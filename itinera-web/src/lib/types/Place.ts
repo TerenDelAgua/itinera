@@ -5,8 +5,8 @@ export interface Place {
     notes: string;
     start_date?: string;
     end_date?: string;
-    lat: number;
-    lon: number;
+    lat: number | null;
+    lon: number | null;
     default_expense_currency?: string;
     total_expenses?: number;
 }

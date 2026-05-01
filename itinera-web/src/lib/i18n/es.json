@@ -101,7 +101,9 @@
         "delete_place_title": "Eliminar destino",
         "delete_place_message": "¿Estás seguro de que quieres eliminar este destino? Se perderán todas las actividades asociadas.",
         "delete_expense_title": "Eliminar gasto",
-        "delete_expense_message": "¿Estás seguro de que quieres eliminar este gasto? Esta acción no se puede deshacer."
+        "delete_expense_message": "¿Estás seguro de que quieres eliminar este gasto? Esta acción no se puede deshacer.",
+        "delete_activity_title": "Eliminar actividad",
+        "delete_activity_message": "¿Estás seguro de que quieres eliminar esta actividad?"
     },
     "place_form": {
         "name_placeholder": "Nombre del destino (ej. Kioto)",
