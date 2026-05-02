@@ -83,7 +83,7 @@ func setupRouter(cfg *config.Config, h *handlers.Handlers) *chi.Mux {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:5173", "http://localhost:3000", "https://*"},
+		AllowedOrigins:   []string{"https://itinera-navy.vercel.app/", "http://localhost:5173", "http://localhost:3000", "https://*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
