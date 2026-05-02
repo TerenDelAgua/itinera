@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="text-scale" content="scale" />
     <meta name="theme-color" content="#FF8C42" />
+    <!-- PWA: iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Itinera" />
+    <!-- PWA: Android / Chrome (replaces deprecated apple-mobile-web-app-capable) -->
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="description" content="Plan your journeys without friction" />
     <link rel="manifest" href="/manifest.json" />
-    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <!-- Inline SVG favicon — no file needed -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><text y='20' font-size='20'>🗺️</text></svg>" />
 
     %sveltekit.head%
   </head>

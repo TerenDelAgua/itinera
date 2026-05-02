@@ -7,12 +7,12 @@ declare const self: ServiceWorkerGlobalScope;
 const STATIC_CACHE = 'itinera-static-v1';
 const DYNAMIC_CACHE = 'itinera-dynamic-v1';
 
-// Assets críticos para cargar offline
+// Assets críticos para cargar offline.
+// ⚠️ Cache.addAll() falla en bloque si cualquier asset devuelve 404.
+// Solo incluir assets que existen realmente en /static.
 const STATIC_ASSETS = [
     '/',
     '/offline.html',
-    '/icon-192.png',
-    '/icon-512.png'
 ];
 
 // Instalación: Cache de assets estáticos
