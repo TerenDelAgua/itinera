@@ -106,7 +106,11 @@ func (h *Handlers) GetTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("[DEBUG] GetTrip - ID: %s, UserID: %v, SessionID: %v", id, userID, sessionID)
+	sidVal := "nil"
+	if sessionID != nil {
+		sidVal = *sessionID
+	}
+	log.Printf("[DEBUG] GetTrip - ID: %s, UserID: %v, SessionID: %s", id, userID, sidVal)
 
 	trip, err := h.TripsRepo.GetTrip(r.Context(), id, userID, sessionID)
 	if err != nil {

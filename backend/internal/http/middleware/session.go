@@ -15,13 +15,14 @@ func SessionMiddleware(isProduction bool) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			cookieName := "session_id"
-
 			cookie, err := r.Cookie(cookieName)
 			if err != nil || cookie.Value == "" {
 				sessionId := uuid.New().String()
 
+				isSecureContext := isProduction || r.Header.Get("X-Forwarded-Proto") == "https"
+
 				sameSite := http.SameSiteLaxMode
-				if isProduction {
+				if isSecureContext {
 					sameSite = http.SameSiteNoneMode
 				}
 
@@ -31,7 +32,7 @@ func SessionMiddleware(isProduction bool) func(http.Handler) http.Handler {
 					Path:     "/",
 					MaxAge:   60 * 60 * 24 * 365, // 1 year
 					HttpOnly: true,
-					Secure:   isProduction,
+					Secure:   isSecureContext,
 					SameSite: sameSite,
 				})
 
