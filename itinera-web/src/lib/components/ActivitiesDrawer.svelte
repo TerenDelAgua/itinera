@@ -59,12 +59,16 @@
   <div 
     class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm" 
     transition:fade 
+    role="presentation"
     onclick={(e) => e.target === e.currentTarget && onClose()}
+    onkeydown={(e) => e.key === 'Escape' && onClose()}
   >
     <div 
       class="bg-teren-surface w-full sm:max-w-lg h-[90vh] sm:h-[80vh] rounded-t-2xl sm:rounded-2xl flex flex-col shadow-2xl overflow-hidden" 
       transition:fly={{ y: 40, duration: 300 }}
+      role="presentation"
       onclick={(e) => e.stopPropagation()}
+      onkeydown={(e) => e.stopPropagation()}
     >
       <!-- Header -->
       <div class="p-6 border-b border-teren-border flex justify-between items-center bg-teren-background">
