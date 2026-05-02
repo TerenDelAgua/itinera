@@ -5,27 +5,13 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/url"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
-func sanitizeDatabaseURL(rawURL string) string {
-	u, err := url.Parse(rawURL)
-	if err != nil || u.User == nil {
-		return rawURL
-	}
-	pass, hasPass := u.User.Password()
-	if !hasPass {
-		return rawURL
-	}
-	
-	u.User = url.UserPassword(u.User.Username(), url.PathEscape(pass))
-	return u.String()
-}
 
 func NewPostgress(cfg *config.Config) (*pgxpool.Pool, error) {
-	pgxConfig, err := pgxpool.ParseConfig(sanitizeDatabaseURL(cfg.DatabaseURL))
+	pgxConfig, err := pgxpool.ParseConfig(cfg.DatabaseURL)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to parse database config: %w", err)
 	}
@@ -41,7 +27,7 @@ func NewPostgress(cfg *config.Config) (*pgxpool.Pool, error) {
 
 		if err == nil {
 			if err = pool.Ping(context.Background()); err == nil {
-				log.Println("✅ Database connection establshed")
+				log.Println("✅ Database connection established")
 				return pool, nil
 			}
 		}
