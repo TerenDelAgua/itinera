@@ -10,4 +10,6 @@ export interface Trip {
     default_expense_currency: string;
     created_at: string;
     updated_at?: string;
+    place_count: number;
+    total_spent: number;
 }

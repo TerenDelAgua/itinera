@@ -104,7 +104,9 @@
         "delete_expense_title": "Delete Expense",
         "delete_expense_message": "Are you sure you want to delete this expense? This action cannot be undone.",
         "delete_activity_title": "Delete Activity",
-        "delete_activity_message": "Are you sure you want to delete this activity?"
+        "delete_activity_message": "Are you sure you want to delete this activity?",
+        "delete_trip_title": "Delete Trip",
+        "delete_trip_message": "You are about to delete \"{tripName}\" and all associated data. This action cannot be undone."
     },
     "place_form": {
         "name_placeholder": "Destination name (e.g. Kyoto)",

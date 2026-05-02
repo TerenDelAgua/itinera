@@ -15,7 +15,7 @@
   <header class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
     <div class="max-w-6xl mx-auto px-6 h-16 flex justify-between items-center">
       <!-- Logo / Marca -->
-      <div class="flex items-center gap-3 cursor-pointer group">
+      <a href="/" class="flex items-center gap-3 cursor-pointer group no-underline text-inherit">
         <div
           class="w-10 h-10 bg-teren-primary rounded-xl flex items-center justify-center text-white shadow-sm group-hover:bg-teren-primary-hover transition-colors duration-200"
         >
@@ -36,7 +36,7 @@
           </svg>
         </div>
         <span class="text-xl font-bold tracking-tight">Itinera</span>
-      </div>
+      </a>
 
       <!-- User Menu -->
 
