@@ -29,7 +29,6 @@ bin/
 *.so
 *.dylib
 vendor/
-go.sum
 
 # Node / SvelteKit
 node_modules/
