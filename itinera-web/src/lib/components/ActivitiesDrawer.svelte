@@ -51,7 +51,7 @@
     const today = new Date().toISOString().split('T')[0];
     if (dateStr === today) return $t('common.today');
     const d = new Date(dateStr);
-    return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 </script>
 

@@ -5,14 +5,14 @@ import es from './es.json';
 type Locale = 'en' | 'es';
 type Messages = typeof en;
 
-// TypeScript helper to extract deep paths (e.g., "dashboard.subtitle")
 type TranslationKeys<T> = {
-    [K in keyof T]: T[K] extends string
+    [K in keyof T & string]:
+    T[K] extends string
     ? K
-    : T[K] extends Record<string, any>
-    ? `${K & string}.${TranslationKeys<T[K]> & string}`
-    : never;
-}[keyof T];
+    : T[K] extends Record<string, string>
+    ? K | `${K}.${keyof T[K] & string}`
+    : K;
+}[keyof T & string];
 
 export const locale = writable<Locale>('en');
 
@@ -21,11 +21,14 @@ const messages: Record<Locale, Messages> = { en, es };
 export const t = derived(locale, ($locale) => {
     return (key: TranslationKeys<Messages>, vars?: Record<string, string | number>) => {
         const keys = (key as string).split('.');
-        let text = messages[$locale] as any;
+        let text: unknown = messages[$locale];
 
         for (const k of keys) {
-            if (text && text[k] !== undefined) text = text[k];
-            else return key as string;
+            if (text && typeof text === 'object' && k in text) {
+                text = (text as Record<string, unknown>)[k];
+            } else {
+                return key as string;
+            }
         }
 
         if (typeof text !== 'string' || !vars) {

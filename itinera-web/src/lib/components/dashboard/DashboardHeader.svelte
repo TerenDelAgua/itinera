@@ -26,10 +26,12 @@
 
   <button
     onclick={onCreateClick}
-    disabled={isCreatingTrip}
-    class="bg-teren-primary hover:bg-teren-primary-hover text-white font-medium py-2.5 px-6 rounded-lg shadow-sm hover:shadow-md active:scale-95 transition-all duration-200 flex items-center gap-2 disabled:opacity-50 w-fit"
+    class="font-medium py-2.5 px-6 rounded-lg shadow-sm active:scale-95 transition-all duration-200 flex items-center gap-2 w-fit
+           {isCreatingTrip
+      ? 'bg-teren-primary/70 hover:bg-teren-primary/60 text-white'
+      : 'bg-teren-primary hover:bg-teren-primary-hover text-white hover:shadow-md'}"
   >
-    <span class="text-xl leading-none">+</span>
+    <span class="text-xl leading-none">{isCreatingTrip ? "×" : "+"}</span>
     <span>{$t("dashboard.button_new")}</span>
   </button>
 </section>

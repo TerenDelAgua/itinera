@@ -29,7 +29,7 @@ export function getCategoryName(slug: string | undefined): string {
 }
 
 
-export function getRelativeDateLabel(dateStr: string): string {
+export function getRelativeDateLabel(dateStr: string, locale = 'en-US'): string {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const target = new Date(dateStr);
@@ -39,5 +39,5 @@ export function getRelativeDateLabel(dateStr: string): string {
   if (diffDays === 0) return 'Today';
   if (diffDays === 1) return 'Tomorrow';
   if (diffDays === -1) return 'Yesterday';
-  return target.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  return target.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
 }

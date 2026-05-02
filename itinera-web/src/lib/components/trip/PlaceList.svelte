@@ -6,14 +6,9 @@
   import { getCurrencySymbol } from "$lib/utils";
   import { formatDisplayDate } from "$lib/utils/date";
   import type { Place } from "$lib/types/Place";
+  import { resolve } from "$app/paths";
 
-  let {
-    tripId,
-    places,
-    baseCurrency,
-    onRefresh,
-    onRequestDelete,
-  } = $props<{
+  let { tripId, places, baseCurrency, onRefresh, onRequestDelete } = $props<{
     tripId: string;
     places: Place[];
     baseCurrency: string;
@@ -33,7 +28,7 @@
     if (!newPlaceDraft.name) return;
     isSaving = true;
     try {
-      const payload: any = {
+      const payload: { name: string; start_date?: string; end_date?: string } = {
         name: newPlaceDraft.name,
       };
       if (newPlaceDraft.start_date)
@@ -56,7 +51,12 @@
   }
 
   function formatSmartDate(dateStr?: string) {
-    return formatDisplayDate(dateStr, $t, $locale);
+    return formatDisplayDate(
+      dateStr,
+      $t("common.today_short"),
+      $t("common.tomorrow_short"),
+      $locale,
+    );
   }
 </script>
 
@@ -74,77 +74,77 @@
   </div>
 
   {#if isCreatingPlace}
-    <div
-      class="mb-4 p-4 bg-teren-background border-2 border-teren-primary/30 rounded-xl space-y-3"
-      transition:slide={{ duration: 250, easing: cubicOut }}
-    >
-      <input
-        type="text"
-        bind:value={newPlaceDraft.name}
-        placeholder={$t("place_form.name_placeholder")}
-        class="w-full px-3 py-2 text-sm font-bold bg-white border border-teren-border rounded-lg focus:ring-2 focus:ring-teren-primary/30 outline-none"
-        onkeydown={(e) => e.key === "Enter" && createPlace()}
-      />
-      <div class="flex flex-wrap gap-3 items-end">
-        <div class="w-[calc(50%-0.375rem)] sm:flex-1 min-w-0">
-          <label
-            for="new-place-start-date"
-            class="block text-xs text-teren-text-muted mb-1 ml-1 font-medium"
-            >{$t("place_form.start_date")}</label
-          >
+    <div transition:slide={{ duration: 250, easing: cubicOut }}>
+      <!-- Unified widget — same pattern as CreateTripForm -->
+      <form
+        onsubmit={(e) => { e.preventDefault(); createPlace(); }}
+        class="mb-4 bg-teren-surface rounded-xl border-2 border-teren-primary/30 overflow-hidden
+               transition-all duration-300 focus-within:border-teren-primary/60 focus-within:shadow-md focus-within:shadow-teren-primary/10"
+      >
+        <!-- ROW 1: Place name -->
+        <div class="border-b border-teren-border/50">
           <input
-            id="new-place-start-date"
-            type="date"
-            bind:value={newPlaceDraft.start_date}
-            class="w-full min-w-0 px-2 sm:px-3 py-2 text-sm bg-white border border-teren-border rounded-lg focus:ring-2 focus:ring-teren-primary/30 outline-none"
+            type="text"
+            bind:value={newPlaceDraft.name}
+            placeholder={$t("place_form.name_placeholder")}
             onkeydown={(e) => e.key === "Enter" && createPlace()}
-          />
-        </div>
-        <div class="w-[calc(50%-0.375rem)] sm:flex-1 min-w-0">
-          <label
-            for="new-place-end-date"
-            class="block text-xs text-teren-text-muted mb-1 ml-1 font-medium"
-            >{$t("place_form.end_date")}</label
-          >
-          <input
-            id="new-place-end-date"
-            type="date"
-            bind:value={newPlaceDraft.end_date}
-            class="w-full min-w-0 px-2 sm:px-3 py-2 text-sm bg-white border border-teren-border rounded-lg focus:ring-2 focus:ring-teren-primary/30 outline-none"
-            onkeydown={(e) => e.key === "Enter" && createPlace()}
+            class="w-full h-12 px-4 bg-transparent font-bold text-base text-teren-text-main placeholder:text-teren-text-muted/30 focus:outline-none"
           />
         </div>
 
-        <div class="w-full h-0 sm:hidden"></div>
+        <!-- ROW 2: Start date | End date -->
+        <div class="flex items-stretch divide-x divide-teren-border border-b border-teren-border/50">
+          <!-- Start date (with calendar icon) -->
+          <div class="flex-1 relative flex items-center group min-w-0">
+            <span class="absolute left-2.5 text-teren-text-muted group-focus-within:text-teren-primary transition-colors pointer-events-none">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+              </svg>
+            </span>
+            <input
+              id="new-place-start-date"
+              type="date"
+              bind:value={newPlaceDraft.start_date}
+              onclick={(e) => e.currentTarget.showPicker()}
+              onkeydown={(e) => e.key === "Enter" && createPlace()}
+              aria-label={$t("place_form.start_date")}
+              class="w-full h-11 pl-8 pr-3 bg-transparent cursor-pointer text-sm text-teren-text-main focus:outline-none tabular-nums min-w-0
+                     [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+            />
+          </div>
 
-        <div class="w-full sm:w-auto flex justify-end">
+          <!-- End date (no icon) -->
+          <div class="flex-1 relative flex items-center group min-w-0">
+            <input
+              id="new-place-end-date"
+              type="date"
+              bind:value={newPlaceDraft.end_date}
+              onclick={(e) => e.currentTarget.showPicker()}
+              onkeydown={(e) => e.key === "Enter" && createPlace()}
+              aria-label={$t("place_form.end_date")}
+              class="w-full h-11 pl-3 pr-3 bg-transparent cursor-pointer text-sm text-teren-text-main focus:outline-none tabular-nums min-w-0
+                     [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+            />
+          </div>
+        </div>
+
+        <!-- ROW 3: Submit -->
+        <div class="flex justify-end px-3 py-2">
           <button
-            onclick={createPlace}
+            type="submit"
             disabled={isSaving || !newPlaceDraft.name}
-            class="flex-shrink-0 bg-teren-primary hover:bg-teren-primary-hover text-white h-[38px] px-8 sm:px-4 rounded-lg font-bold shadow-sm active:scale-95 transition-all disabled:opacity-50 disabled:active:scale-100 flex items-center justify-center"
+            class="w-10 h-10 bg-teren-primary hover:bg-teren-primary-hover text-white rounded-lg shadow-sm active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center"
           >
             {#if isSaving}
-              <div
-                class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"
-              ></div>
+              <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
             {:else}
-              <svg
-                class="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2.5"
-                  d="M12 4v16m8-8H4"
-                />
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
               </svg>
             {/if}
           </button>
         </div>
-      </div>
+      </form>
     </div>
   {/if}
 
@@ -163,7 +163,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       {#each places as place (place.id)}
         <a
-          href="/trips/{tripId}/places/{place.id}"
+          href={resolve(`/trips/${tripId}/places/${place.id}`)}
           class="group block bg-teren-surface p-5 rounded-xl border border-teren-border hover:border-teren-primary/30 hover:shadow-md transition-all cursor-pointer relative"
         >
           <div class="flex flex-col gap-1">

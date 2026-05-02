@@ -22,14 +22,13 @@ export function formatDate(dateStr: string | undefined | null, locale: string = 
     }).format(targetDate);
 }
 
-export function formatDisplayDate(dateStr: string | undefined | null, t: (key: string) => string, locale: string = 'en-US'): string {
+export function formatDisplayDate(dateStr: string | undefined | null, todayLabel: string, tomorrowLabel: string, locale: string = 'en-US'): string {
     if (!dateStr) return '';
 
     const today = new Date();
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    const targetDate = new Date(dateStr);
     const formatYMD = (d: Date) => {
         // Need local date string, not ISO to avoid timezone shifts
         const offset = d.getTimezoneOffset()
@@ -40,8 +39,8 @@ export function formatDisplayDate(dateStr: string | undefined | null, t: (key: s
     // The dateStr from DB is usually YYYY-MM-DD
     const targetYMD = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
 
-    if (targetYMD === formatYMD(today)) return t('common.today_short').toUpperCase();
-    if (targetYMD === formatYMD(tomorrow)) return t('common.tomorrow_short').toUpperCase();
+    if (targetYMD === formatYMD(today)) return todayLabel.toUpperCase();
+    if (targetYMD === formatYMD(tomorrow)) return tomorrowLabel.toUpperCase();
 
     // Note: ensure we treat the date string as local date to avoid TZ shifts
     const [year, month, day] = targetYMD.split("-").map(Number);

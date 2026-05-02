@@ -18,13 +18,17 @@
   }>();
 
   function formatSmartDate(dateStr?: string) {
-    return formatDisplayDate(dateStr, $t, $locale);
+    return formatDisplayDate(
+      dateStr,
+      $t("common.today_short"),
+      $t("common.tomorrow_short"),
+      $locale,
+    );
   }
 </script>
 
 <div
-  class="bg-white rounded-xl border border-teren-border p-4 hover:border-teren-primary/30 transition-all cursor-pointer group relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-  onclick={() => onClick(place.id)}
+  class="bg-white rounded-xl border border-teren-border p-4 hover:border-teren-primary/30 transition-all group relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4"
 >
   <div class="flex items-start gap-4">
     <div
@@ -34,7 +38,13 @@
     </div>
     <div class="min-w-0">
       <h3 class="font-bold text-teren-text-main truncate pr-8 sm:pr-0">
-        {place.name}
+        <button
+          type="button"
+          onclick={() => onClick(place.id)}
+          class="text-left hover:text-teren-primary focus:outline-none before:absolute before:inset-0 before:z-10"
+        >
+          {place.name}
+        </button>
       </h3>
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
         <span class="text-xs text-teren-text-muted flex items-center gap-1">
@@ -84,7 +94,7 @@
     </div>
 
     <button
-      class="p-2 text-teren-text-muted hover:text-error-base hover:bg-error-subtle rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+      class="p-2 text-teren-text-muted hover:text-error-base hover:bg-error-subtle rounded-lg transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 relative z-20"
       onclick={(e) => {
         e.stopPropagation();
         onDelete(place.id);

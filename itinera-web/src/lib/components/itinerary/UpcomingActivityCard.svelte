@@ -4,9 +4,17 @@
   import { cubicOut } from "svelte/easing";
   import { getRelativeDateLabel } from "$lib/utils";
   import ActivityQuickAdd from "./ActivityQuickAdd.svelte";
-  import { t } from "$lib/i18n/store";
+  import { t, locale } from "$lib/i18n/store";
 
-  let { activities, tripId, tripStart, tripEnd, defaultDate, onRefresh, onOpenDrawer } = $props<{
+  let {
+    activities,
+    tripId,
+    tripStart,
+    tripEnd,
+    defaultDate,
+    onRefresh,
+    onOpenDrawer,
+  } = $props<{
     activities: Activity[];
     tripId: string;
     tripStart?: string;
@@ -21,8 +29,8 @@
   let upcoming = $derived.by(() => {
     const today = new Date().toISOString().split("T")[0];
     return activities
-      .filter((a) => a.date >= today)
-      .sort((a, b) => {
+      .filter((a: Activity) => a.date >= today)
+      .sort((a: Activity, b: Activity) => {
         if (a.date !== b.date) return a.date.localeCompare(b.date);
         if (a.time && b.time) return a.time.localeCompare(b.time);
         return a.time ? -1 : 1; // All-day al final
@@ -74,9 +82,9 @@
       <div
         class="flex flex-col items-center justify-center w-14 h-14 rounded-lg bg-teren-primary-subtle border border-teren-primary/20 text-teren-primary shrink-0"
       >
-        <span class="text-[10px] font-bold uppercase tracking-wide">Next</span>
+        <span class="text-[10px] font-bold uppercase tracking-wide">{$t("itinerary.next_activity")}</span>
         <span class="text-xs font-medium"
-          >{getRelativeDateLabel(upcoming.date)}</span
+          >{getRelativeDateLabel(upcoming.date, $locale)}</span
         >
       </div>
       <div class="flex-1 min-w-0 pt-1">
@@ -105,7 +113,7 @@
       onclick={onOpenDrawer}
       class="text-sm text-teren-text-muted hover:text-teren-primary transition-colors self-start flex items-center gap-1 group"
     >
-      View All
+      {$t("itinerary.view_all")}
       <svg
         class="w-4 h-4 group-hover:translate-x-1 transition-transform"
         fill="none"
@@ -123,7 +131,9 @@
   {:else}
     <!-- Empty State -->
     <div class="text-center py-6">
-      <p class="text-sm text-teren-text-muted">No upcoming activities.</p>
+      <p class="text-sm text-teren-text-muted">
+        {$t("itinerary.no_activities")}
+      </p>
     </div>
 
     <!-- View All (Bottom-Left) -->
@@ -131,7 +141,7 @@
       onclick={onOpenDrawer}
       class="text-sm text-teren-text-muted hover:text-teren-primary transition-colors self-start flex items-center gap-1 group"
     >
-      View All
+      {$t("itinerary.view_all")}
       <svg
         class="w-4 h-4 group-hover:translate-x-1 transition-transform"
         fill="none"

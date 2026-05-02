@@ -5,7 +5,7 @@
   import { t } from "$lib/i18n/store";
 
   // Components
-  import CreateTripForm from "$lib/components/CreateTripForm.svelte";
+  import CreateTripForm from "$lib/components/dashboard/CreateTripForm.svelte";
   import ConfirmModal from "$lib/components/ConfirmModal.svelte";
   import DashboardHeader from "$lib/components/dashboard/DashboardHeader.svelte";
   import EmptyState from "$lib/components/dashboard/EmptyState.svelte";
@@ -31,15 +31,11 @@
   });
 
   function handleCreateTrip() {
-    isCreatingTrip = true;
+    isCreatingTrip = !isCreatingTrip;
   }
 
   function handleTripCreated(newTrip: Trip) {
     trips = [newTrip, ...trips];
-    isCreatingTrip = false;
-  }
-
-  function handleCancelCreate() {
     isCreatingTrip = false;
   }
 
@@ -51,9 +47,10 @@
 
   async function confirmDelete() {
     if (!tripToDelete) return;
+    const id = tripToDelete.id;
     try {
-      await apiFetch(`/trips/${tripToDelete.id}`, { method: "DELETE" });
-      trips = trips.filter((t) => t.id !== tripToDelete.id);
+      await apiFetch(`/trips/${id}`, { method: "DELETE" });
+      trips = trips.filter((t) => t.id !== id);
     } catch (err) {
       console.error("Error deleting trip", err);
     } finally {
@@ -72,10 +69,7 @@
   <!-- FORMULARIO INLINE -->
   {#if isCreatingTrip}
     <div class="mb-10 animate-in fade-in slide-in-from-top-4 duration-300">
-      <CreateTripForm
-        onsuccess={handleTripCreated}
-        oncancel={handleCancelCreate}
-      />
+      <CreateTripForm onsuccess={handleTripCreated} />
     </div>
   {/if}
 

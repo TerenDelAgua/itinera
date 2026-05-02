@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
   import { t, locale } from "$lib/i18n/store";
   import { formatDisplayDate } from "$lib/utils/date";
   import type { Trip } from "$lib/types/Trip";
+  import { resolve } from "$app/paths";
 
   let {
     trip,
@@ -13,29 +13,29 @@
   } = $props();
 
   function formatDate(dateStr: string) {
-    return formatDisplayDate(dateStr, $t, $locale);
-  }
-
-  function handleNavigation() {
-    goto(`/trips/${trip.id}`);
+    return formatDisplayDate(
+      dateStr,
+      $t("common.today_short"),
+      $t("common.tomorrow_short"),
+      $locale,
+    );
   }
 </script>
 
 <article
-  class="group relative bg-white rounded-xl border border-teren-border hover:border-teren-primary/30 shadow-sm hover:shadow-lg hover:shadow-teren-primary/5 transition-all duration-300 cursor-pointer hover:-translate-y-1 overflow-hidden"
-  role="button"
-  tabindex="0"
-  onclick={handleNavigation}
-  onkeydown={(e) => {
-    if (e.key === "Enter") handleNavigation();
-  }}
+  class="group relative bg-white rounded-xl border border-teren-border hover:border-teren-primary/30 shadow-sm hover:shadow-lg hover:shadow-teren-primary/5 transition-all duration-300 hover:-translate-y-1 overflow-hidden focus-within:ring-2 focus-within:ring-teren-primary focus-within:ring-offset-2"
 >
   <div class="p-5 flex flex-col h-full">
-    <!-- 1. TÍTULO (Prioridad absoluta, ancho completo) -->
+    <!-- 1. TÍTULO (Enlace estirado) -->
     <h2
       class="text-xl font-bold text-teren-text-main line-clamp-1 leading-tight mb-1"
     >
-      {trip.name}
+      <a
+        href={resolve(`/trips/${trip.id}`)}
+        class="before:absolute before:inset-0 before:z-10 focus:outline-none"
+      >
+        {trip.name}
+      </a>
     </h2>
 
     <!-- 2. FECHAS (Contexto temporal, permite wrap) -->
@@ -85,7 +85,7 @@
       {/if}
 
       <!-- Grouping Price and Delete to the right -->
-      <div class="flex items-center gap-2 ml-auto">
+      <div class="flex items-center gap-2 ml-auto relative z-20">
         <!-- Badge de Precio -->
         <span
           class="px-2.5 py-1 rounded-full bg-teren-primary-subtle text-teren-primary text-xs font-bold whitespace-nowrap tabular-nums"

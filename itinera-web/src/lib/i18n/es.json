@@ -3,8 +3,8 @@
         "title": "Mis viajes",
         "subtitle": "Planifica y organiza tus aventuras",
         "button_new": "Nuevo viaje",
-        "destination": "destino",
-        "destinations": "destinos"
+        "destination": "Destino",
+        "destinations": "Destinos"
     },
     "empty_state": {
         "title": "Aún no hay viajes",
@@ -19,7 +19,7 @@
         "today_short": "HOY",
         "tomorrow": "Mañana",
         "tomorrow_short": "MAÑ",
-        "next": "Siguiente",
+        "next": "Prox.",
         "delete": "Eliminar",
         "save": "Guardar",
         "add": "Añadir",
@@ -30,7 +30,7 @@
     "trip_form": {
         "title": "Crear un nuevo viaje",
         "name": "Nombre del Viaje",
-        "name_placeholder": "ej. Verano en Japón",
+        "name_placeholder": "Nombre de viaje (ej. Japón)",
         "description": "Descripción (Opcional)",
         "description_placeholder": "ej. Explorando Tokio, Kioto y Osaka",
         "start_date": "Fecha de Inicio",
@@ -40,7 +40,12 @@
         "cancel": "Cancelar",
         "submit": "Crear Viaje",
         "creating": "Creando...",
-        "create_error": "Error al crear el viaje"
+        "create_error": "No se pudo crear el viaje. Por favor, inténtalo de nuevo.",
+        "currency_help": "Las monedas por defecto son {currency}. Puedes cambiar esto dentro del viaje en cualquier momento.",
+        "dates": "Fechas",
+        "error_name_required": "El nombre del viaje es obligatorio.",
+        "error_start_required": "La fecha de inicio es obligatoria.",
+        "error_end_after_start": "La fecha de fin debe ser posterior a la de inicio."
     },
     "currencies": {
         "eur": "Euro (€)",
@@ -87,7 +92,7 @@
         "title": "Itinerario",
         "agenda": "Agenda",
         "view_all": "Ver todo",
-        "next_activity": "Siguiente",
+        "next_activity": "Prox.",
         "no_activities": "No hay actividades próximas planificadas.",
         "add_activity": "Añadir actividad",
         "title_placeholder": "Título (ej. TeamLab)",
@@ -96,7 +101,7 @@
         "add_to_agenda": "Añadir a la agenda",
         "local_activity": "Actividad local",
         "empty_state": "Aún no hay actividades añadidas.",
-        "Add": "Add"
+        "add": "Añadir"
     },
     "confirm": {
         "delete_place_title": "Eliminar destino",

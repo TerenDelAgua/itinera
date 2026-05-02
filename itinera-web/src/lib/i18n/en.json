@@ -30,7 +30,7 @@
     "trip_form": {
         "title": "Create a new trip",
         "name": "Trip Name",
-        "name_placeholder": "e.g. Summer in Japan",
+        "name_placeholder": "Trip name (e.g. Japan)",
         "description": "Description (Optional)",
         "description_placeholder": "e.g. Exploring Tokyo, Kyoto, and Osaka",
         "start_date": "Start Date",
@@ -40,7 +40,12 @@
         "cancel": "Cancel",
         "submit": "Create Trip",
         "creating": "Creating...",
-        "create_error": "Failed to create trip"
+        "create_error": "Could not create trip. Please try again.",
+        "currency_help": "Currencies default to {currency}. You can change this inside your trip anytime.",
+        "dates": "Dates",
+        "error_name_required": "Trip name is required.",
+        "error_start_required": "Start date is required.",
+        "error_end_after_start": "End date must be after start date."
     },
     "currencies": {
         "eur": "Euro (€)",
