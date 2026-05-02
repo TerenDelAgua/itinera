@@ -7,8 +7,8 @@ import (
 )
 
 func RegisterApiRoutes(r chi.Router, h *Handlers) {
-	r.Use(middleware.SessionMiddleware)                  // ← Siempre activo
-	r.Use(middleware.AuthMiddleware(h.Config.JWTSecret)) // ← Opcional, no bloquea
+	r.Use(middleware.SessionMiddleware(h.Config.IsProduction()))
+	r.Use(middleware.AuthMiddleware(h.Config.JWTSecret))
 
 	r.Get("/health", h.healthCheck)
 
