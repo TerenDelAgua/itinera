@@ -26,6 +26,8 @@
     tripEnd?: string;
   } = $props();
 
+  let showQuickAdd = $state(false);
+
   // Group activities by date
   let groupedActivities = $derived.by(() => {
     const groups = new SvelteMap<string, Activity[]>();
@@ -108,8 +110,14 @@
                   {/if}
                 </div>
 
-                <button onclick={() => activityApi.delete(tripId, activity.id).then(onRefresh)} class="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 p-1 transition">
-                  🗑️
+                <button 
+                  onclick={() => activityApi.delete(tripId, activity.id).then(onRefresh)} 
+                  class="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-error-base/60 hover:text-error-base p-1.5 rounded-lg hover:bg-error-subtle transition-all active:scale-95"
+                  aria-label="Delete"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
                 </button>
               </div>
             {/each}
@@ -123,16 +131,31 @@
 
       <!-- Footer: Quick Add (Mirroring Itinerary Style) -->
       <div class="px-6 py-4 border-t border-teren-border bg-white shrink-0">
-        <ActivityQuickAdd
-          {tripId}
-          {tripStart}
-          {tripEnd}
-          {placeId}
-          defaultDate={activities.length > 0 ? activities[0].date : undefined}
-          onSuccess={() => {
-            onRefresh();
-          }}
-        />
+        <button
+          onclick={() => (showQuickAdd = !showQuickAdd)}
+          class="w-full text-center text-sm font-semibold text-teren-primary hover:text-teren-primary-hover py-2 transition-colors active:scale-95"
+        >
+          {showQuickAdd ? $t('common.cancel') : `+ ${$t('itinerary.add_activity')}`}
+        </button>
+
+        {#if showQuickAdd}
+          <div 
+            class="mt-3"
+            transition:fly={{ y: 20, duration: 250, easing: cubicOut }}
+          >
+            <ActivityQuickAdd
+              {tripId}
+              {tripStart}
+              {tripEnd}
+              {placeId}
+              defaultDate={activities.length > 0 ? activities[0].date : undefined}
+              onSuccess={() => {
+                showQuickAdd = false;
+                onRefresh();
+              }}
+            />
+          </div>
+        {/if}
       </div>
     </div>
   </div>
