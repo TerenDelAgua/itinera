@@ -89,8 +89,8 @@ func setupRouter(cfg *config.Config, h *handlers.Handlers) *chi.Mux {
 			if origin == "http://localhost:5173" || origin == "http://localhost:3000" {
 				return true
 			}
-			// Permite el dominio de producción en Vercel
-			if origin == "https://itinera-navy.vercel.app" {
+			// Producción Vercel (todos los subdominios)
+			if strings.Contains(origin, "vercel.app") {
 				return true
 			}
 			// Permite cualquier subdominio de vercel.app (preview deployments)
@@ -99,9 +99,9 @@ func setupRouter(cfg *config.Config, h *handlers.Handlers) *chi.Mux {
 			}
 			return false
 		},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-		ExposedHeaders:   []string{"Link"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Origin", "X-Requested-With",},
+		ExposedHeaders:   []string{"Link", "Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           300,
 	}))
