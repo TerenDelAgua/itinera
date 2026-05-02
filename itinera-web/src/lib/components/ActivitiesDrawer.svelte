@@ -127,6 +127,7 @@
           {tripId}
           {tripStart}
           {tripEnd}
+          {placeId}
           defaultDate={activities.length > 0 ? activities[0].date : undefined}
           onSuccess={() => {
             onRefresh();

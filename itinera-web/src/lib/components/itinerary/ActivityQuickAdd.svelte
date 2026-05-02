@@ -15,6 +15,7 @@
     onCancel,
     defaultDate,
     activity,
+    placeId,
   } = $props<{
     tripId: string;
     tripStart?: string;
@@ -23,6 +24,7 @@
     onCancel?: () => void;
     defaultDate?: string;
     activity?: Activity;
+    placeId?: string;
   }>();
 
   let title = $state(activity?.title || "");
@@ -43,6 +45,7 @@
         date,
         time: time || undefined,
         notes: notes || undefined,
+        place_id: placeId || activity?.place_id
       };
 
       let result: Activity;

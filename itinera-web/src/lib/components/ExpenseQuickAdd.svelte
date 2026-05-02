@@ -38,9 +38,17 @@
   );
   let currency = $state(insertionCurrency);
 
+  let sortedCategories = $derived.by(() => {
+    return [...categories].sort((a, b) => {
+      if (a.slug === 'food') return -1;
+      if (b.slug === 'food') return 1;
+      return a.slug.localeCompare(b.slug);
+    });
+  });
+
   $effect(() => {
-    if (!categoryId && categories.length > 0) {
-      categoryId = categories[0].id;
+    if (!categoryId && sortedCategories.length > 0) {
+      categoryId = sortedCategories[0].id;
     }
   });
 
@@ -152,7 +160,7 @@
         bind:value={categoryId}
         class="appearance-none w-full h-12 bg-transparent text-2xl text-center cursor-pointer focus:outline-none hover:bg-teren-primary-subtle transition-colors"
       >
-        {#each categories as cat (cat.id)}
+        {#each sortedCategories as cat (cat.id)}
           <option value={cat.id}>{getCategoryEmoji(cat.slug)}</option>
         {/each}
       </select>

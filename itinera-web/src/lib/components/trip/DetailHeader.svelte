@@ -106,7 +106,7 @@
             /></svg
           >
 
-          <div class="relative flex items-center cursor-pointer group">
+          <div class="relative flex items-center cursor-pointer group px-1.5 py-0.5 rounded-md hover:bg-teren-primary-subtle transition-all">
             <span
               class="text-teren-text-main group-hover:text-teren-primary transition"
               >{formatDate(startDate, $locale)}</span
@@ -115,13 +115,14 @@
               type="date"
               bind:value={startDate}
               onchange={onSave}
-              class="absolute inset-0 opacity-0 cursor-pointer w-full h-full pointer-events-auto"
+              onclick={(e) => e.currentTarget.showPicker()}
+              class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
             />
           </div>
 
           <span class="opacity-70 mx-0.5">—</span>
 
-          <div class="relative flex items-center cursor-pointer group">
+          <div class="relative flex items-center cursor-pointer group px-1.5 py-0.5 rounded-md hover:bg-teren-primary-subtle transition-all">
             <span
               class="text-teren-text-main group-hover:text-teren-primary transition"
               >{formatDate(endDate, $locale)}</span
@@ -130,7 +131,8 @@
               type="date"
               bind:value={endDate}
               onchange={onSave}
-              class="absolute inset-0 opacity-0 cursor-pointer w-full h-full pointer-events-auto"
+              onclick={(e) => e.currentTarget.showPicker()}
+              class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
             />
           </div>
 

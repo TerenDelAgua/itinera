@@ -12,6 +12,7 @@
     tripStart,
     tripEnd,
     defaultDate,
+    placeId,
     onRefresh,
     onOpenDrawer,
   } = $props<{
@@ -20,6 +21,7 @@
     tripStart?: string;
     tripEnd?: string;
     defaultDate?: string;
+    placeId?: string;
     onRefresh: () => void;
     onOpenDrawer: () => void;
   }>();
@@ -68,6 +70,7 @@
         {tripStart}
         {tripEnd}
         {defaultDate}
+        {placeId}
         onSuccess={() => {
           showQuickAdd = false;
           onRefresh();

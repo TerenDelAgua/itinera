@@ -13,9 +13,13 @@
   onMount(async () => {
     if ("serviceWorker" in navigator) {
       try {
-        const registration = await navigator.serviceWorker.register("/service-worker.js", {
-          scope: "/",
-        });
+        const registration = await navigator.serviceWorker.register(
+          "/service-worker.js",
+          {
+            type: "module",
+            scope: "/",
+          },
+        );
 
         if (registration.installing) {
           console.log("[PWA] Service worker installing");
@@ -90,7 +94,7 @@
             {$locale}
           </button>
         </div>
-        <div
+        <!-- <div
           class="hidden sm:flex items-center gap-2 text-sm text-teren-text-muted font-medium"
         >
           <svg
@@ -109,7 +113,7 @@
             <circle cx="12" cy="7" r="4"></circle>
           </svg>
           <span>teren_91@hotmail.com</span>
-        </div>
+        </div> -->
 
         <button
           class="text-sm font-semibold text-teren-text-main hover:text-teren-primary transition-all duration-200 flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0 active:scale-95"

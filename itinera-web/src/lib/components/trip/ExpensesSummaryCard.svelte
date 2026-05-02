@@ -110,7 +110,6 @@
         insertionCurrency={tripDefaultCurrency}
         onSuccess={() => {
           onRefresh();
-          isMobileExpenseOpen = false;
         }}
       />
     </div>

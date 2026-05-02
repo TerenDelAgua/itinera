@@ -103,10 +103,12 @@
   <div
     class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm"
     transition:fade={{ duration: 200 }}
+    onclick={(e) => e.target === e.currentTarget && onClose()}
   >
     <div
       class="bg-teren-surface w-full sm:max-w-lg h-[85vh] sm:h-[80vh] rounded-t-2xl sm:rounded-2xl flex flex-col overflow-hidden shadow-2xl"
       transition:fly={{ y: 30, duration: 250, easing: cubicOut }}
+      onclick={(e) => e.stopPropagation()}
     >
       <!-- Header -->
       <div
