@@ -39,6 +39,7 @@ func (h *Handlers) CreateTrip(w http.ResponseWriter, r *http.Request) {
 
 	newTrip, err := h.TripsRepo.CreateTrip(r.Context(), userID, sessionID, input)
 	if err != nil {
+		log.Printf("ERROR creating trip: %v", err)
 		http.Error(w, "DB error: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -81,6 +82,10 @@ func (h *Handlers) ListTrips(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) GetTrip(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
+
+	 log.Printf("🔍 [GetTrip] ID recibido: '%s'", id)
+    log.Printf("🔍 [GetTrip] URL completa: %s", r.URL.String())
+    
 
 	// 1. Try authenticated user first
 	var userID *uuid.UUID

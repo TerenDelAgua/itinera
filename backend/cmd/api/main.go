@@ -97,10 +97,14 @@ func setupRouter(cfg *config.Config, h *handlers.Handlers) *chi.Mux {
 			if strings.HasSuffix(origin, ".vercel.app") {
 				return true
 			}
+
+			if strings.Contains(origin, "ngrok-free.app") || strings.Contains(origin, "ngrok.io") {
+            return true
+        }
 			return false
 		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Origin", "X-Requested-With",},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Origin", "X-Requested-With", "ngrok-skip-browser-warning"},
 		ExposedHeaders:   []string{"Link", "Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           300,

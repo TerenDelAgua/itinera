@@ -11,6 +11,7 @@ export async function apiFetch<T>(
     const token = typeof window !== 'undefined' ? localStorage.getItem('session_token') : null;
     const headers: HeadersInit = {
         'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...options.headers,
     };
