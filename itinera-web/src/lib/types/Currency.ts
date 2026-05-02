@@ -12,4 +12,6 @@ export const COMMON_CURRENCIES: Currency[] = [
     { code: 'CHF', symbol: 'Fr', name: 'Swiss Franc' },
     { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar' },
     { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' },
+    { code: 'PHP', symbol: '₱', name: 'Philippine Peso' },
+    { code: 'IDR', symbol: 'Rp', name: 'Indonesian Rupiah' },
 ];
