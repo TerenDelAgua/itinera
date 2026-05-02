@@ -5,25 +5,39 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/url"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+func sanitizeDatabaseURL(rawURL string) string {
+	u, err := url.Parse(rawURL)
+	if err != nil || u.User == nil {
+		return rawURL
+	}
+	pass, hasPass := u.User.Password()
+	if !hasPass {
+		return rawURL
+	}
+	
+	u.User = url.UserPassword(u.User.Username(), url.PathEscape(pass))
+	return u.String()
+}
 
 func NewPostgress(cfg *config.Config) (*pgxpool.Pool, error) {
-	config, err := pgxpool.ParseConfig(cfg.DatabaseURL)
+	pgxConfig, err := pgxpool.ParseConfig(sanitizeDatabaseURL(cfg.DatabaseURL))
 	if err != nil {
 		return nil, fmt.Errorf("Failed to parse database config: %w", err)
 	}
 
-	config.MaxConns = 25
-	config.MinConns = 5
-	config.MaxConnLifetime = 30 * time.Minute
-	config.MaxConnIdleTime = 10 * time.Minute
+	pgxConfig.MaxConns = 25
+	pgxConfig.MinConns = 5
+	pgxConfig.MaxConnLifetime = 30 * time.Minute
+	pgxConfig.MaxConnIdleTime = 10 * time.Minute
 
 	var pool *pgxpool.Pool
 	for i := 0; i < 10; i++ {
-		pool, err = pgxpool.NewWithConfig(context.Background(), config)
+		pool, err = pgxpool.NewWithConfig(context.Background(), pgxConfig)
 
 		if err == nil {
 			if err = pool.Ping(context.Background()); err == nil {
