@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offline - Itinera</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        background-color: #f5f4f1;
+        color: #1c1917;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 2rem;
+        text-align: center;
+      }
+      .container {
+        max-width: 400px;
+      }
+      .icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background-color: #fff7ed;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+      }
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        color: #1c1917;
+      }
+      p {
+        color: #57534e;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+      }
+      button {
+        background-color: #ff8c42;
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+      button:hover {
+        background-color: #e06b20;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="icon">📴</div>
+      <h1 id="title">You're Offline</h1>
+      <p id="description">
+        Don't worry. Your trips are saved locally. You can continue planning and
+        we'll sync when you're back online.
+      </p>
+      <button id="retry" onclick="window.location.reload()">Try Again</button>
+    </div>
+
+    <script>
+      const translations = {
+        en: {
+          title: "You're Offline",
+          description:
+            "Don't worry. Your trips are saved locally. You can continue planning and we'll sync when you're back online.",
+          retry: "Try Again",
+          pageTitle: "Offline - Itinera",
+        },
+        es: {
+          title: "Sin conexión",
+          description:
+            "No te preocupes. Tus viajes están guardados localmente. Puedes seguir planificando y sincronizaremos cuando vuelvas a estar en línea.",
+          retry: "Reintentar",
+          pageTitle: "Sin conexión - Itinera",
+        },
+      };
+
+      const lang = navigator.language.startsWith("es") ? "es" : "en";
+      const t = translations[lang];
+
+      document.documentElement.lang = lang;
+      document.title = t.pageTitle;
+      document.getElementById("title").textContent = t.title;
+      document.getElementById("description").textContent = t.description;
+      document.getElementById("retry").textContent = t.retry;
+    </script>
+  </body>
+</html>

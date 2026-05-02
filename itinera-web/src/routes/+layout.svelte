@@ -2,12 +2,48 @@
   import "../app.css";
   import { locale } from "$lib/i18n/store";
   import { resolve } from "$app/paths";
+  import { onMount } from "svelte";
 
   function toggleLang() {
     locale.update((lang) => (lang === "en" ? "es" : "en"));
   }
 
   let { children: childrenProp } = $props();
+
+  onMount(async () => {
+    if ("serviceWorker" in navigator) {
+      try {
+        const registration = await navigator.serviceWorker.register("/service-worker.js", {
+          scope: "/",
+        });
+
+        if (registration.installing) {
+          console.log("[PWA] Service worker installing");
+        } else if (registration.waiting) {
+          console.log("[PWA] Service worker installed");
+        } else if (registration.active) {
+          console.log("[PWA] Service worker active");
+        }
+
+        // Actualización en segundo plano
+        registration.addEventListener("updatefound", () => {
+          const newWorker = registration.installing;
+          newWorker?.addEventListener("statechange", () => {
+            if (
+              newWorker.state === "installed" &&
+              navigator.serviceWorker.controller
+            ) {
+              // Nueva versión disponible
+              console.log("[PWA] New version available");
+              // Aquí podrías mostrar un toast: "Nueva versión disponible. Recarga para actualizar."
+            }
+          });
+        });
+      } catch (error) {
+        console.error("[PWA] Service worker registration failed:", error);
+      }
+    }
+  });
 </script>
 
 <div
