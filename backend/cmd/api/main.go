@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -83,12 +84,26 @@ func setupRouter(cfg *config.Config, h *handlers.Handlers) *chi.Mux {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"https://itinera-navy.vercel.app/", "http://localhost:5173", "http://localhost:3000", "https://*"},
+		AllowOriginFunc: func(r *http.Request, origin string) bool {
+			// Permite orígenes de desarrollo local
+			if origin == "http://localhost:5173" || origin == "http://localhost:3000" {
+				return true
+			}
+			// Permite el dominio de producción en Vercel
+			if origin == "https://itinera-navy.vercel.app" {
+				return true
+			}
+			// Permite cualquier subdominio de vercel.app (preview deployments)
+			if strings.HasSuffix(origin, ".vercel.app") {
+				return true
+			}
+			return false
+		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
-		MaxAge:           30,
+		MaxAge:           300,
 	}))
 
 	r.Get("/health", func(
