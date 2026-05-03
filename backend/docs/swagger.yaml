@@ -1,0 +1,870 @@
+basePath: /api/v1
+definitions:
+  handlers.TokenResponse:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
+  models.Activity:
+    properties:
+      created_at:
+        type: string
+      date:
+        description: 'Format: YYYY-MM-DD'
+        type: string
+      id:
+        type: string
+      notes:
+        description: Optional notes
+        type: string
+      place_id:
+        description: NULL = trip-level activity
+        type: string
+      time:
+        description: 'Format: HH:MM'
+        type: string
+      title:
+        type: string
+      trip_id:
+        type: string
+    type: object
+  models.CategorySummary:
+    properties:
+      category_id:
+        type: string
+      total:
+        type: number
+    type: object
+  models.Expense:
+    properties:
+      amount:
+        type: number
+      category_id:
+        type: string
+      conversion_date:
+        type: string
+      created_at:
+        type: string
+      currency:
+        type: string
+      date:
+        type: string
+      exchange_rate:
+        type: number
+      id:
+        type: string
+      notes:
+        type: string
+      original_amount:
+        type: number
+      original_currency:
+        type: string
+      place_id:
+        type: string
+      trip_id:
+        type: string
+    type: object
+  models.ExpenseCategory:
+    properties:
+      color_hex:
+        type: string
+      id:
+        type: string
+      slug:
+        type: string
+    type: object
+  models.Place:
+    properties:
+      created_at:
+        type: string
+      default_expense_currency:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: string
+      lat:
+        type: number
+      lon:
+        type: number
+      name:
+        type: string
+      notes:
+        type: string
+      start_date:
+        description: ISO YYYY-MM-DD
+        type: string
+      trip_id:
+        type: string
+    type: object
+  models.PlaceSummary:
+    properties:
+      place_id:
+        type: string
+      place_name:
+        type: string
+      total:
+        type: number
+    type: object
+  models.Trip:
+    properties:
+      base_currency:
+        example: EUR
+        type: string
+      created_at:
+        type: string
+      default_expense_currency:
+        example: JPY
+        type: string
+      description:
+        example: Explorando Tokyo y Kyoto
+        type: string
+      end_date:
+        example: "2024-05-15"
+        type: string
+      id:
+        type: string
+      name:
+        example: Viaje a Japón
+        type: string
+      place_count:
+        description: Summary fields for Dashboard
+        type: integer
+      session_id:
+        description: For guests (maps to cookie)
+        type: string
+      start_date:
+        example: "2024-05-01"
+        type: string
+      total_spent:
+        type: number
+      user_id:
+        description: NULL for guests
+        type: string
+    type: object
+  models.TripExpenseSummary:
+    properties:
+      by_category:
+        items:
+          $ref: '#/definitions/models.CategorySummary'
+        type: array
+      by_place:
+        items:
+          $ref: '#/definitions/models.PlaceSummary'
+        type: array
+      global_total:
+        type: number
+      grand_total:
+        type: number
+      places_total:
+        type: number
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+    type: object
+  services.CreateExpenseInput:
+    properties:
+      amount:
+        type: number
+      category_id:
+        type: string
+      date:
+        type: string
+      notes:
+        type: string
+      original_currency:
+        type: string
+      place_id:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: API to plan trip and manage expenses Itinera.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Itinera API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return a JWT token
+      parameters:
+      - description: Login data (email, password)
+        in: body
+        name: user
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.TokenResponse'
+        "401":
+          description: Invalid credentials
+          schema:
+            type: string
+      summary: User login
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new account and return a JWT token
+      parameters:
+      - description: Registration data (email, password)
+        in: body
+        name: user
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.TokenResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "409":
+          description: Email already exists
+          schema:
+            type: string
+      summary: Register a new user
+      tags:
+      - auth
+  /expenses/categories:
+    get:
+      description: Get a list of available expense categories and their icons
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ExpenseCategory'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get expense categories
+      tags:
+      - expenses
+  /trips:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of trips associated with the current user or session
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Trip'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: List trips
+      tags:
+      - trips
+    post:
+      consumes:
+      - application/json
+      description: Create a new trip associated with the current user or session
+      parameters:
+      - description: Trip data
+        in: body
+        name: trip
+        required: true
+        schema:
+          $ref: '#/definitions/models.Trip'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Trip'
+        "400":
+          description: Invalid JSON
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create a trip
+      tags:
+      - trips
+  /trips/{id}:
+    delete:
+      description: Delete a trip and all its associated data
+      parameters:
+      - description: Trip ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Delete a trip
+      tags:
+      - trips
+    get:
+      consumes:
+      - application/json
+      description: Get detailed information about a specific trip by ID
+      parameters:
+      - description: Trip ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Trip'
+        "404":
+          description: Trip not found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get trip details
+      tags:
+      - trips
+    put:
+      consumes:
+      - application/json
+      description: Partially update trip information
+      parameters:
+      - description: Trip ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Partial trip data
+        in: body
+        name: data
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Trip'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "403":
+          description: Forbidden
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Update a trip
+      tags:
+      - trips
+  /trips/{id}/expenses:
+    get:
+      description: Get all expenses associated with a specific trip
+      parameters:
+      - description: Trip ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Expense'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: List trip expenses
+      tags:
+      - expenses
+    post:
+      consumes:
+      - application/json
+      description: Create a new expense for a trip, optionally associated with a place
+      parameters:
+      - description: Trip ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Expense data
+        in: body
+        name: expense
+        required: true
+        schema:
+          $ref: '#/definitions/services.CreateExpenseInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Expense'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create an expense
+      tags:
+      - expenses
+  /trips/{id}/expenses/{expenseId}:
+    delete:
+      description: Delete an expense by ID
+      parameters:
+      - description: Trip ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Expense ID (UUID)
+        in: path
+        name: expenseId
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Invalid ID
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Delete an expense
+      tags:
+      - expenses
+    put:
+      consumes:
+      - application/json
+      description: Update details of an existing expense
+      parameters:
+      - description: Trip ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Expense ID (UUID)
+        in: path
+        name: expenseId
+        required: true
+        type: string
+      - description: Updated expense data
+        in: body
+        name: expense
+        required: true
+        schema:
+          $ref: '#/definitions/models.Expense'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Expense'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Update an expense
+      tags:
+      - expenses
+  /trips/{id}/expenses/summary:
+    get:
+      description: Get a detailed summary of expenses by category and place for a
+        trip
+      parameters:
+      - description: Trip ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TripExpenseSummary'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get trip expense summary
+      tags:
+      - expenses
+  /trips/{id}/places:
+    get:
+      description: Get all destinations (places) associated with a trip
+      parameters:
+      - description: Trip ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Place'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: List trip places
+      tags:
+      - places
+    post:
+      consumes:
+      - application/json
+      description: Add a new destination (place) to a trip
+      parameters:
+      - description: Trip ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Place data
+        in: body
+        name: place
+        required: true
+        schema:
+          $ref: '#/definitions/models.Place'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Place'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create a place
+      tags:
+      - places
+  /trips/{id}/places/{placeId}:
+    delete:
+      description: Delete a destination and its associated activities
+      parameters:
+      - description: Trip ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Place ID (UUID)
+        in: path
+        name: placeId
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Delete a place
+      tags:
+      - places
+    get:
+      description: Get detailed information about a specific place (destination)
+      parameters:
+      - description: Trip ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Place ID (UUID)
+        in: path
+        name: placeId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Place'
+        "404":
+          description: Place not found
+          schema:
+            type: string
+      summary: Get place details
+      tags:
+      - places
+  /trips/{id}/places/{placeId}/expenses:
+    get:
+      description: Get all expenses associated with a specific place
+      parameters:
+      - description: Trip ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Place ID (UUID)
+        in: path
+        name: placeId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Expense'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: List place expenses
+      tags:
+      - expenses
+    post:
+      consumes:
+      - application/json
+      description: Create a new expense for a trip, optionally associated with a place
+      parameters:
+      - description: Trip ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Place ID (UUID)
+        in: path
+        name: placeId
+        type: string
+      - description: Expense data
+        in: body
+        name: expense
+        required: true
+        schema:
+          $ref: '#/definitions/services.CreateExpenseInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Expense'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create an expense
+      tags:
+      - expenses
+  /trips/{id}/places/{placeId}/expenses/summary:
+    get:
+      description: Get a summary of expenses for a specific place
+      parameters:
+      - description: Trip ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Place ID (UUID)
+        in: path
+        name: placeId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.CategorySummary'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get place expense summary
+      tags:
+      - expenses
+  /trips/{trip_id}/activities:
+    get:
+      description: Get all activities (agenda) for a specific trip
+      parameters:
+      - description: Trip ID (UUID)
+        in: path
+        name: trip_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Activity'
+            type: array
+        "400":
+          description: Invalid ID
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: List trip activities
+      tags:
+      - activities
+    post:
+      consumes:
+      - application/json
+      description: Add a new activity to the trip agenda
+      parameters:
+      - description: Trip ID (UUID)
+        in: path
+        name: trip_id
+        required: true
+        type: string
+      - description: Activity data (title, date, time, notes, place_id)
+        in: body
+        name: activity
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Activity'
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create an activity
+      tags:
+      - activities
+  /trips/{trip_id}/activities/{id}:
+    delete:
+      description: Delete an activity by ID
+      parameters:
+      - description: Trip ID (UUID)
+        in: path
+        name: trip_id
+        required: true
+        type: string
+      - description: Activity ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "400":
+          description: Invalid ID
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Delete an activity
+      tags:
+      - activities
+swagger: "2.0"
