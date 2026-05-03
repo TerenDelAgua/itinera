@@ -115,7 +115,11 @@ func (h *Handlers) GetTrip(w http.ResponseWriter, r *http.Request) {
 	trip, err := h.TripsRepo.GetTrip(r.Context(), id, userID, sessionID)
 	if err != nil {
 		log.Printf("[DEBUG] GetTrip DB Error: %v", err)
-		http.Error(w, "Trip not found or access denied", http.StatusNotFound)
+		if err.Error() == "trip not found or unauthorized" {
+			http.Error(w, "Trip not found or access denied", http.StatusNotFound)
+		} else {
+			http.Error(w, "Internal database error", http.StatusInternalServerError)
+		}
 		return
 	}
 

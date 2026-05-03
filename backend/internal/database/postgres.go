@@ -16,10 +16,10 @@ func NewPostgress(cfg *config.Config) (*pgxpool.Pool, error) {
 		return nil, fmt.Errorf("Failed to parse database config: %w", err)
 	}
 
-	pgxConfig.MaxConns = 25
-	pgxConfig.MinConns = 5
+	pgxConfig.MaxConns = 10
+	pgxConfig.MinConns = 2
 	pgxConfig.MaxConnLifetime = 30 * time.Minute
-	pgxConfig.MaxConnIdleTime = 10 * time.Minute
+	pgxConfig.MaxConnIdleTime = 5 * time.Minute
 
 	var pool *pgxpool.Pool
 	for i := 0; i < 10; i++ {
