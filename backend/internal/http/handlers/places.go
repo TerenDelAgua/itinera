@@ -9,6 +9,16 @@ import (
 	"github.com/google/uuid"
 )
 
+// GetPlace godoc
+// @Summary      Get place details
+// @Description  Get detailed information about a specific place (destination)
+// @Tags         places
+// @Produce      json
+// @Param        id       path      string  true  "Trip ID (UUID)"
+// @Param        placeId  path      string  true  "Place ID (UUID)"
+// @Success      200      {object}  models.Place
+// @Failure      404      {string}  string "Place not found"
+// @Router       /trips/{id}/places/{placeId} [get]
 func (h *Handlers) GetPlace(w http.ResponseWriter, r *http.Request) {
 	placeID, _ := uuid.Parse(chi.URLParam(r, "placeId"))
 	p, err := h.PlacesRepo.GetPlace(r.Context(), placeID)
@@ -19,6 +29,15 @@ func (h *Handlers) GetPlace(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(p)
 }
 
+// ListPlaces godoc
+// @Summary      List trip places
+// @Description  Get all destinations (places) associated with a trip
+// @Tags         places
+// @Produce      json
+// @Param        id   path      string  true  "Trip ID (UUID)"
+// @Success      200  {array}   models.Place
+// @Failure      500  {string}  string "Internal Server Error"
+// @Router       /trips/{id}/places [get]
 func (h *Handlers) ListPlaces(w http.ResponseWriter, r *http.Request) {
 	tripID, _ := uuid.Parse(chi.URLParam(r, "id"))
 	places, err := h.PlacesRepo.ListPlacesByTrip(r.Context(), tripID)
@@ -29,6 +48,18 @@ func (h *Handlers) ListPlaces(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(places)
 }
 
+// CreatePlace godoc
+// @Summary      Create a place
+// @Description  Add a new destination (place) to a trip
+// @Tags         places
+// @Accept       json
+// @Produce      json
+// @Param        id     path      string        true  "Trip ID (UUID)"
+// @Param        place  body      models.Place  true  "Place data"
+// @Success      201    {object}  models.Place
+// @Failure      400    {string}  string "Invalid input"
+// @Failure      500    {string}  string "Internal Server Error"
+// @Router       /trips/{id}/places [post]
 func (h *Handlers) CreatePlace(w http.ResponseWriter, r *http.Request) {
 	tripID, _ := uuid.Parse(chi.URLParam(r, "id"))
 	var input models.Place
@@ -64,6 +95,15 @@ func (h *Handlers) UpdatePlace(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(p)
 }
 
+// DeletePlace godoc
+// @Summary      Delete a place
+// @Description  Delete a destination and its associated activities
+// @Tags         places
+// @Param        id       path      string  true  "Trip ID (UUID)"
+// @Param        placeId  path      string  true  "Place ID (UUID)"
+// @Success      204      {string}  string "No Content"
+// @Failure      500      {string}  string "Internal Server Error"
+// @Router       /trips/{id}/places/{placeId} [delete]
 func (h *Handlers) DeletePlace(w http.ResponseWriter, r *http.Request) {
 	placeID, _ := uuid.Parse(chi.URLParam(r, "placeId"))
 	if err := h.PlacesRepo.DeletePlace(r.Context(), placeID); err != nil {

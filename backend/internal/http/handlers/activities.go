@@ -11,6 +11,16 @@ import (
 
 
 
+// ListActivities godoc
+// @Summary      List trip activities
+// @Description  Get all activities (agenda) for a specific trip
+// @Tags         activities
+// @Produce      json
+// @Param        trip_id  path      string  true  "Trip ID (UUID)"
+// @Success      200      {array}   models.Activity
+// @Failure      400      {string}  string "Invalid ID"
+// @Failure      500      {string}  string "Internal Server Error"
+// @Router       /trips/{trip_id}/activities [get]
 func (h *Handlers) ListActivities(w http.ResponseWriter, r *http.Request) {
 	tripId := chi.URLParam(r, "trip_id")
 	id, err := uuid.Parse(tripId)
@@ -29,6 +39,18 @@ func (h *Handlers) ListActivities(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(activities)
 }
 
+// CreateActivity godoc
+// @Summary      Create an activity
+// @Description  Add a new activity to the trip agenda
+// @Tags         activities
+// @Accept       json
+// @Produce      json
+// @Param        trip_id   path      string  true  "Trip ID (UUID)"
+// @Param        activity  body      object  true  "Activity data (title, date, time, notes, place_id)"
+// @Success      201       {object}  models.Activity
+// @Failure      400       {string}  string "Invalid input"
+// @Failure      500       {string}  string "Internal Server Error"
+// @Router       /trips/{trip_id}/activities [post]
 func (h *Handlers) CreateActivity(w http.ResponseWriter, r *http.Request) {
 	tripIdStr := chi.URLParam(r, "trip_id")
 	tripId, err := uuid.Parse(tripIdStr)
@@ -163,6 +185,16 @@ func (h *Handlers) UpdateActivity(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// DeleteActivity godoc
+// @Summary      Delete an activity
+// @Description  Delete an activity by ID
+// @Tags         activities
+// @Param        trip_id  path      string  true  "Trip ID (UUID)"
+// @Param        id       path      string  true  "Activity ID (UUID)"
+// @Success      204      {string}  string "No Content"
+// @Failure      400      {string}  string "Invalid ID"
+// @Failure      500      {string}  string "Internal Server Error"
+// @Router       /trips/{trip_id}/activities/{id} [delete]
 func (h *Handlers) DeleteActivity(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := uuid.Parse(idStr)

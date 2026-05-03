@@ -8,12 +8,12 @@ type Trip struct {
 	ID           uuid.UUID  `json:"id"`
 	UserId       *uuid.UUID `json:"user_id,omitempty"`    // NULL for guests
 	SessionId    *string    `json:"session_id,omitempty"` // For guests (maps to cookie)
-	Name         string     `json:"name"`
-	Description  *string    `json:"description"`
-	StartDate              string     `json:"start_date"` // ISO format
-	EndDate                string     `json:"end_date"`   // ISO format
-	BaseCurrency           string     `json:"base_currency"`
-	DefaultExpenseCurrency string     `json:"default_expense_currency"`
+	Name         string     `json:"name" example:"Viaje a Japón"`
+	Description  *string    `json:"description" example:"Explorando Tokyo y Kyoto"`
+	StartDate              string     `json:"start_date" example:"2024-05-01"`
+	EndDate                string     `json:"end_date" example:"2024-05-15"`
+	BaseCurrency           string     `json:"base_currency" example:"EUR"`
+	DefaultExpenseCurrency string     `json:"default_expense_currency" example:"JPY"`
 	CreatedAt              string     `json:"created_at"`
 
 	// Summary fields for Dashboard
