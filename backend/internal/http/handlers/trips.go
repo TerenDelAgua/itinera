@@ -11,6 +11,17 @@ import (
 	"github.com/google/uuid"
 )
 
+// CreateTrip godoc
+// @Summary      Create a trip
+// @Description  Create a new trip associated with the current user or session
+// @Tags         trips
+// @Accept       json
+// @Produce      json
+// @Param        trip  body      models.Trip  true  "Trip data"
+// @Success      201   {object}  models.Trip
+// @Failure      400   {string}  string "Invalid JSON"
+// @Failure      500   {string}  string "Internal Server Error"
+// @Router       /trips [post]
 func (h *Handlers) CreateTrip(w http.ResponseWriter, r *http.Request) {
 	var input models.Trip
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -49,6 +60,15 @@ func (h *Handlers) CreateTrip(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(newTrip)
 }
 
+// ListTrips godoc
+// @Summary      List trips
+// @Description  Get a list of trips associated with the current user or session
+// @Tags         trips
+// @Accept       json
+// @Produce      json
+// @Success      200  {array}   models.Trip
+// @Failure      500  {string}  string "Internal Server Error"
+// @Router       /trips [get]
 func (h *Handlers) ListTrips(w http.ResponseWriter, r *http.Request) {
 	// 1. Try authenticated user first
 	var userID *uuid.UUID
@@ -80,6 +100,17 @@ func (h *Handlers) ListTrips(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(trips)
 }
 
+// GetTrip godoc
+// @Summary      Get trip details
+// @Description  Get detailed information about a specific trip by ID
+// @Tags         trips
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Trip ID (UUID)"
+// @Success      200  {object}  models.Trip
+// @Failure      404  {string}  string "Trip not found"
+// @Failure      500  {string}  string "Internal Server Error"
+// @Router       /trips/{id} [get]
 func (h *Handlers) GetTrip(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
@@ -128,6 +159,19 @@ func (h *Handlers) GetTrip(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(trip)
 }
 
+// UpdateTrip godoc
+// @Summary      Update a trip
+// @Description  Partially update trip information
+// @Tags         trips
+// @Accept       json
+// @Produce      json
+// @Param        id    path      string          true  "Trip ID (UUID)"
+// @Param        data  body      map[string]any  true  "Partial trip data"
+// @Success      200   {object}  models.Trip
+// @Failure      400   {string}  string "Invalid input"
+// @Failure      403   {string}  string "Forbidden"
+// @Failure      500   {string}  string "Internal Server Error"
+// @Router       /trips/{id} [put]
 func (h *Handlers) UpdateTrip(w http.ResponseWriter, r *http.Request) {
 	tripID := chi.URLParam(r, "id")
 	if _, err := uuid.Parse(tripID); err != nil {
@@ -172,6 +216,14 @@ func (h *Handlers) UpdateTrip(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(updatedTrip)
 }
 
+// DeleteTrip godoc
+// @Summary      Delete a trip
+// @Description  Delete a trip and all its associated data
+// @Tags         trips
+// @Param        id   path      string  true  "Trip ID (UUID)"
+// @Success      204  {string}  string "No Content"
+// @Failure      500  {string}  string "Internal Server Error"
+// @Router       /trips/{id} [delete]
 func (h *Handlers) DeleteTrip(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 

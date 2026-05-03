@@ -26,6 +26,17 @@ func (h *Handlers) generateToken(user models.User) (string, error) {
 	return token.SignedString([]byte(h.Config.JWTSecret))
 }
 
+// Register godoc
+// @Summary      Register a new user
+// @Description  Create a new account and return a JWT token
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        user  body      object  true  "Registration data (email, password)"
+// @Success      200   {object}  handlers.TokenResponse
+// @Failure      400   {string}  string "Invalid request body"
+// @Failure      409   {string}  string "Email already exists"
+// @Router       /auth/register [post]
 func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 
 	var input struct {
@@ -49,6 +60,16 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(TokenResponse{Token: token, User: *user})
 }
 
+// Login godoc
+// @Summary      User login
+// @Description  Authenticate user and return a JWT token
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        user  body      object  true  "Login data (email, password)"
+// @Success      200   {object}  handlers.TokenResponse
+// @Failure      401   {string}  string "Invalid credentials"
+// @Router       /auth/login [post]
 func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		Email    string `json:"email"`

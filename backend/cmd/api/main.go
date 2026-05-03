@@ -19,7 +19,26 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
+
+	_ "backend/docs"
+
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
+
+// @title           Itinera API
+// @version         1.0
+// @description     API to plan trip and manage expenses Itinera.
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8080
+// @BasePath  /api/v1
 
 func main() {
 	if err := godotenv.Load(); err != nil {
@@ -86,7 +105,7 @@ func setupRouter(cfg *config.Config, h *handlers.Handlers) *chi.Mux {
 	r.Use(cors.Handler(cors.Options{
 		AllowOriginFunc: func(r *http.Request, origin string) bool {
 			// Permite orígenes de desarrollo local
-			if origin == "http://localhost:5173" || origin == "http://localhost:3000" {
+			if origin == "http://localhost:5173" || origin == "http://127.0.0.1:5173" || origin == "http://localhost:3000" {
 				return true
 			}
 			// Producción Vercel (todos los subdominios)
@@ -129,6 +148,10 @@ func setupRouter(cfg *config.Config, h *handlers.Handlers) *chi.Mux {
 	r.Route("/api/v1", func(router chi.Router) {
 		handlers.RegisterApiRoutes(router, h)
 	})
+
+	r.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("/swagger/doc.json"), // The url pointing to API definition
+	))
 
 	return r
 }
