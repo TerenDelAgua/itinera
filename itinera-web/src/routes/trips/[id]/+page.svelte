@@ -67,7 +67,6 @@
   async function loadAllData() {
     if (!tripId) return;
 
-    // Only show skeleton on initial load
     if (!summary) isLoading = true;
 
     try {
@@ -131,17 +130,29 @@
     }
   }
 
-  async function updateTripCurrency(code: string) {
+  async function updateTripCurrency(code?: string) {
     try {
-      tripDefaultCurrency = code;
+      if (!code) return;
+      const previousBase = baseCurrency;
+      baseCurrency = code;
+
+      // If the default expense currency was the same as the old base, update it too
+      // so we don't leave it behind unintentionally.
+      const newDefault =
+        tripDefaultCurrency === previousBase ? code : tripDefaultCurrency;
+      tripDefaultCurrency = newDefault;
 
       await apiFetch(`/trips/${tripId}`, {
         method: "PUT",
-        body: JSON.stringify({ default_expense_currency: code }),
+        body: JSON.stringify({
+          base_currency: code,
+          default_expense_currency: newDefault,
+        }),
       });
+      loadAllData();
     } catch (e) {
       console.error("Failed to update trip currency", e);
-      tripDefaultCurrency = baseCurrency;
+      loadAllData(); // reset on error
     }
   }
 
@@ -173,7 +184,7 @@
     bind:description={tripDescription}
     bind:startDate={tripStartDate}
     bind:endDate={tripEndDate}
-    defaultCurrency={tripDefaultCurrency}
+    defaultCurrency={baseCurrency}
     onSave={saveTripInfo}
     onUpdateCurrency={updateTripCurrency}
     onBack={() => goto("/")}
