@@ -94,11 +94,33 @@ func (h *Handlers) CreateExpense(w http.ResponseWriter, r *http.Request) {
 // @Router       /trips/{id}/expenses/summary [get]
 func (h *Handlers) GetExpenseSummary(w http.ResponseWriter, r *http.Request) {
 	tripId, _ := uuid.Parse(chi.URLParam(r, "id"))
+	targetCurrency := r.URL.Query().Get("currency")
+
 	summary, err := h.ExpensesRepo.GetExpensesSummary(r.Context(), tripId)
 	if err != nil {
 		http.Error(w, "DB Error", http.StatusInternalServerError)
 		return
 	}
+
+	// Dynamic conversion if target currency is provided and different from trip's base
+	if targetCurrency != "" {
+		trip, err := h.TripsRepo.GetTripById(r.Context(), tripId)
+		if err == nil && trip.BaseCurrency != targetCurrency {
+			rate, err := h.ExpenseSvc.ExchangeRate.GetRate(r.Context(), trip.BaseCurrency, targetCurrency)
+			if err == nil && rate != 1.0 {
+				summary.GrandTotal *= rate
+				summary.GlobalTotal *= rate
+				summary.PlacesTotal *= rate
+				for i := range summary.ByCategory {
+					summary.ByCategory[i].Total *= rate
+				}
+				for i := range summary.ByPlace {
+					summary.ByPlace[i].Total *= rate
+				}
+			}
+		}
+	}
+
 	json.NewEncoder(w).Encode(summary)
 }
 
@@ -208,12 +230,28 @@ func (h *Handlers) ListPlaceExpenses(w http.ResponseWriter, r *http.Request) {
 // @Failure      500      {string}  string "Internal Server Error"
 // @Router       /trips/{id}/places/{placeId}/expenses/summary [get]
 func (h *Handlers) GetPlaceExpenseSummary(w http.ResponseWriter, r *http.Request) {
+	tripID, _ := uuid.Parse(chi.URLParam(r, "id"))
 	placeId, _ := uuid.Parse(chi.URLParam(r, "placeId"))
+	targetCurrency := r.URL.Query().Get("currency")
+
 	summary, err := h.ExpensesRepo.GetPlaceExpensesSummary(r.Context(), placeId)
 	if err != nil {
 		http.Error(w, "DB Error", http.StatusInternalServerError)
 		return
 	}
+
+	if targetCurrency != "" {
+		trip, err := h.TripsRepo.GetTripById(r.Context(), tripID)
+		if err == nil && trip.BaseCurrency != targetCurrency {
+			rate, err := h.ExpenseSvc.ExchangeRate.GetRate(r.Context(), trip.BaseCurrency, targetCurrency)
+			if err == nil && rate != 1.0 {
+				for i := range summary {
+					summary[i].Total *= rate
+				}
+			}
+		}
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(summary)
 }
