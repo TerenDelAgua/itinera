@@ -6,7 +6,7 @@ settings:
 
 importers:
 
-  .:
+  itinera-web:
     devDependencies:
       '@eslint/js':
         specifier: ^10.0.1

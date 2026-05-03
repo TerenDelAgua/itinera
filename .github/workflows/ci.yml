@@ -1,0 +1,161 @@
+name: Itinera CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  backend-test:
+    name: Backend Tests (Go)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ${{ secrets.DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache-dependency-path: backend/go.sum
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: go mod download
+
+      - name: Apply Migrations
+        env:
+          DATABASE_URL: postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:5432/${{ secrets.DB_NAME }}?sslmode=disable
+        run: |
+          for f in backend/migrations/*.sql; do
+            echo "Applying $f..."
+            psql $DATABASE_URL -f $f
+          done
+
+      - name: Run Backend Tests
+        working-directory: ./backend
+        env:
+          DATABASE_URL: postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:5432/${{ secrets.DB_NAME }}?sslmode=disable
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: go test ./... -v
+
+  frontend-test:
+    name: Frontend Tests (Vitest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Frontend Tests
+        env:
+          VITE_API_URL: http://localhost:8080/api/v1
+        run: pnpm --filter itinera-web test
+
+  e2e-test:
+    name: E2E Tests (Playwright)
+    needs: [backend-test, frontend-test]
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ${{ secrets.DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install Frontend Deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Browsers
+        run: pnpm --filter itinera-web exec playwright install --with-deps chromium
+
+      - name: Build Backend
+        working-directory: ./backend
+        run: go build -o itinera-api ./cmd/api/main.go
+
+      - name: Apply Migrations
+        env:
+          DATABASE_URL: postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:5432/${{ secrets.DB_NAME }}?sslmode=disable
+        run: |
+          for f in backend/migrations/*.sql; do
+            echo "Applying $f..."
+            psql $DATABASE_URL -f $f
+          done
+
+      - name: Run E2E Tests
+        env:
+          DATABASE_URL: postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:5432/${{ secrets.DB_NAME }}?sslmode=disable
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          VITE_API_URL: http://localhost:8080/api/v1
+        run: |
+          ./backend/itinera-api > backend.log 2>&1 &
+          
+          echo "Waiting for backend to be ready..."
+          timeout 30s bash -c 'until curl -s http://localhost:8080/swagger/index.html > /dev/null; do sleep 1; done' || (cat backend.log && exit 1)
+          
+          pnpm --filter itinera-web test:e2e || (cat backend.log && exit 1)
+
+      - name: Upload Logs and Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-artifacts
+          path: |
+            backend.log
+            itinera-web/playwright-report/
+          retention-days: 30
