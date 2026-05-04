@@ -13,12 +13,12 @@
   import type { Expense_Category, Trip } from "$lib/index";
 
   // Components
-  import ExpenseDrawer from "$lib/components/ExpenseDrawer.svelte";
-  import ConfirmModal from "$lib/components/ConfirmModal.svelte";
+  import ExpenseDrawer from "$lib/components/Expenses/ExpenseDrawer.svelte";
+  import ConfirmModal from "$lib/components/utils/ConfirmModal.svelte";
   import { activityApi } from "$lib/api/activity";
   import type { Activity } from "$lib/types/Activity";
-  import ItineraryDrawer from "$lib/components/itinerary/ItineraryDrawer.svelte";
-  import UpcomingActivityCard from "$lib/components/itinerary/UpcomingActivityCard.svelte";
+  import ActivityDrawer from "$lib/components/activities/ActivityDrawer.svelte";
+  import UpcomingActivityCard from "$lib/components/activities/UpcomingActivityCard.svelte";
   import DetailHeader from "$lib/components/trip/DetailHeader.svelte";
   import ExpensesSummaryCard from "$lib/components/trip/ExpensesSummaryCard.svelte";
   import PlaceList from "$lib/components/trip/PlaceList.svelte";
@@ -268,7 +268,7 @@
     onCancel={cancelDeletePlace}
   />
 
-  <ItineraryDrawer
+  <ActivityDrawer
     isOpen={isAgendaOpen}
     {tripId}
     tripStart={tripStartDate}

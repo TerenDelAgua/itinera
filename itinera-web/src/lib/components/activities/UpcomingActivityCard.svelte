@@ -52,6 +52,7 @@
       {$t("itinerary.title")}
     </h3>
     <button
+      data-testid="add-activity-btn"
       onclick={() => (showQuickAdd = !showQuickAdd)}
       class="text-sm font-medium text-teren-primary hover:text-teren-primary-hover transition px-3 py-1.5 rounded-lg bg-teren-primary-subtle active:scale-95 flex-shrink-0"
     >
@@ -72,7 +73,6 @@
         {defaultDate}
         {placeId}
         onSuccess={() => {
-          showQuickAdd = false;
           onRefresh();
         }}
       />

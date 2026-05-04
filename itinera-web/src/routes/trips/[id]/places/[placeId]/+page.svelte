@@ -6,8 +6,8 @@
   import { cubicOut } from "svelte/easing";
   import { untrack } from "svelte";
   import { t, locale } from "$lib/i18n/store";
+  import ActivityDrawer from "$lib/components/activities/ActivityDrawer.svelte";
   import { formatDate } from "$lib/utils/date";
-  import ActivitiesDrawer from "$lib/components/ActivitiesDrawer.svelte";
   import { activityApi } from "$lib/api/activity";
 
   import type { Place } from "$lib/types/Place";
@@ -15,11 +15,11 @@
   import type { Expense, Expense_Category } from "$lib/index";
   import type { Trip } from "$lib/types/Trip";
 
-  import ExpenseQuickAdd from "$lib/components/ExpenseQuickAdd.svelte";
-  import ExpenseDrawer from "$lib/components/ExpenseDrawer.svelte";
-  import ExpenseSummaryPills from "$lib/components/ExpenseSummaryPills.svelte";
+  import ExpenseQuickAdd from "$lib/components/Expenses/ExpenseQuickAdd.svelte";
+  import ExpenseDrawer from "$lib/components/Expenses/ExpenseDrawer.svelte";
+  import ExpenseSummaryPills from "$lib/components/Expenses/ExpenseSummaryPills.svelte";
   import CurrencySelector from "$lib/components/currency/CurrencySelector.svelte";
-  import UpcomingActivityCard from "$lib/components/itinerary/UpcomingActivityCard.svelte";
+  import UpcomingActivityCard from "$lib/components/activities/UpcomingActivityCard.svelte";
   import DetailHeader from "$lib/components/trip/DetailHeader.svelte";
   import ExpensesSummaryCard from "$lib/components/trip/ExpensesSummaryCard.svelte";
   import type { Activity } from "$lib/types/Activity";
@@ -82,7 +82,7 @@
       expenses = expensesData;
       categorySummary = summaryData;
       categories = catsData;
-      activities = actsData;
+      activities = actsData.filter(a => a.place_id === placeId);
     } catch (e) {
       console.error("Failed to load place data", e);
       goto(`/trips/${tripId}`);
@@ -240,7 +240,7 @@
     onRefreshSummary={loadAllData}
   />
 
-  <ActivitiesDrawer
+  <ActivityDrawer
     isOpen={isAgendaOpen}
     {tripId}
     {placeId}

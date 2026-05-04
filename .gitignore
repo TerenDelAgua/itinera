@@ -63,3 +63,6 @@ coverage/
 # DB / Migrations (optional: keep schema, ignore local dumps)
 *.sql.bak
 *.dump
+
+#playwright
+playwright-report/

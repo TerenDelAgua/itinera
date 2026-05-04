@@ -65,4 +65,63 @@ test.describe('Itinerary Flow', () => {
     expect(sessionCookie).toBeDefined();
     expect(sessionCookie?.value).toMatch(/[0-9a-f-]+/);
   });
+
+  test('should only show local activities in place view', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('.animate-spin')).not.toBeVisible({ timeout: 15000 });
+    
+    // Create a trip
+    const newTripBtn = page.getByRole('button', { name: /New trip/i });
+    const firstTripBtn = page.getByText(/Create your first trip/i);
+    if (await firstTripBtn.isVisible()) {
+      await firstTripBtn.click();
+    } else {
+      await newTripBtn.click();
+    }
+    
+    const tripName = `Filter Test ${Date.now()}`;
+    await page.getByPlaceholder(/Trip name/i).fill(tripName);
+    await page.locator('form button[type="submit"]').click();
+    
+    // Navigate to it
+    const tripCard = page.getByText(tripName);
+    await tripCard.click();
+    await expect(page).toHaveURL(/\/trips\/[0-9a-f-]+/);
+    
+    // Add a global activity via UpcomingActivityCard
+    // The button has "+ Add" or similar text
+    await page.getByTestId('add-activity-btn').first().click();
+    
+    const activityInput = page.getByTestId('activity-title-input');
+    await expect(activityInput).toBeVisible();
+    await activityInput.fill('Global Activity 1');
+    await activityInput.press('Enter');
+    
+    // Verify it's added
+    await expect(page.getByText('Global Activity 1').first()).toBeVisible({ timeout: 5000 });
+
+    // Create a place
+    await page.getByTestId('add-place-button').click();
+    const placeInput = page.getByTestId('place-name-input');
+    await expect(placeInput).toBeVisible();
+    await placeInput.fill('Test City');
+    await placeInput.press('Enter');
+    
+    // It should appear in the list
+    const placeLink = page.getByText('Test City');
+    await expect(placeLink).toBeVisible({ timeout: 5000 });
+
+    // Navigate to place
+    await placeLink.click();
+    await expect(page).toHaveURL(/\/trips\/[0-9a-f-]+\/places\/[0-9a-f-]+/);
+    
+    // Verify Global Activity 1 is NOT visible in the UpcomingActivityCard
+    await expect(page.getByText('Global Activity 1')).not.toBeVisible();
+    
+    // Open Activity Drawer
+    await page.getByText(/View all/i).last().click();
+    
+    // Verify Global Activity 1 is NOT visible in the drawer either
+    await expect(page.getByText('Global Activity 1')).not.toBeVisible();
+  });
 });
