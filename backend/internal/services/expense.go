@@ -110,3 +110,48 @@ func (s *ExpenseService) CalculateAndCreateExpense(ctx context.Context, tripID u
 
 	return exp, nil
 }
+
+func (s *ExpenseService) RecalculateTripExpenses(ctx context.Context, tripID uuid.UUID) error {
+	trip, err := s.TripRepo.GetTripById(ctx, tripID)
+	if err != nil {
+		return err
+	}
+
+	expenses, err := s.ExpensesRepo.GetExpensesByTrip(ctx, tripID)
+	if err != nil {
+		return err
+	}
+
+	targetCurrency := trip.BaseCurrency
+	if targetCurrency == "" {
+		targetCurrency = "EUR"
+	}
+
+	for _, exp := range expenses {
+		var finalAmount float64
+		var rate float64 = 1.0
+
+		if exp.OriginalCurrency == targetCurrency {
+			finalAmount = exp.OriginalAmount
+		} else {
+			rate, err = s.ExchangeRate.GetRate(ctx, exp.OriginalCurrency, targetCurrency)
+			if err != nil {
+				rate = 1.0
+			}
+			finalAmount = exp.OriginalAmount * rate
+		}
+
+		// Update individual expense
+		exp.Amount = finalAmount
+		exp.ExchangeRate = rate
+		exp.Currency = targetCurrency
+		exp.ConversionDate = time.Now()
+
+		_, err = s.ExpensesRepo.UpdateExpense(ctx, exp.Id, exp)
+		if err != nil {
+			fmt.Printf("Error updating expense %s during recalculation: %v\n", exp.Id, err)
+		}
+	}
+
+	return nil
+}

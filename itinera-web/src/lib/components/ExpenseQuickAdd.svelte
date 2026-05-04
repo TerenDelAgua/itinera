@@ -198,6 +198,7 @@
       <div class="flex-1 min-w-0 px-4">
         <input
           type="number"
+          data-testid="expense-amount-input"
           inputmode="decimal"
           step="0.01"
           bind:value={amount}
@@ -223,6 +224,7 @@
       <div class="flex-shrink-0 h-12 pl-4 pr-4">
         <button
           onclick={handleSubmit}
+          data-testid="add-expense-button"
           disabled={isSubmitting || !amount}
           class="w-10 h-10 bg-teren-primary hover:bg-teren-primary-hover text-white font-semibold rounded-lg shadow-sm active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center"
         >

@@ -211,6 +211,16 @@ func (h *Handlers) UpdateTrip(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
+	// Recalculate expenses if base_currency changed
+	if _, ok := updates["base_currency"]; ok {
+		tID, _ := uuid.Parse(tripID)
+		// We do it synchronously to ensure the next fetch gets updated data
+		if err := h.ExpenseSvc.RecalculateTripExpenses(r.Context(), tID); err != nil {
+			log.Printf("ERROR recalculating expenses for trip %s: %v", tripID, err)
+		}
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(updatedTrip)

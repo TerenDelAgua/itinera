@@ -67,6 +67,7 @@
     </h2>
     <button
       onclick={() => (isCreatingPlace = !isCreatingPlace)}
+      data-testid="add-place-button"
       class="text-sm font-medium text-teren-primary hover:text-teren-primary-hover transition px-3 py-1.5 rounded-lg hover:bg-teren-primary-subtle active:scale-95"
     >
       + {$t("common.add")}

@@ -26,6 +26,7 @@
 
   <button
     onclick={onCreateClick}
+    data-testid="new-trip-button"
     class="font-medium py-2.5 px-6 rounded-lg shadow-sm active:scale-95 transition-all duration-200 flex items-center gap-2 w-fit
            {isCreatingTrip
       ? 'bg-teren-primary/70 hover:bg-teren-primary/60 text-white'
