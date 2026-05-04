@@ -123,8 +123,8 @@ func setupRouter(cfg *config.Config, h *handlers.Handlers) *chi.Mux {
 			return false
 		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token", "Origin", "X-Requested-With", "ngrok-skip-browser-warning"},
-		ExposedHeaders:   []string{"Link", "Content-Length"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-Session-Id", "X-CSRF-Token", "Origin", "X-Requested-With", "ngrok-skip-browser-warning"},
+		ExposedHeaders:   []string{"Link", "Content-Length", "X-Session-Id"},
 		AllowCredentials: true,
 		MaxAge:           300,
 	}))

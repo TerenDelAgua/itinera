@@ -89,6 +89,7 @@
     <div class="border-b border-teren-border/50">
       <input
         id="trip-name"
+        data-testid="trip-name-input"
         type="text"
         bind:value={name}
         oninput={handleInput}
