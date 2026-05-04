@@ -4,11 +4,13 @@ import (
 	"backend/internal/http/middleware"
 	"backend/internal/models"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 )
 
 // CreateTrip godoc
@@ -143,10 +145,15 @@ func (h *Handlers) GetTrip(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("[DEBUG] GetTrip - ID: %s, UserID: %v, SessionID: %s", id, userID, sidVal)
 
+	// Validate UUID format before querying DB to avoid syntax errors
+	if _, err := uuid.Parse(id); err != nil {
+		http.Error(w, "Invalid trip ID format", http.StatusBadRequest)
+		return
+	}
+
 	trip, err := h.TripsRepo.GetTrip(r.Context(), id, userID, sessionID)
 	if err != nil {
-		log.Printf("[DEBUG] GetTrip DB Error: %v", err)
-		if err.Error() == "trip not found or unauthorized" {
+		if errors.Is(err, pgx.ErrNoRows) {
 			http.Error(w, "Trip not found or access denied", http.StatusNotFound)
 		} else {
 			http.Error(w, "Internal database error", http.StatusInternalServerError)
