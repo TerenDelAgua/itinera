@@ -11,6 +11,7 @@
     getCategoryName,
   } from "$lib/utils";
   import { t } from "$lib/i18n/store";
+  import { COMMON_CURRENCIES } from "$lib/types/Currency";
 
   let {
     tripId,
@@ -32,7 +33,13 @@
   let loading = $state(true);
   let editingId = $state<string | null>(null);
   let deleteConfirmId = $state<string | null>(null);
-  let draft = $state({ amount: "", date: "", notes: "", category_id: "" });
+  let draft = $state({
+    amount: "",
+    date: "",
+    notes: "",
+    category_id: "",
+    currency: "",
+  });
 
   $effect(() => {
     if (isOpen && tripId) loadExpenses();
@@ -53,10 +60,11 @@
   function startEdit(exp: Expense) {
     editingId = exp.id;
     draft = {
-      amount: String(exp.amount),
+      amount: String(exp.original_amount || exp.amount),
       date: exp.date.split("T")[0],
       notes: exp.notes || "",
       category_id: exp.category_id || "",
+      currency: exp.original_currency || exp.currency || "EUR",
     };
   }
 
@@ -64,7 +72,9 @@
     if (!draft.amount || parseFloat(draft.amount) <= 0) return;
     const payload = {
       ...draft,
-      amount: parseFloat(draft.amount),
+      original_amount: parseFloat(draft.amount),
+      original_currency: draft.currency,
+      amount: parseFloat(draft.amount), // Fallback if backend doesn't recalculate
       date: new Date(draft.date).toISOString(),
     };
     await apiFetch(`/trips/${tripId}/expenses/${id}`, {
@@ -210,21 +220,59 @@
                 >
                   {#each items as exp (exp.id)}
                     {#if editingId === exp.id}
-                      <!-- Modo Edición Minimalista -->
+                      <!-- Modo Edición Mejorado -->
                       <div
-                        class="p-3 bg-teren-background border-2 border-teren-primary/30 rounded-lg space-y-2"
+                        class="p-4 bg-teren-surface border-2 border-teren-primary/30 rounded-xl space-y-4 shadow-sm"
                       >
-                        <div class="flex gap-2">
-                          <input
-                            type="number"
-                            step="0.01"
-                            bind:value={draft.amount}
-                            class="w-24 px-2 py-1.5 text-sm font-bold bg-white border border-teren-border rounded focus:ring-2 focus:ring-teren-primary/30 outline-none"
-                            autofocus
-                          />
-                          <div class="relative group/date flex-1">
+                        <!-- Fila 1: Categoría, Divisa, Cantidad -->
+                        <div class="flex items-stretch gap-2">
+                          <!-- Selector de Categoría -->
+                          <div
+                            class="relative w-16 h-11 bg-white border border-teren-border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-teren-primary/30"
+                          >
+                            <select
+                              bind:value={draft.category_id}
+                              class="appearance-none w-full h-full bg-transparent text-xl text-center cursor-pointer focus:outline-none"
+                            >
+                              {#each categories as cat (cat.id)}
+                                <option value={cat.id}
+                                  >{getCategoryEmoji(cat.slug)}</option
+                                >
+                              {/each}
+                            </select>
+                          </div>
+
+                          <!-- Selector de Divisa -->
+                          <div
+                            class="relative w-20 h-11 bg-white border border-teren-border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-teren-primary/30"
+                          >
+                            <select
+                              bind:value={draft.currency}
+                              class="appearance-none w-full h-full bg-transparent text-sm font-bold text-teren-text-main text-center cursor-pointer focus:outline-none"
+                            >
+                              {#each COMMON_CURRENCIES as c (c.code)}
+                                <option value={c.code}>{c.code}</option>
+                              {/each}
+                            </select>
+                          </div>
+
+                          <!-- Input de Cantidad -->
+                          <div class="flex-1">
+                            <input
+                              type="number"
+                              step="0.01"
+                              bind:value={draft.amount}
+                              class="w-full h-11 px-3 text-sm font-bold bg-white border border-teren-border rounded-lg focus:ring-2 focus:ring-teren-primary/30 outline-none"
+                              autofocus
+                            />
+                          </div>
+                        </div>
+
+                        <!-- Fila 2: Fecha, Notas -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                          <div class="relative flex items-center group sm:col-span-1">
                             <svg
-                              class="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-teren-text-muted pointer-events-none"
+                              class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-teren-text-muted pointer-events-none"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -238,30 +286,34 @@
                             <input
                               type="date"
                               bind:value={draft.date}
-                              class="w-full pl-8 pr-2 py-1.5 text-xs bg-white border border-teren-border rounded focus:ring-2 focus:ring-teren-primary/30 outline-none appearance-none [&::-webkit-calendar-picker-indicator]:opacity-0"
+                              class="w-full h-11 pl-10 pr-3 text-sm bg-white border border-teren-border rounded-lg focus:ring-2 focus:ring-teren-primary/30 outline-none appearance-none [&::-webkit-calendar-picker-indicator]:opacity-0"
+                            />
+                          </div>
+                          <div class="sm:col-span-2">
+                            <input
+                              type="text"
+                              bind:value={draft.notes}
+                              placeholder={$t("detail.notes_optional")}
+                              class="w-full h-11 px-4 text-sm bg-white border border-teren-border rounded-lg focus:ring-2 focus:ring-teren-primary/30 outline-none"
+                              onkeydown={(e) =>
+                                e.key === "Enter" && saveEdit(exp.id)}
                             />
                           </div>
                         </div>
-                        <input
-                          type="text"
-                          bind:value={draft.notes}
-                          placeholder={$t("detail.notes_optional")}
-                          class="w-full px-2 py-1.5 text-xs bg-white border border-teren-border rounded focus:ring-2 focus:ring-teren-primary/30 outline-none"
-                          onkeydown={(e) =>
-                            e.key === "Enter" && saveEdit(exp.id)}
-                        />
-                        <div class="flex justify-end gap-2 pt-1">
+
+                        <!-- Fila 3: Botones -->
+                        <div class="flex justify-end gap-3 pt-2">
                           <button
                             onclick={() => (editingId = null)}
-                            class="px-3 py-1.5 text-xs text-teren-text-muted hover:text-teren-text-main hover:bg-gray-100 rounded transition"
+                            class="px-5 py-2 text-sm font-medium text-teren-text-muted hover:text-teren-text-main hover:bg-gray-100 rounded-xl transition"
                           >
                             {$t("common.cancel")}
                           </button>
                           <button
                             onclick={() => saveEdit(exp.id)}
-                            class="px-3 py-1.5 text-xs bg-teren-primary hover:bg-teren-primary-hover text-white font-medium rounded transition active:scale-95"
+                            class="px-5 py-2 text-sm bg-teren-primary hover:bg-teren-primary-hover text-white font-semibold rounded-xl shadow-sm transition active:scale-95"
                           >
-                            {$t("common.done")}
+                            {$t("common.save")}
                           </button>
                         </div>
                       </div>
