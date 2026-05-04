@@ -58,33 +58,30 @@
     if (!place) isLoading = true;
 
     try {
-      const [
-        placeData,
-        expensesData,
-        summaryData,
-        catsData,
-        tripData,
-        actsData,
-      ] = await Promise.all([
+      const [placeData, tripData] = await Promise.all([
         apiFetch<Place>(`/trips/${tripId}/places/${placeId}`),
-        apiFetch<Expense[]>(`/trips/${tripId}/places/${placeId}/expenses`),
-        apiFetch<CategorySummary[]>(
-          `/trips/${tripId}/places/${placeId}/expenses/summary`,
-        ),
-        apiFetch<Expense_Category[]>(`/trips/${tripId}/expenses/categories`),
         apiFetch<Trip>(`/trips/${tripId}`),
-        activityApi.list(tripId),
       ]);
 
       place = placeData;
-      expenses = expensesData;
-      categorySummary = summaryData;
-      categories = catsData;
       tripBaseCurrency = tripData.base_currency || "EUR";
       tripDefaultCurrency =
         tripData.default_expense_currency || tripData.base_currency || "EUR";
       tripStartDate = tripData.start_date?.split("T")[0] || "";
       tripEndDate = tripData.end_date?.split("T")[0] || "";
+
+      const [expensesData, summaryData, catsData, actsData] = await Promise.all([
+        apiFetch<Expense[]>(`/trips/${tripId}/places/${placeId}/expenses`),
+        apiFetch<CategorySummary[]>(
+          `/trips/${tripId}/places/${placeId}/expenses/summary?currency=${effectivePlaceCurrency}`,
+        ),
+        apiFetch<Expense_Category[]>(`/trips/${tripId}/expenses/categories`),
+        activityApi.list(tripId),
+      ]);
+
+      expenses = expensesData;
+      categorySummary = summaryData;
+      categories = catsData;
       activities = actsData;
     } catch (e) {
       console.error("Failed to load place data", e);
@@ -106,7 +103,7 @@
   }
 
   function calculateTotal() {
-    return expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
+    return categorySummary.reduce((sum, s) => sum + (s.total || 0), 0);
   }
 
   const effectivePlaceCurrency = $derived(
@@ -194,7 +191,7 @@
         {placeId}
         {categories}
         {categorySummary}
-        baseCurrency={tripBaseCurrency}
+        displayCurrency={effectivePlaceCurrency}
         {tripDefaultCurrency}
         effectiveCurrency={effectivePlaceCurrency}
         grandTotalValue={calculateTotal()}

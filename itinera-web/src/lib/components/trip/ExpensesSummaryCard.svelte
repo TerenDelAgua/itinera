@@ -13,7 +13,7 @@
     placeId,
     categories,
     categorySummary,
-    baseCurrency,
+    displayCurrency,
     tripDefaultCurrency,
     effectiveCurrency,
     grandTotalValue,
@@ -28,7 +28,7 @@
     placeId?: string;
     categories: Expense_Category[];
     categorySummary: CategorySummary[];
-    baseCurrency: string;
+    displayCurrency: string;
     tripDefaultCurrency: string;
     effectiveCurrency: string;
     grandTotalValue: number;
@@ -67,10 +67,11 @@
     </div>
     <div class="flex items-center">
       <span
+        data-testid="grand-total"
         class="text-3xl sm:text-2xl font-bold text-teren-primary tabular-nums leading-none"
       >
         {grandTotalValue.toFixed(2)}
-        {getCurrencySymbol(baseCurrency)}
+        {getCurrencySymbol(displayCurrency)}
       </span>
     </div>
   </div>
@@ -78,7 +79,7 @@
   <ExpenseSummaryPills
     {categories}
     summary={categorySummary}
-    currency={baseCurrency}
+    currency={displayCurrency}
   />
 
   <div class="hidden sm:block mt-6">
@@ -86,7 +87,7 @@
       {tripId}
       {placeId}
       {categories}
-      {baseCurrency}
+      baseCurrency={displayCurrency}
       {tripStart}
       {tripEnd}
       insertionCurrency={effectiveCurrency}
@@ -104,10 +105,10 @@
         {tripId}
         {placeId}
         {categories}
-        {baseCurrency}
+        baseCurrency={displayCurrency}
         {tripStart}
         {tripEnd}
-        insertionCurrency={tripDefaultCurrency}
+        insertionCurrency={effectiveCurrency}
         onSuccess={() => {
           onRefresh();
         }}

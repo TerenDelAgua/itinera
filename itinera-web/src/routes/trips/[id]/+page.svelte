@@ -70,14 +70,7 @@
     if (!summary) isLoading = true;
 
     try {
-      const [tripData, placesData, summaryData, catsData, actsData] =
-        await Promise.all([
-          apiFetch<Trip>(`/trips/${tripId}`),
-          apiFetch<Place[]>(`/trips/${tripId}/places`),
-          apiFetch<TripExpenseSummary>(`/trips/${tripId}/expenses/summary`),
-          apiFetch<Expense_Category[]>(`/trips/${tripId}/expenses/categories`),
-          activityApi.list(tripId),
-        ]);
+      const tripData = await apiFetch<Trip>(`/trips/${tripId}`);
 
       tripName = tripData.name;
       tripDescription = tripData.description || "";
@@ -86,6 +79,15 @@
       baseCurrency = tripData.base_currency || "EUR";
       tripDefaultCurrency =
         tripData.default_expense_currency || tripData.base_currency || "EUR";
+
+      const [placesData, summaryData, catsData, actsData] = await Promise.all([
+        apiFetch<Place[]>(`/trips/${tripId}/places`),
+        apiFetch<TripExpenseSummary>(
+          `/trips/${tripId}/expenses/summary?currency=${baseCurrency}`,
+        ),
+        apiFetch<Expense_Category[]>(`/trips/${tripId}/expenses/categories`),
+        activityApi.list(tripId),
+      ]);
 
       places = (placesData || []).map((p) => ({
         ...p,
@@ -209,7 +211,7 @@
         {tripId}
         {categories}
         categorySummary={summary?.by_category || []}
-        {baseCurrency}
+        displayCurrency={baseCurrency}
         {tripDefaultCurrency}
         {effectiveCurrency}
         grandTotalValue={$animatedGrandTotal}
