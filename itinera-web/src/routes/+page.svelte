@@ -6,7 +6,7 @@
 
   // Components
   import CreateTripForm from "$lib/components/dashboard/CreateTripForm.svelte";
-  import ConfirmModal from "$lib/components/ConfirmModal.svelte";
+  import ConfirmModal from "$lib/components/utils/ConfirmModal.svelte";
   import DashboardHeader from "$lib/components/dashboard/DashboardHeader.svelte";
   import EmptyState from "$lib/components/dashboard/EmptyState.svelte";
   import TripCard from "$lib/components/dashboard/TripCard.svelte";

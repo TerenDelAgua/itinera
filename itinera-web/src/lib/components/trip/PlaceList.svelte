@@ -41,7 +41,6 @@
         body: JSON.stringify(payload),
       });
       newPlaceDraft = { name: "", start_date: "", end_date: "" };
-      isCreatingPlace = false;
       onRefresh();
     } catch (err) {
       console.error("Error creating place:", err);
@@ -85,6 +84,7 @@
         <!-- ROW 1: Place name -->
         <div class="border-b border-teren-border/50">
           <input
+            data-testid="place-name-input"
             type="text"
             bind:value={newPlaceDraft.name}
             placeholder={$t("place_form.name_placeholder")}

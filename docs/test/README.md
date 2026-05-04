@@ -53,8 +53,8 @@ pnpm test:e2e
 *   **Componentes:** `src/lib/components/*.test.ts`. Reactividad de Svelte 5 y lógica de `localStorage`.
 
 ### E2E
-*   **Flujos Críticos:** `tests/itinerary.spec.ts`. Creación de viajes y persistencia de sesión.
-
+*   **Flujos Críticos:** `tests/itinerary.spec.ts`. Creación de viajes, persistencia de sesión y filtrado de actividades locales vs globales.
+*   **Multidivisa:** `tests/currency.spec.ts`. Herencia de divisas y cálculos.
 ---
 
 ## 🛠️ Herramientas utilizadas
