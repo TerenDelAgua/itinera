@@ -7,9 +7,6 @@ declare const self: ServiceWorkerGlobalScope;
 const STATIC_CACHE = 'itinera-static-v1';
 const DYNAMIC_CACHE = 'itinera-dynamic-v1';
 
-// Assets críticos para cargar offline.
-// ⚠️ Cache.addAll() falla en bloque si cualquier asset devuelve 404.
-// Solo incluir assets que existen realmente en /static.
 const STATIC_ASSETS = [
     '/',
     '/offline.html',
@@ -44,8 +41,8 @@ self.addEventListener('fetch', (event: FetchEvent) => {
     const { request } = event;
     const url = new URL(request.url);
 
-    // API calls: Network-First con fallback a cache
-    if (url.pathname.startsWith('/api/')) {
+    // API (GET): Network-First
+    if (url.pathname.startsWith('/api/') && request.method === 'GET') {
         event.respondWith(networkFirstStrategy(request));
         return;
     }
