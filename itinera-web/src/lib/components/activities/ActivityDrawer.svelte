@@ -1,18 +1,19 @@
 <script lang="ts">
   import { fly, fade, slide } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
-  import { tick } from "svelte";
+  import { tick, untrack } from "svelte";
   import type { Activity } from "$lib/types/Activity";
   import { getRelativeDateLabel } from "$lib/utils";
   import ActivityQuickAdd from "./ActivityQuickAdd.svelte";
   import { SvelteMap, SvelteSet, SvelteDate } from "svelte/reactivity";
-  import ConfirmModal from "$lib/components/ConfirmModal.svelte";
+  import ConfirmModal from "$lib/components/utils/ConfirmModal.svelte";
   import { activityApi } from "$lib/api/activity";
   import { t } from "$lib/i18n/store";
 
-  let { isOpen, tripId, tripStart, tripEnd, activities = [], defaultDate, onRefresh, onClose } = $props<{
+  let { isOpen, tripId, placeId, tripStart, tripEnd, activities = [], defaultDate, onRefresh, onClose } = $props<{
     isOpen: boolean;
     tripId: string;
+    placeId?: string;
     tripStart?: string;
     tripEnd?: string;
     activities: Activity[];
@@ -55,12 +56,6 @@
   });
 
   function isCollapsed(date: string): boolean {
-    const today = new Date().toISOString().split("T")[0];
-    const tomorrow = new SvelteDate();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowStr = tomorrow.toISOString().split("T")[0];
-
-    if (date === today || date === tomorrowStr) return false;
     return collapsedSections.has(date);
   }
 
@@ -72,30 +67,34 @@
     }
   }
 
+  let wasOpen = false;
   $effect(() => {
-    if (isOpen) {
-      // 1. Por defecto, colapsar actividades pasadas
-      const todayStr = new Date().toISOString().split("T")[0];
-      const pastDates = new Set(
-        activities.filter((a) => a.date < todayStr).map((a) => a.date),
-      );
-      collapsedSections = new SvelteSet(pastDates);
+    if (isOpen && !wasOpen) {
+      untrack(() => {
+        // 1. Por defecto, colapsar actividades pasadas
+        const todayStr = new Date().toISOString().split("T")[0];
+        const pastDates = new Set(
+          activities.filter((a) => a.date < todayStr).map((a) => a.date),
+        );
+        collapsedSections = new SvelteSet(pastDates);
 
-      // 2. Scroll a "Today" o la primera sección futura disponible
-      tick().then(() => {
-        if (todaySection) {
-          todaySection.scrollIntoView({ behavior: "smooth", block: "start" });
-        } else {
-          // Si no hay hoy, buscar la primera sección futura
-          const firstFuture = document.querySelector(
-            'section[data-future="true"]',
-          );
-          if (firstFuture) {
-            firstFuture.scrollIntoView({ behavior: "smooth", block: "start" });
+        // 2. Scroll a "Today" o la primera sección futura disponible
+        tick().then(() => {
+          if (todaySection) {
+            todaySection.scrollIntoView({ behavior: "smooth", block: "start" });
+          } else {
+            // Si no hay hoy, buscar la primera sección futura
+            const firstFuture = document.querySelector(
+              'section[data-future="true"]',
+            );
+            if (firstFuture) {
+              firstFuture.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
           }
-        }
+        });
       });
     }
+    wasOpen = isOpen;
   });
 </script>
 
@@ -198,6 +197,7 @@
                         {tripId}
                         {tripStart}
                         {tripEnd}
+                        {placeId}
                         {activity}
                         onCancel={() => (editingActivityId = null)}
                         onSuccess={() => {
@@ -309,11 +309,11 @@
           >
             <ActivityQuickAdd
               {tripId}
+              {placeId}
               {tripStart}
               {tripEnd}
               {defaultDate}
               onSuccess={() => {
-                showQuickAdd = false;
                 onRefresh();
               }}
             />

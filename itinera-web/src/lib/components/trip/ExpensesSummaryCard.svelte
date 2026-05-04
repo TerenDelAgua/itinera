@@ -5,8 +5,8 @@
   import { getCurrencySymbol } from "$lib/utils";
   import type { Expense_Category } from "$lib/types/Category";
   import type { CategorySummary } from "$lib/types/Summary";
-  import ExpenseSummaryPills from "$lib/components/ExpenseSummaryPills.svelte";
-  import ExpenseQuickAdd from "$lib/components/ExpenseQuickAdd.svelte";
+  import ExpenseSummaryPills from "$lib/components/Expenses/ExpenseSummaryPills.svelte";
+  import ExpenseQuickAdd from "$lib/components/Expenses/ExpenseQuickAdd.svelte";
 
   let {
     tripId,
