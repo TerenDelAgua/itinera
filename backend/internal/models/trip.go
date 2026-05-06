@@ -14,6 +14,8 @@ type Trip struct {
 	EndDate                string     `json:"end_date" example:"2024-05-15"`
 	BaseCurrency           string     `json:"base_currency" example:"EUR"`
 	DefaultExpenseCurrency string     `json:"default_expense_currency" example:"JPY"`
+	IsPublicDemo           bool       `json:"is_public_demo" example:"false"`
+	ForkedFrom             *uuid.UUID `json:"forked_from,omitempty"`
 	CreatedAt              string     `json:"created_at"`
 
 	// Summary fields for Dashboard

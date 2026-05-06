@@ -14,6 +14,7 @@ type Handlers struct {
 	AuthRepo     *database.AuthRepository
 	ActivityRepo *database.ActivityRepository
 	ExpenseSvc   *services.ExpenseService
+	TripSvc      *services.TripService
 	Config       *config.Config
 }
 
@@ -24,6 +25,7 @@ func NewHandlers(
 	authRepo *database.AuthRepository,
 	activityRepo *database.ActivityRepository,
 	expenseSvc *services.ExpenseService,
+	tripSvc *services.TripService,
 	cfg *config.Config,
 ) *Handlers {
 	return &Handlers{
@@ -33,6 +35,7 @@ func NewHandlers(
 		AuthRepo:     authRepo,
 		ActivityRepo: activityRepo,
 		ExpenseSvc:   expenseSvc,
+		TripSvc:      tripSvc,
 		Config:       cfg,
 	}
 }

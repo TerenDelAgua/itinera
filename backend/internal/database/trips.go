@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	
+
 	"backend/internal/models"
 )
 
@@ -38,7 +38,7 @@ func (r *TripRepository) CreateTrip(ctx context.Context, userId *uuid.UUID, sess
 		user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency
 	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 	RETURNING 
-		id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, created_at
+		id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, is_public_demo, forked_from, created_at
 	`
 
 	err := r.Pool.QueryRow(ctx, query,
@@ -60,6 +60,8 @@ func (r *TripRepository) CreateTrip(ctx context.Context, userId *uuid.UUID, sess
 		&endDate,
 		&newTrip.BaseCurrency,
 		&newTrip.DefaultExpenseCurrency,
+		&newTrip.IsPublicDemo,
+		&newTrip.ForkedFrom,
 		&createdAt,
 	)
 	if err != nil {
@@ -77,12 +79,17 @@ func (r *TripRepository) CreateTrip(ctx context.Context, userId *uuid.UUID, sess
 func (r *TripRepository) ListTrips(ctx context.Context, userId *uuid.UUID, sessionId *string) ([]models.Trip, error) {
 	query := `
 		SELECT 
-			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, created_at,
+			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, 
+			is_public_demo, forked_from, created_at,
 			COALESCE((SELECT SUM(amount) FROM expenses WHERE trip_id = trips.id), 0) as total_spent,
 			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count
 		FROM trips
-		WHERE (user_id = $1 AND $1 IS NOT NULL) OR (session_id = $2 AND $2 IS NOT NULL)
-		ORDER BY created_at DESC
+		WHERE (user_id = $1 AND $1 IS NOT NULL) OR (session_id = $2 AND $2 IS NOT NULL) OR (is_public_demo = true)
+		ORDER BY 
+			is_public_demo ASC, 
+			CASE WHEN is_public_demo = false THEN created_at END DESC NULLS LAST,
+			CASE WHEN is_public_demo = true AND (name ILIKE '%Japón%' OR name ILIKE '%Japan%') THEN 0 ELSE 1 END ASC,
+			created_at DESC
 	`
 	rows, err := r.Pool.Query(ctx, query, userId, sessionId)
 	if err != nil {
@@ -104,6 +111,8 @@ func (r *TripRepository) ListTrips(ctx context.Context, userId *uuid.UUID, sessi
 			&endDate,
 			&trip.BaseCurrency,
 			&trip.DefaultExpenseCurrency,
+			&trip.IsPublicDemo,
+			&trip.ForkedFrom,
 			&createdAt,
 			&trip.TotalSpent,
 			&trip.PlaceCount,
@@ -129,11 +138,12 @@ func (r *TripRepository) GetTrip(ctx context.Context, id string, userId *uuid.UU
 
 	query := `
 		SELECT 
-			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, created_at,
+			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, 
+			is_public_demo, forked_from, created_at,
 			COALESCE((SELECT SUM(amount) FROM expenses WHERE trip_id = trips.id), 0) as total_spent,
 			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count
 		FROM trips
-		WHERE id = $1 AND ((user_id = $2 AND $2 IS NOT NULL) OR (session_id = $3 AND $3 IS NOT NULL))
+		WHERE id = $1 AND ((user_id = $2 AND $2 IS NOT NULL) OR (session_id = $3 AND $3 IS NOT NULL) OR (is_public_demo = true))
 	`
 
 	err := r.Pool.QueryRow(ctx, query, id, userId, sessionId).Scan(
@@ -146,6 +156,8 @@ func (r *TripRepository) GetTrip(ctx context.Context, id string, userId *uuid.UU
 		&endDate,
 		&trip.BaseCurrency,
 		&trip.DefaultExpenseCurrency,
+		&trip.IsPublicDemo,
+		&trip.ForkedFrom,
 		&createdAt,
 		&trip.TotalSpent,
 		&trip.PlaceCount,

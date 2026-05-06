@@ -50,7 +50,7 @@ func (h *Handlers) CreateTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newTrip, err := h.TripsRepo.CreateTrip(r.Context(), userID, sessionID, input)
+	newTrip, err := h.TripSvc.CreateTrip(r.Context(), userID, sessionID, input)
 	if err != nil {
 		log.Printf("ERROR creating trip: %v", err)
 		http.Error(w, "DB error: "+err.Error(), http.StatusInternalServerError)
@@ -91,7 +91,7 @@ func (h *Handlers) ListTrips(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	trips, err := h.TripsRepo.ListTrips(r.Context(), userID, sessionID)
+	trips, err := h.TripSvc.ListTrips(r.Context(), userID, sessionID)
 	if err != nil {
 		http.Error(w, "DB error: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -151,7 +151,7 @@ func (h *Handlers) GetTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	trip, err := h.TripsRepo.GetTrip(r.Context(), id, userID, sessionID)
+	trip, err := h.TripSvc.GetTrip(r.Context(), id, userID, sessionID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			http.Error(w, "Trip not found or access denied", http.StatusNotFound)
@@ -209,7 +209,7 @@ func (h *Handlers) UpdateTrip(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	updatedTrip, err := h.TripsRepo.UpdateTrip(r.Context(), tripID, userID, sessionID, updates)
+	updatedTrip, err := h.TripSvc.UpdateTrip(r.Context(), tripID, userID, sessionID, updates)
 	if err != nil {
 		if err.Error() == "trip not found or unauthorized" {
 			http.Error(w, "Forbidden", http.StatusForbidden)
@@ -263,7 +263,7 @@ func (h *Handlers) DeleteTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := h.TripsRepo.DeleteTrip(r.Context(), id, userID, sessionID)
+	err := h.TripSvc.DeleteTrip(r.Context(), id, userID, sessionID)
 	if err != nil {
 		http.Error(w, "Failed to delete trip", http.StatusInternalServerError)
 		return

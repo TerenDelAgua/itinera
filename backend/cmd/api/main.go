@@ -62,8 +62,9 @@ func main() {
 
 	exchangeRateSvc := services.NewExchangeRateService(pool)
 	expenseSvc := services.NewExpenseService(tripsRepo, expensesRepo, exchangeRateSvc)
+	tripSvc := services.NewTripService(tripsRepo)
 
-	h := handlers.NewHandlers(tripsRepo, placesRepo, expensesRepo, authRepo, activityRepo, expenseSvc, cfg)
+	h := handlers.NewHandlers(tripsRepo, placesRepo, expensesRepo, authRepo, activityRepo, expenseSvc, tripSvc, cfg)
 
 	router := setupRouter(cfg, h)
 
