@@ -99,4 +99,78 @@ func TestTripRepository_Integration(t *testing.T) {
 		err = repo.DeleteTrip(ctx, tripID.String(), nil, &sessionID)
 		assert.NoError(t, err)
 	})
+
+	t.Run("TestListTrips_Guest", func(t *testing.T) {
+		guestSessionID := "guest-session-" + uuid.New().String()
+		
+		japanDemoID := uuid.New()
+		_, err := pool.Exec(ctx, `INSERT INTO trips (id, name, is_public_demo, session_id, created_at, base_currency, default_expense_currency, start_date, end_date) 
+			VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_DATE)`,
+			japanDemoID, "Viaje a Japón Clásico", true, "DEMO", time.Now().Add(-1*time.Hour), "EUR", "EUR")
+		require.NoError(t, err)
+		defer pool.Exec(ctx, "DELETE FROM trips WHERE id = $1", japanDemoID)
+
+		otherDemoID := uuid.New()
+		_, err = pool.Exec(ctx, `INSERT INTO trips (id, name, is_public_demo, session_id, created_at, base_currency, default_expense_currency, start_date, end_date) 
+			VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_DATE)`,
+			otherDemoID, "Roma Express", true, "DEMO", time.Now().Add(-2*time.Hour), "EUR", "EUR")
+		require.NoError(t, err)
+		defer pool.Exec(ctx, "DELETE FROM trips WHERE id = $1", otherDemoID)
+
+		guestTrip, err := repo.CreateTrip(ctx, nil, &guestSessionID, models.Trip{Name: "Guest Trip", BaseCurrency: "EUR", StartDate: "2024-01-01", EndDate: "2024-01-10"})
+		require.NoError(t, err)
+		defer repo.DeleteTrip(ctx, guestTrip.ID.String(), nil, &guestSessionID)
+
+		trips, err := repo.ListTrips(ctx, nil, &guestSessionID)
+		require.NoError(t, err)
+
+		var guestTripIdx, japanIdx, otherIdx = -1, -1, -1
+		for i, tr := range trips {
+			if tr.ID == guestTrip.ID { guestTripIdx = i }
+			if tr.ID == japanDemoID { japanIdx = i }
+			if tr.ID == otherDemoID { otherIdx = i }
+		}
+		
+		require.True(t, guestTripIdx != -1, "Guest trip not found")
+		require.True(t, japanIdx != -1, "Japan demo not found")
+		require.True(t, otherIdx != -1, "Other demo not found")
+		
+		assert.Less(t, guestTripIdx, japanIdx, "Guest trip should be before Japan demo")
+		assert.Less(t, guestTripIdx, otherIdx, "Guest trip should be before Other demo")
+		assert.Less(t, japanIdx, otherIdx, "Japan demo should be before Other demo")
+	})
+
+	t.Run("TestListTrips_User", func(t *testing.T) {
+		userID := uuid.New()
+		
+		_, err := pool.Exec(ctx, `INSERT INTO users (id, email, password_hash) VALUES ($1, $2, 'hash')`,
+			userID, "test_user_"+userID.String()[:8]+"@example.com")
+		require.NoError(t, err)
+		defer pool.Exec(ctx, "DELETE FROM users WHERE id = $1", userID)
+
+		japanDemoID := uuid.New()
+		_, err = pool.Exec(ctx, `INSERT INTO trips (id, name, is_public_demo, session_id, created_at, base_currency, default_expense_currency, start_date, end_date) 
+			VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_DATE)`,
+			japanDemoID, "Viaje a Japón Clásico 2", true, "DEMO", time.Now().Add(-1*time.Hour), "EUR", "EUR")
+		require.NoError(t, err)
+		defer pool.Exec(ctx, "DELETE FROM trips WHERE id = $1", japanDemoID)
+
+		userTrip, err := repo.CreateTrip(ctx, &userID, nil, models.Trip{Name: "User Trip", BaseCurrency: "EUR", StartDate: "2024-01-01", EndDate: "2024-01-10"})
+		require.NoError(t, err)
+		defer repo.DeleteTrip(ctx, userTrip.ID.String(), &userID, nil)
+
+		trips, err := repo.ListTrips(ctx, &userID, nil)
+		require.NoError(t, err)
+
+		var userTripIdx, japanIdx = -1, -1
+		for i, tr := range trips {
+			if tr.ID == userTrip.ID { userTripIdx = i }
+			if tr.ID == japanDemoID { japanIdx = i }
+		}
+		
+		require.True(t, userTripIdx != -1, "User trip not found")
+		require.True(t, japanIdx != -1, "Japan demo not found")
+		
+		assert.Less(t, userTripIdx, japanIdx, "User trip should be before Japan demo")
+	})
 }
