@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/internal/http/middleware"
 	"backend/internal/models"
 	"encoding/json"
 	"net/http"
@@ -39,7 +40,7 @@ func (h *Handlers) GetPlace(w http.ResponseWriter, r *http.Request) {
 // @Failure      500  {string}  string "Internal Server Error"
 // @Router       /trips/{id}/places [get]
 func (h *Handlers) ListPlaces(w http.ResponseWriter, r *http.Request) {
-	tripID, _ := uuid.Parse(chi.URLParam(r, "id"))
+	tripID, _ := uuid.Parse(middleware.GetWorkingTripID(r))
 	places, err := h.PlacesRepo.ListPlacesByTrip(r.Context(), tripID)
 	if err != nil {
 		http.Error(w, "DB Error", http.StatusInternalServerError)
@@ -61,7 +62,7 @@ func (h *Handlers) ListPlaces(w http.ResponseWriter, r *http.Request) {
 // @Failure      500    {string}  string "Internal Server Error"
 // @Router       /trips/{id}/places [post]
 func (h *Handlers) CreatePlace(w http.ResponseWriter, r *http.Request) {
-	tripID, _ := uuid.Parse(chi.URLParam(r, "id"))
+	tripID, _ := uuid.Parse(middleware.GetWorkingTripID(r))
 	var input models.Place
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)

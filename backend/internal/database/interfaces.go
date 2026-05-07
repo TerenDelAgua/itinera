@@ -13,5 +13,12 @@ type TripStore interface {
 	GetTrip(ctx context.Context, id string, userId *uuid.UUID, sessionId *string) (*models.Trip, error)
 	GetTripById(ctx context.Context, id uuid.UUID) (*models.Trip, error)
 	UpdateTrip(ctx context.Context, tripID string, userID *uuid.UUID, sessionID *string, updates map[string]any) (*models.Trip, error)
+	ForkTrip(ctx context.Context, originalTripID string, userID *uuid.UUID, sessionID *string) (*models.Trip, error)
 	DeleteTrip(ctx context.Context, id string, userId *uuid.UUID, sessionId *string) error
+}
+
+type TripContextStore interface {
+	GetFork(ctx context.Context, forkedFrom string, userID *uuid.UUID, sessionID *string) (*models.Trip, error)
+	GetTripMeta(ctx context.Context, tripID string, userID *uuid.UUID, sessionID *string) (isOwner bool, isDemo bool, err error)
+	ForkTrip(ctx context.Context, originalTripID string, userID *uuid.UUID, sessionID *string) (*models.Trip, error)
 }

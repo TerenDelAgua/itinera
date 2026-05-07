@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/internal/http/middleware"
 	"backend/internal/models"
 	"backend/internal/services"
 	"encoding/json"
@@ -43,7 +44,7 @@ func (h *Handlers) GetCategories(w http.ResponseWriter, r *http.Request) {
 // @Router       /trips/{id}/expenses [post]
 // @Router       /trips/{id}/places/{placeId}/expenses [post]
 func (h *Handlers) CreateExpense(w http.ResponseWriter, r *http.Request) {
-	tripID, _ := uuid.Parse(chi.URLParam(r, "id"))
+	tripID, _ := uuid.Parse(middleware.GetWorkingTripID(r))
 	placeIDParam := chi.URLParam(r, "placeId")
 
 	var input services.CreateExpenseInput
@@ -93,7 +94,7 @@ func (h *Handlers) CreateExpense(w http.ResponseWriter, r *http.Request) {
 // @Failure      500  {string}  string "Internal Server Error"
 // @Router       /trips/{id}/expenses/summary [get]
 func (h *Handlers) GetExpenseSummary(w http.ResponseWriter, r *http.Request) {
-	tripId, _ := uuid.Parse(chi.URLParam(r, "id"))
+	tripId, _ := uuid.Parse(middleware.GetWorkingTripID(r))
 	targetCurrency := r.URL.Query().Get("currency")
 
 	summary, err := h.ExpensesRepo.GetExpensesSummary(r.Context(), tripId)
@@ -134,7 +135,7 @@ func (h *Handlers) GetExpenseSummary(w http.ResponseWriter, r *http.Request) {
 // @Failure      500  {string}  string "Internal Server Error"
 // @Router       /trips/{id}/expenses [get]
 func (h *Handlers) ListExpenses(w http.ResponseWriter, r *http.Request) {
-	tripId, _ := uuid.Parse(chi.URLParam(r, "id"))
+	tripId, _ := uuid.Parse(middleware.GetWorkingTripID(r))
 	expenses, err := h.ExpensesRepo.GetExpensesByTrip(r.Context(), tripId)
 	if err != nil {
 		http.Error(w, "DB Error", http.StatusInternalServerError)
@@ -230,7 +231,7 @@ func (h *Handlers) ListPlaceExpenses(w http.ResponseWriter, r *http.Request) {
 // @Failure      500      {string}  string "Internal Server Error"
 // @Router       /trips/{id}/places/{placeId}/expenses/summary [get]
 func (h *Handlers) GetPlaceExpenseSummary(w http.ResponseWriter, r *http.Request) {
-	tripID, _ := uuid.Parse(chi.URLParam(r, "id"))
+	tripID, _ := uuid.Parse(middleware.GetWorkingTripID(r))
 	placeId, _ := uuid.Parse(chi.URLParam(r, "placeId"))
 	targetCurrency := r.URL.Query().Get("currency")
 

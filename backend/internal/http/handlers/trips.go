@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
@@ -114,7 +113,7 @@ func (h *Handlers) ListTrips(w http.ResponseWriter, r *http.Request) {
 // @Failure      500  {string}  string "Internal Server Error"
 // @Router       /trips/{id} [get]
 func (h *Handlers) GetTrip(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+	id := middleware.GetWorkingTripID(r)
 
 	 log.Printf("🔍 [GetTrip] ID recibido: '%s'", id)
     log.Printf("🔍 [GetTrip] URL completa: %s", r.URL.String())
@@ -180,7 +179,7 @@ func (h *Handlers) GetTrip(w http.ResponseWriter, r *http.Request) {
 // @Failure      500   {string}  string "Internal Server Error"
 // @Router       /trips/{id} [put]
 func (h *Handlers) UpdateTrip(w http.ResponseWriter, r *http.Request) {
-	tripID := chi.URLParam(r, "id")
+	tripID := middleware.GetWorkingTripID(r)
 	if _, err := uuid.Parse(tripID); err != nil {
 		http.Error(w, "Invalid trip ID", http.StatusBadRequest)
 		return
@@ -242,7 +241,7 @@ func (h *Handlers) UpdateTrip(w http.ResponseWriter, r *http.Request) {
 // @Failure      500  {string}  string "Internal Server Error"
 // @Router       /trips/{id} [delete]
 func (h *Handlers) DeleteTrip(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+	id := middleware.GetWorkingTripID(r)
 
 	// 1. Try authenticated user first
 	var userID *uuid.UUID
