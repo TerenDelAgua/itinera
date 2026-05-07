@@ -12,7 +12,7 @@
 
   function getCategoryTotal(catId: string) {
     return (
-      summary?.by_category?.find((c) => c.category_id === catId)?.total || 0
+      summary?.by_category?.find((c: any) => c.category_id === catId)?.total || 0
     );
   }
 </script>

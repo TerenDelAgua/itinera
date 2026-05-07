@@ -4,7 +4,7 @@
   import { apiFetch } from "$lib/api";
   import { fly, slide } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
-  import { untrack } from "svelte";
+  import { untrack, onMount } from "svelte";
   import { t, locale } from "$lib/i18n/store";
   import ActivityDrawer from "$lib/components/activities/ActivityDrawer.svelte";
   import { formatDate } from "$lib/utils/date";
@@ -41,14 +41,12 @@
 
   let activities = $state<Activity[]>([]);
   let isAgendaOpen = $state(false);
-  let isMobileExpenseOpen = $state(false);
 
-  $effect(() => {
-    if ($page.url.pathname) {
-      const parts = $page.url.pathname.split("/");
-      tripId = parts[2] || "";
-      placeId = parts[4] || "";
-      if (tripId && placeId) untrack(() => loadAllData());
+  onMount(() => {
+    tripId = $page.params.id ?? "";
+    placeId = $page.params.placeId ?? "";
+    if (tripId && placeId) {
+      loadAllData();
     }
   });
 
@@ -70,19 +68,21 @@
       tripStartDate = tripData.start_date?.split("T")[0] || "";
       tripEndDate = tripData.end_date?.split("T")[0] || "";
 
-      const [expensesData, summaryData, catsData, actsData] = await Promise.all([
-        apiFetch<Expense[]>(`/trips/${tripId}/places/${placeId}/expenses`),
-        apiFetch<CategorySummary[]>(
-          `/trips/${tripId}/places/${placeId}/expenses/summary?currency=${effectivePlaceCurrency}`,
-        ),
-        apiFetch<Expense_Category[]>(`/trips/${tripId}/expenses/categories`),
-        activityApi.list(tripId),
-      ]);
+      const [expensesData, summaryData, catsData, actsData] = await Promise.all(
+        [
+          apiFetch<Expense[]>(`/trips/${tripId}/places/${placeId}/expenses`),
+          apiFetch<CategorySummary[]>(
+            `/trips/${tripId}/places/${placeId}/expenses/summary?currency=${effectivePlaceCurrency}`,
+          ),
+          apiFetch<Expense_Category[]>(`/trips/${tripId}/expenses/categories`),
+          activityApi.list(tripId),
+        ],
+      );
 
       expenses = expensesData;
       categorySummary = summaryData;
       categories = catsData;
-      activities = actsData.filter(a => a.place_id === placeId);
+      activities = actsData.filter((a) => a.place_id === placeId);
     } catch (e) {
       console.error("Failed to load place data", e);
       goto(`/trips/${tripId}`);
@@ -140,14 +140,19 @@
       const payload: any = {
         name: place.name,
       };
-      if (place.start_date) payload.start_date = new Date(place.start_date).toISOString();
-      if (place.end_date) payload.end_date = new Date(place.end_date).toISOString();
+      if (place.start_date)
+        payload.start_date = new Date(place.start_date).toISOString();
+      if (place.end_date)
+        payload.end_date = new Date(place.end_date).toISOString();
       payload.notes = place.notes || "";
 
-      const updated = await apiFetch<Place>(`/trips/${tripId}/places/${placeId}`, {
-        method: "PUT",
-        body: JSON.stringify(payload),
-      });
+      const updated = await apiFetch<Place>(
+        `/trips/${tripId}/places/${placeId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        },
+      );
       place = updated;
     } catch (e) {
       console.error("Failed to update place", e);

@@ -40,7 +40,15 @@ test.describe('Currency and Conversions', () => {
     // Fill QuickAdd
     const amountInput = page.getByTestId('expense-amount-input').last();
     await amountInput.fill('100');
+    
+    // Wait for the POST to finish and the summary to be reloaded
+    const postPromise = page.waitForResponse(resp => resp.url().includes('/expenses') && resp.request().method() === 'POST');
+    const summaryPromise = page.waitForResponse(resp => resp.url().includes('/summary') && resp.request().method() === 'GET');
+    
     await page.getByTestId('add-expense-button').last().click();
+    
+    await postPromise;
+    await summaryPromise;
 
     // Verify initial total (100.00 €)
     const totalLabel = page.getByTestId('grand-total').last();
@@ -102,10 +110,17 @@ test.describe('Currency and Conversions', () => {
     await amountInput.click();
     await amountInput.fill('50');
     
+    // Wait for the POST and summary reload
+    const postExpPromise = page.waitForResponse(resp => resp.url().includes('/expenses') && resp.request().method() === 'POST');
+    const summaryExpPromise = page.waitForResponse(resp => resp.url().includes('/summary') && resp.request().method() === 'GET');
+
     // Ensure the button is enabled before clicking
     const addBtn = page.getByTestId('add-expense-button').last();
     await expect(addBtn).toBeEnabled({ timeout: 10000 });
     await addBtn.click();
+
+    await postExpPromise;
+    await summaryExpPromise;
 
     // Total should be 50.00 €
     const totalLabel = page.getByTestId('grand-total').last();

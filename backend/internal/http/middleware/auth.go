@@ -16,7 +16,7 @@ func AuthMiddleware(jwtSecret string) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-				//Not authenticated -> continue (handler will fallback to session-based auth)
+				// Not authenticated → continue (handler will fallback to session-based auth)
 				next.ServeHTTP(w, r)
 				return
 			}
@@ -29,6 +29,7 @@ func AuthMiddleware(jwtSecret string) func(http.Handler) http.Handler {
 
 			if err != nil {
 				http.Error(w, "Invalid token", http.StatusUnauthorized)
+				return // ← bug fix: missing return after http.Error
 			}
 
 			userIdStr, ok := claims["user_id"].(string)
@@ -45,7 +46,6 @@ func AuthMiddleware(jwtSecret string) func(http.Handler) http.Handler {
 
 			ctx := context.WithValue(r.Context(), ContextKeyUserId{}, userID)
 			next.ServeHTTP(w, r.WithContext(ctx))
-		},
-		)
+		})
 	}
 }

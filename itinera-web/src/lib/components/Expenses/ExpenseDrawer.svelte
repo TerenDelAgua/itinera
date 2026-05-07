@@ -3,7 +3,8 @@
   import { cubicOut } from "svelte/easing";
   import { SvelteMap, SvelteSet } from "svelte/reactivity";
   import { apiFetch } from "$lib/api";
-  import type { Expense, Category } from "$lib/types";
+  import type { Expense } from "$lib/types/Expense";
+  import type { Expense_Category as Category } from "$lib/index";
   import ConfirmModal from "../utils/ConfirmModal.svelte";
   import {
     getCurrencySymbol,
@@ -370,8 +371,10 @@
 
                           <!-- Botón Delete (solo hover en desktop) -->
                           <button
-                            onclick={(e) =>
-                              e.stopPropagation() || requestDelete(exp.id)}
+                            onclick={(e) => {
+                              e.stopPropagation();
+                              requestDelete(exp.id);
+                            }}
                             class="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-error-base/70 hover:text-error-base p-1.5 rounded-lg hover:bg-error-subtle transition active:scale-95 flex-shrink-0"
                             aria-label="Delete"
                           >

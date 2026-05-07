@@ -95,7 +95,11 @@ test.describe('Itinerary Flow', () => {
     const activityInput = page.getByTestId('activity-title-input');
     await expect(activityInput).toBeVisible();
     await activityInput.fill('Global Activity 1');
+    
+    // Wait for the POST to finish
+    const postPromise = page.waitForResponse(resp => resp.url().includes('/activities') && resp.request().method() === 'POST');
     await activityInput.press('Enter');
+    await postPromise;
     
     // Verify it's added
     await expect(page.getByText('Global Activity 1').first()).toBeVisible({ timeout: 5000 });
@@ -104,8 +108,10 @@ test.describe('Itinerary Flow', () => {
     await page.getByTestId('add-place-button').click();
     const placeInput = page.getByTestId('place-name-input');
     await expect(placeInput).toBeVisible();
+    const postPlacePromise = page.waitForResponse(resp => resp.url().includes('/places') && resp.request().method() === 'POST');
     await placeInput.fill('Test City');
     await placeInput.press('Enter');
+    await postPlacePromise;
     
     // It should appear in the list
     const placeLink = page.getByText('Test City');

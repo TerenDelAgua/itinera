@@ -15,13 +15,15 @@ test.describe('Ghost Mode Fork-On-Write', () => {
 	const editedName = 'Japón Clásico (Demo) - Mi Viaje';
 
 	test('URL stays the same after editing demo, but data reflects the fork', async ({ page }) => {
+		let currentName = 'Japón Clásico (Demo)';
+
 		// ── Mock: GET initial demo ──────────────────────────────────────────────
 		await page.route(`**/api/v1/trips/${demoTripId}`, async (route, request) => {
 			if (request.method() === 'GET') {
 				await route.fulfill({
 					json: {
 						id: demoTripId,
-						name: 'Japón Clásico (Demo)',
+						name: currentName,
 						description: 'Demo trip description',
 						start_date: '2024-05-01',
 						end_date: '2024-05-15',
@@ -31,11 +33,13 @@ test.describe('Ghost Mode Fork-On-Write', () => {
 				});
 			} else if (request.method() === 'PUT') {
 				// Backend forks internally and returns the fork's data.
-				// The response still comes back to /trips/demo-id but with the forked data.
+				const body = JSON.parse(request.postData() || '{}');
+				if (body.name) currentName = body.name;
+
 				await route.fulfill({
 					json: {
 						id: forkedTripId,
-						name: editedName,
+						name: currentName,
 						description: 'Demo trip description',
 						start_date: '2024-05-01',
 						end_date: '2024-05-15',
