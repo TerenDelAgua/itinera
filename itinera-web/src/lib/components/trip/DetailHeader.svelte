@@ -19,9 +19,9 @@
     onBack,
   } = $props<{
     name: string;
-    description: string;
-    startDate: string;
-    endDate: string;
+    description?: string;
+    startDate?: string;
+    endDate?: string;
     defaultCurrency: string;
     currencyFallbackLabel?: string;
     allowInheritCurrency?: boolean;

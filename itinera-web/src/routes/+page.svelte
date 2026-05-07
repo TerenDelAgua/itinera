@@ -4,6 +4,8 @@
   import type { Trip } from "$lib/types/Trip";
   import { t } from "$lib/i18n/store";
 
+  import { Events } from "$lib/services/tracking";
+
   // Components
   import CreateTripForm from "$lib/components/dashboard/CreateTripForm.svelte";
   import ConfirmModal from "$lib/components/utils/ConfirmModal.svelte";
@@ -27,6 +29,8 @@
     try {
       const data = await apiFetch<Trip[]>("/trips");
       trips = data;
+      Events.sessionStarted(document.referrer || "direct");
+      Events.landingView();
     } catch (err) {
       error = err instanceof Error ? err.message : "Failed to load trips";
     } finally {

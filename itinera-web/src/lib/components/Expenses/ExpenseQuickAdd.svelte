@@ -1,6 +1,7 @@
 <script lang="ts">
   import { apiFetch } from "$lib/api";
-  import type { Expense, Category } from "$lib/types";
+  import type { Expense } from "$lib/types/Expense";
+  import type { Expense_Category as Category } from "$lib/index";
   import { t, locale } from "$lib/i18n/store";
   import { getCategoryEmoji } from "$lib/utils";
   import { getFriendlyErrorMessage } from "$lib/utils/errorMapper";
