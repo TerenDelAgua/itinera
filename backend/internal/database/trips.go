@@ -35,8 +35,8 @@ func (r *TripRepository) CreateTrip(ctx context.Context, userId *uuid.UUID, sess
 
 	query := `
 	INSERT INTO trips (
-		user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency
-	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, is_public_demo
+	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 	RETURNING 
 		id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, is_public_demo, forked_from, created_at
 	`
@@ -50,6 +50,7 @@ func (r *TripRepository) CreateTrip(ctx context.Context, userId *uuid.UUID, sess
 		tripData.EndDate,
 		tripData.BaseCurrency,
 		tripData.DefaultExpenseCurrency,
+		tripData.IsPublicDemo,
 	).Scan(
 		&newTrip.ID,
 		&newTrip.UserId,
@@ -448,10 +449,10 @@ func (r *TripRepository) ForkTrip(ctx context.Context, originalTripID string, us
 		}
 	}
 
-	// 6. Log event
-	logQuery := `INSERT INTO event_logs (event_name, session_id, user_id, trip_id, metadata) VALUES ($1, $2, $3, $4, $5)`
-	metadata := fmt.Sprintf(`{"forked_from": "%s"}`, originalTripID)
-	if _, err := tx.Exec(ctx, logQuery, "trip_forked", sessionID, userID, newTripID, metadata); err != nil {
+	// 6. Log event (using unified events table)
+	logQuery := `INSERT INTO events (type, session_id, user_id, trip_id, metadata, created_at) VALUES ($1, $2, $3, $4, $5, NOW())`
+	metadata := fmt.Sprintf(`{"forked_from": "%s", "trigger": "ghost_mode_write"}`, originalTripID)
+	if _, err := tx.Exec(ctx, logQuery, "demo_deep_forked", sessionID, userID, newTripID, metadata); err != nil {
 		return nil, fmt.Errorf("failed to log fork event: %w", err)
 	}
 
