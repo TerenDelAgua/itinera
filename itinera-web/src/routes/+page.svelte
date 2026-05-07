@@ -16,6 +16,10 @@
   let error = $state<string | null>(null);
   let isCreatingTrip = $state(false);
 
+  // Derivados para separación visual
+  let userTrips = $derived(trips.filter((t) => !t.is_public_demo));
+  let demoTrips = $derived(trips.filter((t) => t.is_public_demo));
+
   // Estado para borrar
   let tripToDelete = $state<Trip | null>(null);
 
@@ -95,11 +99,48 @@
   {:else if trips.length === 0}
     <EmptyState onCreateClick={handleCreateTrip} />
   {:else}
-    <!-- GRID DE TARJETAS -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {#each trips as trip (trip.id)}
-        <TripCard {trip} onDeleteClick={handleDeleteClick} />
-      {/each}
+    <div class="space-y-8">
+      {#if userTrips.length > 0}
+        <section class="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {#each userTrips as trip (trip.id)}
+              <TripCard {trip} onDeleteClick={handleDeleteClick} />
+            {/each}
+          </div>
+        </section>
+      {/if}
+
+      {#if userTrips.length > 0 && demoTrips.length > 0}
+        <div class="border-t border-teren-border/40"></div>
+      {/if}
+
+      {#if demoTrips.length > 0}
+        <section class="animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <h3
+            class="text-sm font-bold text-teren-text-muted uppercase tracking-wider mb-5 px-1 flex items-center gap-2"
+          >
+            <svg
+              class="w-4 h-4 text-orange-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
+            </svg>
+            {$t("dashboard.inspiration")}
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {#each demoTrips as trip (trip.id)}
+              <TripCard {trip} onDeleteClick={handleDeleteClick} />
+            {/each}
+          </div>
+        </section>
+      {/if}
     </div>
   {/if}
 

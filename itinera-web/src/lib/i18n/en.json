@@ -4,7 +4,9 @@
         "subtitle": "Plan and organize your journeys",
         "button_new": "New trip",
         "destination": "Destination",
-        "destinations": "Destinations"
+        "destinations": "Destinations",
+        "inspiration": "Inspiration",
+        "inspiration_badge": "INSPIRATION"
     },
     "empty_state": {
         "title": "No trips yet",

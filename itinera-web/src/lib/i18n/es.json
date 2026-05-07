@@ -4,7 +4,9 @@
         "subtitle": "Planifica y organiza tus aventuras",
         "button_new": "Nuevo viaje",
         "destination": "Destino",
-        "destinations": "Destinos"
+        "destinations": "Destinos",
+        "inspiration": "Inspiración",
+        "inspiration_badge": "INSPIRATION"
     },
     "empty_state": {
         "title": "Aún no hay viajes",

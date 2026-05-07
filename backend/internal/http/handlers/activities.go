@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/internal/http/middleware"
 	"backend/internal/models"
 	"encoding/json"
 	"net/http"
@@ -22,7 +23,7 @@ import (
 // @Failure      500      {string}  string "Internal Server Error"
 // @Router       /trips/{trip_id}/activities [get]
 func (h *Handlers) ListActivities(w http.ResponseWriter, r *http.Request) {
-	tripId := chi.URLParam(r, "trip_id")
+	tripId := middleware.GetWorkingTripID(r)
 	id, err := uuid.Parse(tripId)
 	if err != nil {
 		http.Error(w, "Invalid trip ID", http.StatusBadRequest)
@@ -52,7 +53,7 @@ func (h *Handlers) ListActivities(w http.ResponseWriter, r *http.Request) {
 // @Failure      500       {string}  string "Internal Server Error"
 // @Router       /trips/{trip_id}/activities [post]
 func (h *Handlers) CreateActivity(w http.ResponseWriter, r *http.Request) {
-	tripIdStr := chi.URLParam(r, "trip_id")
+	tripIdStr := middleware.GetWorkingTripID(r)
 	tripId, err := uuid.Parse(tripIdStr)
 	if err != nil {
 		http.Error(w, "Invalid trip Id", http.StatusBadRequest)
