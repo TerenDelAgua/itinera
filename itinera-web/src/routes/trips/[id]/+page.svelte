@@ -108,8 +108,14 @@
     }
   }
 
-  async function saveTripInfo() {
-    if (!tripName) return;
+  let isSaving = $state(false);
+  let saveTimer: ReturnType<typeof setTimeout>;
+
+  function saveTripInfo() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      if (!tripName || isSaving) return;
+      isSaving = true;
     try {
       const payload = {
         name: tripName,
@@ -121,20 +127,25 @@
         base_currency: baseCurrency,
         default_expense_currency: tripDefaultCurrency,
       };
-      await apiFetch(`/trips/${tripId}`, {
+      const response = await apiFetch<Trip>(`/trips/${tripId}`, {
         method: "PUT",
         body: JSON.stringify(payload),
       });
+
       // reload to sync with summary if currency changed
       loadAllData();
     } catch (e) {
       console.error("Failed to update trip", e);
-    }
+    } finally {
+        isSaving = false;
+      }
+    }, 300);
   }
 
   async function updateTripCurrency(code?: string) {
+    if (!code || isSaving) return;
+    isSaving = true;
     try {
-      if (!code) return;
       const previousBase = baseCurrency;
       baseCurrency = code;
 
@@ -144,17 +155,25 @@
         tripDefaultCurrency === previousBase ? code : tripDefaultCurrency;
       tripDefaultCurrency = newDefault;
 
-      await apiFetch(`/trips/${tripId}`, {
+      const response = await apiFetch<Trip>(`/trips/${tripId}`, {
         method: "PUT",
         body: JSON.stringify({
           base_currency: code,
           default_expense_currency: newDefault,
         }),
       });
+
+      if (response && response.id && response.id !== tripId) {
+        await goto(`/trips/${response.id}`, { replaceState: true });
+        return;
+      }
+
       loadAllData();
     } catch (e) {
       console.error("Failed to update trip currency", e);
       loadAllData(); // reset on error
+    } finally {
+      isSaving = false;
     }
   }
 
