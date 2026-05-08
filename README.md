@@ -234,7 +234,7 @@ Key principles:
 - **Guest-First** — zero friction before any registration gate
 - **Warm neutrals** (`#F5F4F1` background, `#FF8C42` primary accent)
 
-See [TEREN_DESIGN_SYSTEM.md](docs/TEREN_DESIGN_SYSTEM.md) for tokens, components, and guidelines.
+See [TEREN_DESIGN_SYSTEM.md](docs/TEREN_DESIGN_SYSTEM.md) for tokens, components, guidelines and styles.
 
 ---
 
