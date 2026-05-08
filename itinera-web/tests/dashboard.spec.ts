@@ -30,7 +30,7 @@ test.describe('Dashboard ListTrips', () => {
 			});
 		});
 
-		await page.goto('/');
+		await page.goto('/trips');
 
 		// Ensure the page has loaded by checking for the main dashboard title
 		await expect(page.getByRole('heading', { name: /My trips/i })).toBeVisible();

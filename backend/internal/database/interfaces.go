@@ -15,6 +15,8 @@ type TripStore interface {
 	UpdateTrip(ctx context.Context, tripID string, userID *uuid.UUID, sessionID *string, updates map[string]any) (*models.Trip, error)
 	ForkTrip(ctx context.Context, originalTripID string, userID *uuid.UUID, sessionID *string) (*models.Trip, error)
 	DeleteTrip(ctx context.Context, id string, userId *uuid.UUID, sessionId *string) error
+	ListPublicDemos(ctx context.Context, limit int) ([]models.Trip, error)
+	GetPublicStats(ctx context.Context) (int, error)
 }
 
 type TripContextStore interface {
