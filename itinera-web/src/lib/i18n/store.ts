@@ -1,8 +1,9 @@
 import { writable, derived } from 'svelte/store';
 import en from './en.json';
 import es from './es.json';
+import ja from './jp.json';
 
-type Locale = 'en' | 'es';
+type Locale = 'en' | 'es' | 'ja';
 type Messages = typeof en;
 
 type TranslationKeys<T> = {
@@ -16,7 +17,7 @@ type TranslationKeys<T> = {
 
 export const locale = writable<Locale>('en');
 
-const messages: Record<Locale, Messages> = { en, es };
+const messages: Record<Locale, Messages> = { en, es, ja };
 
 export const t = derived(locale, ($locale) => {
     return (key: TranslationKeys<Messages>, vars?: Record<string, string | number>) => {

@@ -111,12 +111,12 @@
     >
       <!-- Header -->
       <div
-        class="px-6 py-4 border-b border-teren-border flex justify-between items-center bg-white shrink-0"
+        class="px-6 py-4 border-b border-teren-border flex justify-between items-center bg-teren-card shrink-0"
       >
         <h2 class="text-lg font-bold text-teren-text-main">Itinerary</h2>
         <button
           onclick={onClose}
-          class="text-teren-text-muted hover:text-teren-text-main p-2 rounded-lg hover:bg-teren-background transition"
+          class="text-teren-text-muted hover:text-teren-text-main p-2 rounded-lg hover:bg-teren-interactive-hover transition"
         >
           <svg
             class="w-5 h-5"
@@ -295,7 +295,7 @@
       </div>
 
       <!-- Footer: Quick Add -->
-      <div class="px-6 py-4 border-t border-teren-border bg-white shrink-0">
+      <div class="px-6 py-4 border-t border-teren-border bg-teren-card shrink-0">
         <button
           onclick={() => (showQuickAdd = !showQuickAdd)}
           class="w-full text-center text-sm font-medium text-teren-primary hover:text-teren-primary-hover py-2 transition-colors"

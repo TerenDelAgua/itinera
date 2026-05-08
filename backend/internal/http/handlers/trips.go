@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
@@ -50,7 +49,7 @@ func (h *Handlers) CreateTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newTrip, err := h.TripsRepo.CreateTrip(r.Context(), userID, sessionID, input)
+	newTrip, err := h.TripSvc.CreateTrip(r.Context(), userID, sessionID, input)
 	if err != nil {
 		log.Printf("ERROR creating trip: %v", err)
 		http.Error(w, "DB error: "+err.Error(), http.StatusInternalServerError)
@@ -72,6 +71,13 @@ func (h *Handlers) CreateTrip(w http.ResponseWriter, r *http.Request) {
 // @Failure      500  {string}  string "Internal Server Error"
 // @Router       /trips [get]
 func (h *Handlers) ListTrips(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Query().Get("demos_only") == "true" {
+		trips, _ := h.TripSvc.ListPublicDemos(r.Context(), 6) // Allow up to 6 for grid variety
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]any{"trips": trips})
+		return
+	}
+
 	// 1. Try authenticated user first
 	var userID *uuid.UUID
 	if uid, ok := r.Context().Value(middleware.ContextKeyUserId{}).(uuid.UUID); ok {
@@ -91,7 +97,7 @@ func (h *Handlers) ListTrips(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	trips, err := h.TripsRepo.ListTrips(r.Context(), userID, sessionID)
+	trips, err := h.TripSvc.ListTrips(r.Context(), userID, sessionID)
 	if err != nil {
 		http.Error(w, "DB error: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -114,7 +120,7 @@ func (h *Handlers) ListTrips(w http.ResponseWriter, r *http.Request) {
 // @Failure      500  {string}  string "Internal Server Error"
 // @Router       /trips/{id} [get]
 func (h *Handlers) GetTrip(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+	id := middleware.GetWorkingTripID(r)
 
 	 log.Printf("🔍 [GetTrip] ID recibido: '%s'", id)
     log.Printf("🔍 [GetTrip] URL completa: %s", r.URL.String())
@@ -151,7 +157,7 @@ func (h *Handlers) GetTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	trip, err := h.TripsRepo.GetTrip(r.Context(), id, userID, sessionID)
+	trip, err := h.TripSvc.GetTrip(r.Context(), id, userID, sessionID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			http.Error(w, "Trip not found or access denied", http.StatusNotFound)
@@ -180,7 +186,7 @@ func (h *Handlers) GetTrip(w http.ResponseWriter, r *http.Request) {
 // @Failure      500   {string}  string "Internal Server Error"
 // @Router       /trips/{id} [put]
 func (h *Handlers) UpdateTrip(w http.ResponseWriter, r *http.Request) {
-	tripID := chi.URLParam(r, "id")
+	tripID := middleware.GetWorkingTripID(r)
 	if _, err := uuid.Parse(tripID); err != nil {
 		http.Error(w, "Invalid trip ID", http.StatusBadRequest)
 		return
@@ -209,7 +215,7 @@ func (h *Handlers) UpdateTrip(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	updatedTrip, err := h.TripsRepo.UpdateTrip(r.Context(), tripID, userID, sessionID, updates)
+	updatedTrip, err := h.TripSvc.UpdateTrip(r.Context(), tripID, userID, sessionID, updates)
 	if err != nil {
 		if err.Error() == "trip not found or unauthorized" {
 			http.Error(w, "Forbidden", http.StatusForbidden)
@@ -242,7 +248,7 @@ func (h *Handlers) UpdateTrip(w http.ResponseWriter, r *http.Request) {
 // @Failure      500  {string}  string "Internal Server Error"
 // @Router       /trips/{id} [delete]
 func (h *Handlers) DeleteTrip(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+	id := middleware.GetWorkingTripID(r)
 
 	// 1. Try authenticated user first
 	var userID *uuid.UUID
@@ -263,11 +269,22 @@ func (h *Handlers) DeleteTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := h.TripsRepo.DeleteTrip(r.Context(), id, userID, sessionID)
+	err := h.TripSvc.DeleteTrip(r.Context(), id, userID, sessionID)
 	if err != nil {
 		http.Error(w, "Failed to delete trip", http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+func (h *Handlers) GetPublicStats(w http.ResponseWriter, r *http.Request) {
+	count, err := h.TripSvc.GetPublicStats(r.Context())
+	if err != nil {
+		log.Printf("ERROR fetching public stats: %v", err)
+		http.Error(w, "Error fetching stats", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]int{"total_trips": count})
 }

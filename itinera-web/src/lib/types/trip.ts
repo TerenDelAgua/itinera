@@ -8,6 +8,8 @@ export interface Trip {
     end_date: string;
     base_currency: string;
     default_expense_currency: string;
+    is_public_demo: boolean;
+    forked_from?: string;
     created_at: string;
     updated_at?: string;
     place_count: number;

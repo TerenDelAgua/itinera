@@ -4,7 +4,7 @@
   import { apiFetch } from "$lib/api";
   import { fly, slide } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
-  import { untrack } from "svelte";
+  import { untrack, onMount } from "svelte";
   import { t, locale } from "$lib/i18n/store";
   import ActivityDrawer from "$lib/components/activities/ActivityDrawer.svelte";
   import { formatDate } from "$lib/utils/date";
@@ -41,14 +41,12 @@
 
   let activities = $state<Activity[]>([]);
   let isAgendaOpen = $state(false);
-  let isMobileExpenseOpen = $state(false);
 
-  $effect(() => {
-    if ($page.url.pathname) {
-      const parts = $page.url.pathname.split("/");
-      tripId = parts[2] || "";
-      placeId = parts[4] || "";
-      if (tripId && placeId) untrack(() => loadAllData());
+  onMount(() => {
+    tripId = $page.params.id ?? "";
+    placeId = $page.params.placeId ?? "";
+    if (tripId && placeId) {
+      loadAllData();
     }
   });
 
@@ -70,19 +68,21 @@
       tripStartDate = tripData.start_date?.split("T")[0] || "";
       tripEndDate = tripData.end_date?.split("T")[0] || "";
 
-      const [expensesData, summaryData, catsData, actsData] = await Promise.all([
-        apiFetch<Expense[]>(`/trips/${tripId}/places/${placeId}/expenses`),
-        apiFetch<CategorySummary[]>(
-          `/trips/${tripId}/places/${placeId}/expenses/summary?currency=${effectivePlaceCurrency}`,
-        ),
-        apiFetch<Expense_Category[]>(`/trips/${tripId}/expenses/categories`),
-        activityApi.list(tripId),
-      ]);
+      const [expensesData, summaryData, catsData, actsData] = await Promise.all(
+        [
+          apiFetch<Expense[]>(`/trips/${tripId}/places/${placeId}/expenses`),
+          apiFetch<CategorySummary[]>(
+            `/trips/${tripId}/places/${placeId}/expenses/summary?currency=${effectivePlaceCurrency}`,
+          ),
+          apiFetch<Expense_Category[]>(`/trips/${tripId}/expenses/categories`),
+          activityApi.list(tripId),
+        ],
+      );
 
       expenses = expensesData;
       categorySummary = summaryData;
       categories = catsData;
-      activities = actsData.filter(a => a.place_id === placeId);
+      activities = actsData.filter((a) => a.place_id === placeId);
     } catch (e) {
       console.error("Failed to load place data", e);
       goto(`/trips/${tripId}`);
@@ -140,14 +140,19 @@
       const payload: any = {
         name: place.name,
       };
-      if (place.start_date) payload.start_date = new Date(place.start_date).toISOString();
-      if (place.end_date) payload.end_date = new Date(place.end_date).toISOString();
+      if (place.start_date)
+        payload.start_date = new Date(place.start_date).toISOString();
+      if (place.end_date)
+        payload.end_date = new Date(place.end_date).toISOString();
       payload.notes = place.notes || "";
 
-      const updated = await apiFetch<Place>(`/trips/${tripId}/places/${placeId}`, {
-        method: "PUT",
-        body: JSON.stringify(payload),
-      });
+      const updated = await apiFetch<Place>(
+        `/trips/${tripId}/places/${placeId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        },
+      );
       place = updated;
     } catch (e) {
       console.error("Failed to update place", e);
@@ -166,19 +171,22 @@
       bind:description={place.notes}
       bind:startDate={place.start_date}
       bind:endDate={place.end_date}
-      defaultCurrency={place.default_expense_currency || ""}
+      bind:defaultCurrency={place.default_expense_currency}
       currencyFallbackLabel={`${$t("common.inherit")} (${tripDefaultCurrency})`}
       allowInheritCurrency={true}
       iconType="place"
       durationLabel={calculateDuration(place.start_date, place.end_date)}
-      hideDescription={true}
+      hideDescription={false}
       onSave={savePlaceInfo}
       onUpdateCurrency={savePlaceCurrency}
       onBack={() => goto(`/trips/${tripId}`)}
     />
   {/if}
 
-  <main class="max-w-3xl mx-auto px-4 py-8 space-y-8">
+  <main 
+    class="max-w-3xl mx-auto px-4 py-8 space-y-8"
+    data-place-id={placeId}
+  >
     {#if isLoading}
       <div class="animate-pulse space-y-6">
         <div
@@ -203,21 +211,6 @@
         onOpenDrawer={() => (isDrawerOpen = true)}
       />
 
-      {#if place.notes}
-        <section
-          in:fly={{ y: 20, duration: 400, delay: 100 }}
-          class="bg-teren-background p-6 rounded-xl border border-teren-border"
-        >
-          <h3
-            class="text-sm font-semibold text-teren-text-muted uppercase tracking-wider mb-3"
-          >
-            {$t("detail.description")}
-          </h3>
-          <p class="text-teren-text-main leading-relaxed whitespace-pre-wrap">
-            {place.notes}
-          </p>
-        </section>
-      {/if}
 
       <UpcomingActivityCard
         {tripId}

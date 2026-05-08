@@ -7,6 +7,7 @@
   import { formatDisplayDate } from "$lib/utils/date";
   import type { Place } from "$lib/types/Place";
   import { resolve } from "$app/paths";
+  import { Events } from "$lib/services/tracking";
 
   let { tripId, places, baseCurrency, onRefresh, onRequestDelete } = $props<{
     tripId: string;
@@ -36,10 +37,11 @@
       if (newPlaceDraft.end_date)
         payload.end_date = new Date(newPlaceDraft.end_date).toISOString();
 
-      await apiFetch(`/trips/${tripId}/places`, {
+      const created = await apiFetch<Place>(`/trips/${tripId}/places`, {
         method: "POST",
         body: JSON.stringify(payload),
       });
+      Events.placeCreated(tripId, created.id, created.name);
       newPlaceDraft = { name: "", start_date: "", end_date: "" };
       onRefresh();
     } catch (err) {

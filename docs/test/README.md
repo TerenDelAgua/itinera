@@ -46,10 +46,12 @@ pnpm test:e2e
 ### Backend
 *   **Integración DB:** Localizado en `backend/internal/database/*_test.go`. Verifica agregaciones SQL y relaciones.
 *   **API Handlers:** Localizado en `backend/internal/http/handlers/*_test.go`. Valida entradas JSON y códigos de error.
-*   **Middleware:** Localizado en `backend/internal/http/middleware/*_test.go`. Asegura la gestión de sesiones.
+*   **Middleware:** Localizado en `backend/internal/http/middleware/*_test.go`. Asegura la gestión de sesiones y el sistema de "Fork-on-Write" para demos.
+*   **Event Tracking:** Localizado en `backend/internal/database/events_test.go` (integración) y `backend/internal/http/handlers/events_test.go` (validación).
 
 ### Frontend
 *   **Utilidades:** `src/lib/utils.test.ts`. Formateo de fechas, monedas y emojis.
+*   **Servicios:** `src/lib/services/tracking.test.ts`. Validación de payloads de eventos y fallback de telemetría.
 *   **Componentes:** `src/lib/components/*.test.ts`. Reactividad de Svelte 5 y lógica de `localStorage`.
 
 ### E2E

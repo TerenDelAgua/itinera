@@ -2,63 +2,54 @@
   import "../app.css";
   import { locale } from "$lib/i18n/store";
   import { resolve } from "$app/paths";
-  import { onMount } from "svelte";
 
-  function toggleLang() {
-    locale.update((lang) => (lang === "en" ? "es" : "en"));
+  import { themeStore } from "$lib/stores/theme";
+  import { onMount } from "svelte";
+  import { page } from "$app/state";
+
+  let isDark = $state(false);
+
+  let logoHref = $derived(
+    page.url.pathname.startsWith("/trips") ? resolve("/trips") : resolve("/")
+  );
+
+  onMount(() => {
+    themeStore.init();
+
+    // Update local state based on DOM to sync icons
+    isDark = document.documentElement.classList.contains("dark");
+
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = () => {
+      const saved = localStorage.getItem("teren-theme");
+      if (!saved) {
+        themeStore.init();
+      }
+      isDark = document.documentElement.classList.contains("dark");
+    };
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  });
+
+  function handleToggleTheme() {
+    themeStore.toggle();
+    isDark = document.documentElement.classList.contains("dark");
   }
 
   let { children: childrenProp } = $props();
-
-  onMount(async () => {
-    if ("serviceWorker" in navigator) {
-      try {
-        const registration = await navigator.serviceWorker.register(
-          "/service-worker.js",
-          {
-            type: "module",
-            scope: "/",
-          },
-        );
-
-        if (registration.installing) {
-          console.log("[PWA] Service worker installing");
-        } else if (registration.waiting) {
-          console.log("[PWA] Service worker installed");
-        } else if (registration.active) {
-          console.log("[PWA] Service worker active");
-        }
-
-        // Actualización en segundo plano
-        registration.addEventListener("updatefound", () => {
-          const newWorker = registration.installing;
-          newWorker?.addEventListener("statechange", () => {
-            if (
-              newWorker.state === "installed" &&
-              navigator.serviceWorker.controller
-            ) {
-              // Nueva versión disponible
-              console.log("[PWA] New version available");
-              // Aquí podrías mostrar un toast: "Nueva versión disponible. Recarga para actualizar."
-            }
-          });
-        });
-      } catch (error) {
-        console.error("[PWA] Service worker registration failed:", error);
-      }
-    }
-  });
 </script>
 
 <div
-  class="flex flex-col min-h-screen bg-teren-background text-teren-text-main"
+  class="flex flex-col min-h-screen bg-teren-background text-teren-text-main transition-colors duration-300"
 >
-  <header class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+  <header
+    class="bg-teren-card border-b border-teren-border sticky top-0 z-50 shadow-sm transition-colors duration-300"
+  >
     <div class="max-w-6xl mx-auto px-6 h-16 flex justify-between items-center">
-      <!-- Logo / Marca -->
+      <!-- Logo -->
       <a
-        href={resolve("/")}
-        class="flex items-center gap-3 cursor-pointer group no-underline text-inherit"
+        href={logoHref}
+        class="flex items-center gap-3 group no-underline text-inherit"
       >
         <div
           class="w-10 h-10 bg-teren-primary rounded-xl flex items-center justify-center text-white shadow-sm group-hover:bg-teren-primary-hover transition-colors duration-200"
@@ -75,48 +66,72 @@
             stroke-linejoin="round"
           >
             <path d="M9 3L5 6v15l4-3 6 3 4-3V3l-4 3-6-3z"></path>
-            <path d="M9 3v15"></path>
-            <path d="M15 6v15"></path>
+            <path d="M9 3v15"></path><path d="M15 6v15"></path>
           </svg>
         </div>
         <span class="text-xl font-bold tracking-tight">Itinera</span>
       </a>
 
-      <!-- User Menu -->
-
-      <div class="flex items-center gap-6">
-        <div class="flex items-center gap-4">
-          <!-- Language Toggle (TEREN Style) -->
-          <button
-            onclick={toggleLang}
-            class="text-sm font-medium text-teren-text-muted hover:text-teren-primary transition px-2 py-1 rounded hover:bg-gray-50 uppercase"
-          >
-            {$locale}
-          </button>
-        </div>
-        <!-- <div
-          class="hidden sm:flex items-center gap-2 text-sm text-teren-text-muted font-medium"
+      <!-- Menu Derecha -->
+      <div class="flex items-center gap-2 sm:gap-4">
+        <!-- Idioma -->
+        <select
+          bind:value={$locale}
+          class="bg-transparent text-sm font-bold text-teren-text-muted hover:text-teren-primary transition px-2 py-1 rounded hover:bg-teren-interactive-hover uppercase focus:outline-none cursor-pointer border-none"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="opacity-70"
+          <option value="en" class="bg-teren-surface text-teren-text-main"
+            >EN</option
           >
-            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-          <span>teren_91@hotmail.com</span>
-        </div> -->
+          <option value="es" class="bg-teren-surface text-teren-text-main"
+            >ES</option
+          >
+          <option value="ja" class="bg-teren-surface text-teren-text-main"
+            >JP</option
+          >
+        </select>
 
+        <!-- Theme Toggle -->
         <button
-          class="text-sm font-semibold text-teren-text-main hover:text-teren-primary transition-all duration-200 flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0 active:scale-95"
+          onclick={handleToggleTheme}
+          id="theme-toggle"
+          class="w-10 h-10 flex items-center justify-center rounded-lg text-teren-text-muted hover:text-teren-primary hover:bg-teren-interactive-hover transition-all duration-200 active:scale-95 shadow-sm"
+          aria-label="Toggle theme"
+        >
+          {#if isDark}
+            <!-- Sun icon -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              ><circle cx="12" cy="12" r="4" /><path
+                d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+              /></svg
+            >
+          {:else}
+            <!-- Moon icon -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              ><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg
+            >
+          {/if}
+        </button>
+        <!-- 
+        <div
+          class="hidden md:flex items-center gap-2 text-teren-text-muted border-l border-teren-border pl-4 ml-2"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -128,11 +143,33 @@
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
+            class="opacity-70"
+            ><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle
+              cx="12"
+              cy="7"
+              r="4"
+            ></circle></svg
           >
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-            <polyline points="16 17 21 12 16 7"></polyline>
-            <line x1="21" y1="12" x2="9" y2="12"></line>
-          </svg>
+          <span class="text-sm font-medium">teren_91@hotmail.com</span>
+        </div> -->
+
+        <button
+          class="text-sm font-semibold text-teren-text-main hover:text-teren-primary transition-all duration-200 flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 ml-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            ><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline
+              points="16 17 21 12 16 7"
+            ></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg
+          >
           <span class="hidden sm:inline">Salir</span>
         </button>
       </div>
@@ -142,10 +179,4 @@
   <main class="mx-auto flex-1 w-full max-w-6xl px-6 py-12">
     {@render childrenProp?.()}
   </main>
-
-  <footer
-    class="py-8 text-center text-sm font-medium text-teren-text-muted opacity-70"
-  >
-    Built with TEREN Design System
-  </footer>
 </div>

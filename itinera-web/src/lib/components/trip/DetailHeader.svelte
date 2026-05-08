@@ -8,7 +8,7 @@
     description = $bindable(),
     startDate = $bindable(),
     endDate = $bindable(),
-    defaultCurrency,
+    defaultCurrency = $bindable(),
     currencyFallbackLabel,
     allowInheritCurrency = false,
     iconType = "trip",
@@ -19,10 +19,10 @@
     onBack,
   } = $props<{
     name: string;
-    description: string;
-    startDate: string;
-    endDate: string;
-    defaultCurrency: string;
+    description?: string;
+    startDate?: string;
+    endDate?: string;
+    defaultCurrency: string | undefined;
     currencyFallbackLabel?: string;
     allowInheritCurrency?: boolean;
     iconType?: "trip" | "place";
@@ -36,13 +36,14 @@
 
 <header
   class="bg-teren-background border-b border-teren-border py-4"
+  data-testid={iconType === "place" ? "place-header" : "trip-header"}
 >
   <div class="max-w-3xl mx-auto px-4 flex items-start justify-between">
     <div class="flex items-start gap-3 w-full">
       <button
         onclick={onBack}
         aria-label={$t("detail.back")}
-        class="p-2 -ml-2 mt-0.5 text-teren-text-muted hover:text-teren-text-main hover:bg-gray-100 rounded-lg transition active:scale-95 flex-shrink-0"
+        class="p-2 -ml-2 mt-0.5 text-teren-text-muted hover:text-teren-text-main hover:bg-teren-interactive-hover rounded-lg transition active:scale-95 flex-shrink-0"
       >
         <svg
           class="w-5 h-5"
@@ -143,7 +144,7 @@
 
           <div class="relative">
             <CurrencySelector
-              value={defaultCurrency || ""}
+              bind:value={defaultCurrency}
               fallbackLabel={currencyFallbackLabel}
               allowInherit={allowInheritCurrency}
               onSave={onUpdateCurrency}
@@ -152,14 +153,18 @@
         </div>
 
         {#if !hideDescription}
-          <input
-            type="text"
+          <textarea
             bind:value={description}
             onblur={onSave}
-            onkeydown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+            oninput={(e) => {
+              const target = e.currentTarget;
+              target.style.height = "auto";
+              target.style.height = target.scrollHeight + "px";
+            }}
             placeholder={$t("detail.description")}
-            class="bg-transparent border-none p-0 focus:ring-0 text-sm text-teren-text-muted outline-none w-full truncate mt-0.5 italic"
-          />
+            class="bg-transparent border-none p-0 focus:ring-0 text-sm text-teren-text-muted outline-none w-full mt-0.5 italic resize-none overflow-hidden"
+            rows="1"
+          ></textarea>
         {/if}
       </div>
     </div>

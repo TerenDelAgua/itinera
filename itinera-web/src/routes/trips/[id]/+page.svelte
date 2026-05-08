@@ -1,11 +1,14 @@
 <script lang="ts">
+  import { goto, afterNavigate } from "$app/navigation";
   import { page } from "$app/stores";
-  import { goto } from "$app/navigation";
+  import { onMount } from "svelte";
   import { apiFetch } from "$lib/api";
   import { t } from "$lib/i18n/store";
+  import { Events } from "$lib/services/tracking";
   import { cubicOut } from "svelte/easing";
   import { tweened } from "svelte/motion";
   import { untrack } from "svelte";
+  import { fly } from "svelte/transition";
 
   // Types
   import type { Place } from "$lib/types/Place";
@@ -57,10 +60,18 @@
     return tripStartDate;
   });
 
-  $effect(() => {
-    if ($page.url.pathname) {
-      tripId = $page.url.pathname.split("/").pop() || "";
-      untrack(() => loadAllData());
+  onMount(() => {
+    tripId = $page.params.id ?? "";
+    if (tripId) {
+      loadAllData();
+    }
+  });
+
+  afterNavigate(({ to }) => {
+    const newId = to?.params?.id;
+    if (newId && newId !== tripId) {
+      tripId = newId;
+      loadAllData();
     }
   });
 
@@ -101,6 +112,10 @@
       if (summary) {
         animatedGrandTotal.set(summary.grand_total || 0);
       }
+
+      if (tripData.is_public_demo) {
+        Events.demoViewed(tripId, tripName);
+      }
     } catch (e) {
       console.error("Failed to load trip data", e);
     } finally {
@@ -108,8 +123,14 @@
     }
   }
 
-  async function saveTripInfo() {
-    if (!tripName) return;
+  let isSaving = $state(false);
+  let saveTimer: ReturnType<typeof setTimeout>;
+
+  function saveTripInfo() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      if (!tripName || isSaving) return;
+      isSaving = true;
     try {
       const payload = {
         name: tripName,
@@ -121,20 +142,25 @@
         base_currency: baseCurrency,
         default_expense_currency: tripDefaultCurrency,
       };
-      await apiFetch(`/trips/${tripId}`, {
+      const response = await apiFetch<Trip>(`/trips/${tripId}`, {
         method: "PUT",
         body: JSON.stringify(payload),
       });
+
       // reload to sync with summary if currency changed
       loadAllData();
     } catch (e) {
       console.error("Failed to update trip", e);
-    }
+    } finally {
+        isSaving = false;
+      }
+    }, 300);
   }
 
   async function updateTripCurrency(code?: string) {
+    if (!code || isSaving) return;
+    isSaving = true;
     try {
-      if (!code) return;
       const previousBase = baseCurrency;
       baseCurrency = code;
 
@@ -144,41 +170,45 @@
         tripDefaultCurrency === previousBase ? code : tripDefaultCurrency;
       tripDefaultCurrency = newDefault;
 
-      await apiFetch(`/trips/${tripId}`, {
+      const response = await apiFetch<Trip>(`/trips/${tripId}`, {
         method: "PUT",
         body: JSON.stringify({
           base_currency: code,
           default_expense_currency: newDefault,
         }),
       });
+
+      // reload to sync with summary if currency changed
       loadAllData();
     } catch (e) {
-      console.error("Failed to update trip currency", e);
-      loadAllData(); // reset on error
+      console.error("Failed to update currency", e);
+    } finally {
+      isSaving = false;
     }
   }
 
-  function requestDeletePlace(id: string) {
+  function handleDeletePlace(id: string) {
     deletePlaceConfirmId = id;
   }
 
   async function confirmDeletePlace() {
     if (!deletePlaceConfirmId) return;
-    const id = deletePlaceConfirmId;
-    deletePlaceConfirmId = null;
-
     try {
-      await apiFetch(`/trips/${tripId}/places/${id}`, { method: "DELETE" });
+      await apiFetch(`/trips/${tripId}/places/${deletePlaceConfirmId}`, {
+        method: "DELETE",
+      });
       loadAllData();
-    } catch (e) {
-      console.error("Failed to delete place", e);
+    } catch (err) {
+      console.error("Error deleting place", err);
+    } finally {
+      deletePlaceConfirmId = null;
     }
   }
-
-  function cancelDeletePlace() {
-    deletePlaceConfirmId = null;
-  }
 </script>
+
+<svelte:head>
+  <title>{tripName ? `${tripName} | Itinera` : $t("common.loading")}</title>
+</svelte:head>
 
 <div class="min-h-screen bg-teren-background pb-20">
   <DetailHeader
@@ -186,75 +216,74 @@
     bind:description={tripDescription}
     bind:startDate={tripStartDate}
     bind:endDate={tripEndDate}
-    defaultCurrency={baseCurrency}
+    bind:defaultCurrency={baseCurrency}
     onSave={saveTripInfo}
     onUpdateCurrency={updateTripCurrency}
-    onBack={() => goto("/")}
+    onBack={() => goto("/trips")}
   />
 
-  <main class="max-w-3xl mx-auto px-4 py-8 space-y-12">
+  <main class="max-w-3xl mx-auto px-4 py-8 space-y-10">
     {#if isLoading}
-      <!-- Skeleton Loading -->
       <div class="animate-pulse space-y-6">
         <div
-          class="h-40 bg-teren-surface rounded-xl border border-teren-border"
+          class="h-48 bg-teren-surface rounded-xl border border-teren-border"
         ></div>
         <div
-          class="h-64 bg-teren-surface rounded-xl border border-teren-border"
+          class="h-32 bg-teren-surface rounded-xl border border-teren-border"
         ></div>
       </div>
     {:else}
-      <!-- ========================================== -->
-      <!-- 1. GLOBAL EXPENSES CARD -->
-      <!-- ========================================== -->
-      <ExpensesSummaryCard
-        {tripId}
-        {categories}
-        categorySummary={summary?.by_category || []}
-        displayCurrency={baseCurrency}
-        {tripDefaultCurrency}
-        {effectiveCurrency}
-        grandTotalValue={$animatedGrandTotal}
-        tripStart={tripStartDate}
-        tripEnd={tripEndDate}
-        onRefresh={loadAllData}
-        onOpenDrawer={() => (isDrawerOpen = true)}
-      />
-
-      <!-- ========================================== -->
-      <!-- 2. ACTIVITIES SECTION -->
-      <!-- ========================================== -->
+      <div in:fly={{ y: 20, duration: 400, easing: cubicOut }}>
+        <ExpensesSummaryCard
+          {tripId}
+          {categories}
+          categorySummary={summary?.by_category || []}
+          displayCurrency={baseCurrency}
+          tripDefaultCurrency={tripDefaultCurrency}
+          effectiveCurrency={effectiveCurrency}
+          grandTotalValue={$animatedGrandTotal}
+          tripStart={tripStartDate}
+          tripEnd={tripEndDate}
+          onRefresh={loadAllData}
+          onOpenDrawer={() => (isDrawerOpen = true)}
+        />
+      </div>
 
       <UpcomingActivityCard
-        {activities}
         {tripId}
+        activities={activities.filter((a) => !a.place_id)}
         tripStart={tripStartDate}
         tripEnd={tripEndDate}
-        defaultDate={initialActivityDate}
-        onRefresh={loadAllData}
         onOpenDrawer={() => (isAgendaOpen = true)}
+        onRefresh={loadAllData}
       />
 
-      <!-- ========================================== -->
-      <!-- 3. DESTINATIONS (PLACES) -->
-      <!-- ========================================== -->
       <PlaceList
-        {tripId}
         {places}
+        {tripId}
         {baseCurrency}
         onRefresh={loadAllData}
-        onRequestDelete={requestDeletePlace}
+        onRequestDelete={handleDeletePlace}
       />
     {/if}
   </main>
 
-  <!-- Drawers and Modals outside of loading context -->
   <ExpenseDrawer
     {tripId}
     {categories}
     isOpen={isDrawerOpen}
     onClose={() => (isDrawerOpen = false)}
     onRefreshSummary={loadAllData}
+  />
+
+  <ActivityDrawer
+    isOpen={isAgendaOpen}
+    {tripId}
+    tripStart={tripStartDate}
+    tripEnd={tripEndDate}
+    {activities}
+    onRefresh={loadAllData}
+    onClose={() => (isAgendaOpen = false)}
   />
 
   <ConfirmModal
@@ -265,17 +294,6 @@
     cancelText={$t("common.cancel")}
     isDestructive={true}
     onConfirm={confirmDeletePlace}
-    onCancel={cancelDeletePlace}
-  />
-
-  <ActivityDrawer
-    isOpen={isAgendaOpen}
-    {tripId}
-    tripStart={tripStartDate}
-    tripEnd={tripEndDate}
-    {activities}
-    defaultDate={initialActivityDate}
-    onRefresh={refreshActivities}
-    onClose={() => (isAgendaOpen = false)}
+    onCancel={() => (deletePlaceConfirmId = null)}
   />
 </div>

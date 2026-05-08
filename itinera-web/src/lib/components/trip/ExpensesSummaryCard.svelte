@@ -53,7 +53,7 @@
       <h2 class="text-lg font-semibold text-teren-text-main tracking-tight flex items-center gap-2">
         {$t("detail.expenses")}
         {#if titleBadge}
-          <span class="text-xs font-bold text-teren-primary bg-white px-2 py-0.5 rounded-full border border-teren-primary/20 shadow-sm">
+          <span class="text-xs font-bold text-teren-primary bg-teren-card px-2 py-0.5 rounded-full border border-teren-primary/20 shadow-sm">
             {titleBadge}
           </span>
         {/if}

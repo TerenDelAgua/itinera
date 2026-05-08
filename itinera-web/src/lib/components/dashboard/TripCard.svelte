@@ -23,20 +23,32 @@
 </script>
 
 <article
-  class="group relative bg-white rounded-xl border border-teren-border hover:border-teren-primary/30 shadow-sm hover:shadow-lg hover:shadow-teren-primary/5 transition-all duration-300 hover:-translate-y-1 overflow-hidden focus-within:ring-2 focus-within:ring-teren-primary focus-within:ring-offset-2"
+  class="group relative bg-teren-card rounded-xl border border-teren-border transition-all duration-300 hover:-translate-y-1 overflow-hidden focus-within:ring-2 focus-within:ring-teren-primary focus-within:ring-offset-2
+         {trip.is_public_demo
+    ? 'hover:border-teren-primary/30 shadow-sm hover:shadow-lg hover:shadow-teren-primary/10'
+    : 'hover:border-teren-primary/30 shadow-sm hover:shadow-lg hover:shadow-teren-primary/5'}"
 >
   <div class="p-5 flex flex-col h-full">
-    <!-- 1. TÍTULO (Enlace estirado) -->
-    <h2
-      class="text-xl font-bold text-teren-text-main line-clamp-1 leading-tight mb-1"
-    >
-      <a
-        href={resolve(`/trips/${trip.id}`)}
-        class="before:absolute before:inset-0 before:z-10 focus:outline-none"
+    <div class="flex items-start justify-between gap-4 mb-1">
+      <h2
+        class="text-xl font-bold text-teren-text-main line-clamp-1 leading-tight"
       >
-        {trip.name}
-      </a>
-    </h2>
+        <a
+          href={resolve(`/trips/${trip.id}`)}
+          class="before:absolute before:inset-0 before:z-10 focus:outline-none"
+        >
+          {trip.name}
+        </a>
+      </h2>
+
+      {#if trip.is_public_demo}
+        <span
+          class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-orange-50 text-orange-500 border border-orange-100 uppercase"
+        >
+          {$t("dashboard.inspiration_badge")}
+        </span>
+      {/if}
+    </div>
 
     <!-- 2. FECHAS (Contexto temporal, permite wrap) -->
     <div class="text-xs font-medium text-teren-text-muted tabular-nums mb-3">
@@ -93,28 +105,28 @@
           € {trip.total_spent?.toFixed(2) || "0.00"}
         </span>
 
-        <!-- Botón Borrar (Siempre visible en móvil, Hover en Desktop) -->
-        <button
-          onclick={(e) => onDeleteClick(trip, e)}
-          class="p-1.5 rounded-md text-teren-text-muted hover:text-error-base hover:bg-error-subtle transition-all
-                 flex md:hidden <!-- Móvil: Siempre visible -->
-                 md:opacity-0 md:group-hover:opacity-100 md:focus:opacity-100 <!-- Desktop: Solo hover/focus -->"
-          aria-label="Eliminar viaje"
-        >
-          <svg
-            class="w-4 h-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
+        <!-- Botón Borrar (Siempre visible en móvil, Hover en Desktop) - Oculto en Demos -->
+        {#if !trip.is_public_demo}
+          <button
+            onclick={(e) => onDeleteClick(trip, e)}
+            class="p-1.5 rounded-md text-teren-text-muted hover:text-error-base hover:bg-error-subtle transition-all flex md:flex md:opacity-0 md:group-hover:opacity-100 md:focus:opacity-100"
+            aria-label="Eliminar viaje"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-            />
-          </svg>
-        </button>
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
+            </svg>
+          </button>
+        {/if}
       </div>
     </div>
   </div>

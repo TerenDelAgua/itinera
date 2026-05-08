@@ -28,7 +28,7 @@
 </script>
 
 <div
-  class="bg-white rounded-xl border border-teren-border p-4 hover:border-teren-primary/30 transition-all group relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+  class="bg-teren-card rounded-xl border border-teren-border p-4 hover:border-teren-primary/30 transition-all group relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4"
 >
   <div class="flex items-start gap-4">
     <div

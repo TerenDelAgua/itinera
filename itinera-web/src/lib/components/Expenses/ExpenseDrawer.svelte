@@ -3,7 +3,8 @@
   import { cubicOut } from "svelte/easing";
   import { SvelteMap, SvelteSet } from "svelte/reactivity";
   import { apiFetch } from "$lib/api";
-  import type { Expense, Category } from "$lib/types";
+  import type { Expense } from "$lib/types/Expense";
+  import type { Expense_Category as Category } from "$lib/index";
   import ConfirmModal from "../utils/ConfirmModal.svelte";
   import {
     getCurrencySymbol,
@@ -145,7 +146,7 @@
         </h2>
         <button
           onclick={onClose}
-          class="text-teren-text-muted hover:text-teren-text-main p-2 rounded-lg hover:bg-gray-100 transition active:scale-95"
+          class="text-teren-text-muted hover:text-teren-text-main p-2 rounded-lg hover:bg-teren-interactive-hover transition active:scale-95"
           aria-label="Close"
         >
           <svg
@@ -182,7 +183,7 @@
                 onclick={() => toggleCategory(slug)}
                 class="w-full text-left py-3 flex items-center gap-2 group/header focus:outline-none"
               >
-                <span class="text-xl select-none">{getCategoryEmoji(slug)}</span
+                <span class="emoji text-xl select-none">{getCategoryEmoji(slug)}</span
                 >
                 <h3
                   class="text-sm font-semibold text-teren-text-muted uppercase tracking-wider group-hover/header:text-teren-primary transition-colors"
@@ -228,11 +229,11 @@
                         <div class="flex items-stretch gap-2">
                           <!-- Selector de Categoría -->
                           <div
-                            class="relative w-16 h-11 bg-white border border-teren-border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-teren-primary/30"
+                            class="relative w-16 h-11 bg-teren-card border border-teren-border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-teren-primary/30"
                           >
                             <select
                               bind:value={draft.category_id}
-                              class="appearance-none w-full h-full bg-transparent text-xl text-center cursor-pointer focus:outline-none"
+                              class="appearance-none w-full h-full text-xl text-center cursor-pointer focus:outline-none"
                             >
                               {#each categories as cat (cat.id)}
                                 <option value={cat.id}
@@ -244,11 +245,11 @@
 
                           <!-- Selector de Divisa -->
                           <div
-                            class="relative w-20 h-11 bg-white border border-teren-border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-teren-primary/30"
+                            class="relative w-20 h-11 bg-teren-card border border-teren-border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-teren-primary/30"
                           >
                             <select
                               bind:value={draft.currency}
-                              class="appearance-none w-full h-full bg-transparent text-sm font-bold text-teren-text-main text-center cursor-pointer focus:outline-none"
+                              class="appearance-none w-full h-full text-sm font-bold text-teren-text-main text-center cursor-pointer focus:outline-none"
                             >
                               {#each COMMON_CURRENCIES as c (c.code)}
                                 <option value={c.code}>{c.code}</option>
@@ -262,7 +263,7 @@
                               type="number"
                               step="0.01"
                               bind:value={draft.amount}
-                              class="w-full h-11 px-3 text-sm font-bold bg-white border border-teren-border rounded-lg focus:ring-2 focus:ring-teren-primary/30 outline-none"
+                              class="w-full h-11 px-3 text-sm font-bold bg-teren-card border border-teren-border rounded-lg focus:ring-2 focus:ring-teren-primary/30 outline-none"
                               autofocus
                             />
                           </div>
@@ -286,7 +287,7 @@
                             <input
                               type="date"
                               bind:value={draft.date}
-                              class="w-full h-11 pl-10 pr-3 text-sm bg-white border border-teren-border rounded-lg focus:ring-2 focus:ring-teren-primary/30 outline-none appearance-none [&::-webkit-calendar-picker-indicator]:opacity-0"
+                              class="w-full h-11 pl-10 pr-3 text-sm bg-teren-card border border-teren-border rounded-lg focus:ring-2 focus:ring-teren-primary/30 outline-none appearance-none [&::-webkit-calendar-picker-indicator]:opacity-0"
                             />
                           </div>
                           <div class="sm:col-span-2">
@@ -294,7 +295,7 @@
                               type="text"
                               bind:value={draft.notes}
                               placeholder={$t("detail.notes_optional")}
-                              class="w-full h-11 px-4 text-sm bg-white border border-teren-border rounded-lg focus:ring-2 focus:ring-teren-primary/30 outline-none"
+                              class="w-full h-11 px-4 text-sm bg-teren-card border border-teren-border rounded-lg focus:ring-2 focus:ring-teren-primary/30 outline-none"
                               onkeydown={(e) =>
                                 e.key === "Enter" && saveEdit(exp.id)}
                             />
@@ -305,7 +306,7 @@
                         <div class="flex justify-end gap-3 pt-2">
                           <button
                             onclick={() => (editingId = null)}
-                            class="px-5 py-2 text-sm font-medium text-teren-text-muted hover:text-teren-text-main hover:bg-gray-100 rounded-xl transition"
+                            class="px-5 py-2 text-sm font-medium text-teren-text-muted hover:text-teren-text-main hover:bg-teren-interactive-hover rounded-xl transition"
                           >
                             {$t("common.cancel")}
                           </button>
@@ -327,7 +328,7 @@
                           <div class="flex gap-3 flex-1 min-w-0">
                             <!-- Icono con Tooltip -->
                             <span
-                              class="text-xl select-none relative group/icon flex-shrink-0"
+                              class="emoji text-xl select-none relative group/icon flex-shrink-0"
                             >
                               {getCategoryEmoji(slug)}
                               <span
@@ -370,8 +371,10 @@
 
                           <!-- Botón Delete (solo hover en desktop) -->
                           <button
-                            onclick={(e) =>
-                              e.stopPropagation() || requestDelete(exp.id)}
+                            onclick={(e) => {
+                              e.stopPropagation();
+                              requestDelete(exp.id);
+                            }}
                             class="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-error-base/70 hover:text-error-base p-1.5 rounded-lg hover:bg-error-subtle transition active:scale-95 flex-shrink-0"
                             aria-label="Delete"
                           >

@@ -1,12 +1,14 @@
 <script lang="ts">
   import { apiFetch } from "$lib/api";
-  import type { Expense, Category } from "$lib/types";
+  import type { Expense } from "$lib/types/Expense";
+  import type { Expense_Category as Category } from "$lib/index";
   import { t, locale } from "$lib/i18n/store";
   import { getCategoryEmoji } from "$lib/utils";
   import { getFriendlyErrorMessage } from "$lib/utils/errorMapper";
   import { fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
   import { COMMON_CURRENCIES } from "$lib/types/Currency";
+  import { Events } from "$lib/services/tracking";
 
   let {
     tripId,
@@ -14,7 +16,7 @@
     onSuccess,
     placeId,
     baseCurrency = "EUR",
-    insertionCurrency = "EUR",
+    insertionCurrency,
     tripStart,
     tripEnd,
   }: {
@@ -34,14 +36,19 @@
   let isSubmitting = $state(false);
   let errorMessage = $state<string | null>(null);
 
-  let currency = $state(
-    (typeof localStorage !== "undefined"
-      ? localStorage.getItem("last_expense_currency")
-      : null) ||
-      insertionCurrency ||
-      baseCurrency ||
-      "EUR",
-  );
+  let currency = $state("EUR");
+
+  // Sync with props/storage
+  $effect(() => {
+    // If parent provides a specific insertion currency (e.g. Place currency), use it.
+    // Otherwise fallback to last used or base currency.
+    if (insertionCurrency) {
+      currency = insertionCurrency;
+    } else {
+      const saved = typeof localStorage !== "undefined" ? localStorage.getItem("last_expense_currency") : null;
+      currency = saved || baseCurrency || "EUR";
+    }
+  });
 
   $effect(() => {
     if (typeof localStorage !== "undefined" && currency) {
@@ -85,6 +92,7 @@
         }),
       });
 
+      Events.expenseCreated(tripId, parseFloat(amount), currency, categoryId);
       onSuccess(exp);
       amount = "";
       notes = "";
@@ -174,7 +182,8 @@
       <div class="flex-shrink-0 w-16 relative group">
         <select
           bind:value={categoryId}
-          class="appearance-none w-full h-12 bg-transparent text-2xl text-center cursor-pointer focus:outline-none hover:bg-teren-primary-subtle transition-colors"
+          data-testid="expense-category-selector"
+          class="appearance-none w-full h-12 text-2xl text-center cursor-pointer focus:outline-none hover:bg-teren-primary-subtle transition-colors"
         >
           {#each sortedCategories as cat (cat.id)}
             <option value={cat.id}>{getCategoryEmoji(cat.slug)}</option>
@@ -186,7 +195,7 @@
       <div class="flex-shrink-0 w-20 relative">
         <select
           bind:value={currency}
-          class="appearance-none w-full h-12 bg-transparent text-lg font-bold text-teren-text-main text-center cursor-pointer focus:outline-none hover:bg-teren-primary-subtle transition-colors"
+          class="appearance-none w-full h-12 text-lg font-bold text-teren-text-main text-center cursor-pointer focus:outline-none hover:bg-teren-primary-subtle transition-colors"
         >
           {#each COMMON_CURRENCIES as c (c.code)}
             <option value={c.code}>{c.symbol}</option>

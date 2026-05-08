@@ -4,7 +4,9 @@
         "subtitle": "Planifica y organiza tus aventuras",
         "button_new": "Nuevo viaje",
         "destination": "Destino",
-        "destinations": "Destinos"
+        "destinations": "Destinos",
+        "inspiration": "Inspiración",
+        "inspiration_badge": "INSPIRATION"
     },
     "empty_state": {
         "title": "Aún no hay viajes",
@@ -120,6 +122,32 @@
     },
     "expenses": {
         "notes_placeholder": "Notas (opcional)..."
+    },
+    "landing": {
+        "travelers_planning": "viajeros planeando ahora mismo",
+        "hero_title_plan": "Planifica viajes",
+        "hero_title_frictionless": "sin fricción",
+        "hero_subtitle": "Itinera es tu compañero de planificación: guest-first, offline-ready, y especializado en Japón. Empieza en segundos.",
+        "cta_primary": "Empezar a planificar — Sin registro",
+        "cta_secondary": "Ver inspiración",
+        "value_guest_title": "Primero el invitado",
+        "value_guest_desc": "Sin muros de registro. Sin anuncios. Solo planificación elegante para viajeros detallistas.",
+        "value_offline_title": "Siempre disponible",
+        "value_offline_desc": "Aviones, metros, montañas. Accede a tus planes en cualquier lugar, incluso sin internet.",
+        "value_japan_title": "Especialistas en Japón",
+        "value_japan_desc": "Herramientas para Japón: optimización de JR Pass, etiquetas de estaciones y guías de etiqueta.",
+        "inspiration_title": "Empieza con inspiración",
+        "inspiration_subtitle": "Itinerarios curados que puedes hacer tuyos",
+        "customize": "Personalizar",
+        "how_title": "Sin necesidad de cuenta",
+        "how_subtitle": "Tres pasos para tu próxima aventura",
+        "how_step1_title": "Elige una plantilla o empieza de cero",
+        "how_step1_desc": "Explora nuestros itinerarios o crea el tuyo. Sin registro previo.",
+        "how_step2_title": "Planifica tu viaje",
+        "how_step2_desc": "Edita, añade lugares, registra gastos. Tus datos se guardan por 30 días.",
+        "how_step3_title": "Guarda cuando estés listo",
+        "how_step3_desc": "Regístrate en cualquier momento para sincronizar dispositivos y guardar tus planes para siempre.",
+        "give_feedback": "Danos feedback"
     },
     "errors": {
         "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",

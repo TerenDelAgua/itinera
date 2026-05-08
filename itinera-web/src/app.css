@@ -1,34 +1,127 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 @theme {
   /* Fondos: Off-white cálido (piedra sutil) para el cuerpo, Blanco roto para tarjetas */
-  --color-teren-background: #F5F4F1; /* Warm stone 50/100 */
-  --color-teren-surface: #FCFBFA; /* Ligeramente distinto al blanco puro */
-  
+  --color-teren-background: #f5f4f1; /* Warm stone 50/100 */
+  --color-teren-surface: #fcfbfa; /* Ligeramente distinto al blanco puro */
+  --color-teren-card: #ffffff; /* Tarjetas elevadas — reemplaza bg-white hardcodeado */
+
   /* Texto: Alto contraste para exteriores */
-  --color-teren-text-main: #1C1917;  /* Stone 900 */
-  --color-teren-text-muted: #57534E; /* Stone 600 - Más oscuro que antes para legibilidad bajo el sol */
-  
+  --color-teren-text-main: #1c1917; /* Stone 900 */
+  --color-teren-text-muted: #57534e; /* Stone 600 - Más oscuro que antes para legibilidad bajo el sol */
+
   /* Acento: Naranja Amanecer */
-  --color-teren-primary: #FF8C42;
-  --color-teren-primary-hover: #E06B20;
-  --color-teren-primary-subtle: #FFF7ED;
-  
+  --color-teren-primary: #ff8c42;
+  --color-teren-primary-hover: #e06b20;
+  --color-teren-primary-subtle: #fff7ed;
+
   /* Bordes sutiles pero visibles */
-  --color-teren-border: #E7E5E4; /* Stone 200 */
+  --color-teren-border: #e7e5e4; /* Stone 200 */
+
+  /* Interactive: Estados de botones y listas */
+  --color-teren-interactive-hover: #f5f5f4; /* Stone 100 */
+  --color-teren-interactive-active: #e7e5e4; /* Stone 200 */
 
   /* Errores (TEREN DS 3.9) */
-  --color-error-base: #DC2626;
-  --color-error-subtle: #FEF2F2;
-  --color-error-hover: #B91C1C;
+  --color-error-base: #dc2626;
+  --color-error-subtle: #fef2f2;
+  --color-error-hover: #b91c1c;
 
   /* Typography */
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
   @apply bg-teren-background text-teren-text-main font-sans antialiased;
+}
+
+/* ─── Dark Mode ──────────────────────────────────────────────────────────────
+   Estrategia dual:
+   1. .dark en <html> (toggle manual desde la UI, guardado en localStorage)
+   2. prefers-color-scheme (respaldo automático si no hay preferencia guardada)
+   Cuando el usuario elige manualmente, .dark tiene prioridad sobre la media query.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Paleta oscura — Oficial TEREN Black Theme v1.0 */
+.dark {
+  --color-teren-background: #0f0e0c; /* Deep Warm Black */
+  --color-teren-surface: #1c1a17; /* Warm Charcoal */
+  --color-teren-card: #1c1a17; /* Elevación 1 */
+
+  --color-teren-text-main: #f5f4f1; /* Warm White */
+  --color-teren-text-muted: #a8a29e; /* Stone Gray */
+
+  /* El primary se mantiene, pero el hover es más luminoso en dark */
+  --color-teren-primary: #ff8c42;
+  --color-teren-primary-hover: #ffaa6b;
+  --color-teren-primary-subtle: #2c1f10;
+
+  --color-teren-border: #3f3d38; /* Stone oscuro */
+
+  --color-error-base: #f87171;
+  --color-error-subtle: #2c1010;
+  --color-error-hover: #ef4444;
+
+  /* Interactive Dark (Black Theme) */
+  --color-teren-interactive-hover: #272520; /* Ligeramente más claro que la superficie */
+  --color-teren-interactive-active: #33302b;
+}
+
+/* Reglas de UI específicas para Black Theme */
+.dark .bg-teren-card,
+.dark .bg-teren-surface,
+.dark [class*="shadow-"] {
+  box-shadow: none !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Inputs y Formularios en Dark Mode: 
+   Usamos interactive-hover (#272520) para que resalten sobre la superficie (#1C1A17) 
+   pero respetamos cuando se pide explícitamente bg-transparent */
+.dark input:not([type="checkbox"]):not([type="radio"]):not(.bg-transparent),
+.dark select:not(.bg-transparent),
+.dark textarea:not(.bg-transparent) {
+  background-color: var(--color-teren-interactive-hover);
+}
+
+/* Multimedia en modo oscuro: evitar deslumbramiento */
+.dark img,
+.dark .emoji,
+.dark span[role="img"],
+.dark .text-xl.select-none { /* Target emojis in spans without class */
+  filter: brightness(0.95) saturate(0.9);
+  transition: filter 0.3s ease;
+}
+
+/* Respaldo automático: si el usuario NO ha elegido tema manualmente,
+   respetar la preferencia del sistema operativo */
+@media (prefers-color-scheme: dark) {
+  html:not(.light):not(.dark) {
+    --color-teren-background: #0f0e0c;
+    --color-teren-surface: #1c1a17;
+    --color-teren-card: #1c1a17;
+    --color-teren-text-main: #f5f4f1;
+    --color-teren-text-muted: #a8a29e;
+    --color-teren-primary: #ff8c42;
+    --color-teren-primary-hover: #ffaa6b;
+    --color-teren-primary-subtle: #2c1f10;
+    --color-teren-border: #3f3d38;
+    --color-error-base: #f87171;
+    --color-error-subtle: #2c1010;
+    --color-error-hover: #ef4444;
+    --color-teren-interactive-hover: #272520;
+    --color-teren-interactive-active: #33302b;
+  }
+}
+
+/* ─── Global fixes for native controls ────────────────────────────────────── */
+html.dark {
+  color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
 }
 
 /* Hide native browser calendar and time icons */
@@ -36,4 +129,32 @@ input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="time"]::-webkit-calendar-picker-indicator {
   display: none;
   -webkit-appearance: none;
+}
+/* ─── Shared Animations ────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.delay-100 {
+  animation-delay: 100ms;
+}
+.delay-300 {
+  animation-delay: 300ms;
+}
+.delay-500 {
+  animation-delay: 500ms;
+}
+.delay-700 {
+  animation-delay: 700ms;
 }
