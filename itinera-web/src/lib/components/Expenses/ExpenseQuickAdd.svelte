@@ -175,7 +175,7 @@
       <div class="flex-shrink-0 w-16 relative group">
         <select
           bind:value={categoryId}
-          class="appearance-none w-full h-12 bg-transparent text-2xl text-center cursor-pointer focus:outline-none hover:bg-teren-primary-subtle transition-colors"
+          class="appearance-none w-full h-12 text-2xl text-center cursor-pointer focus:outline-none hover:bg-teren-primary-subtle transition-colors"
         >
           {#each sortedCategories as cat (cat.id)}
             <option value={cat.id}>{getCategoryEmoji(cat.slug)}</option>
@@ -187,7 +187,7 @@
       <div class="flex-shrink-0 w-20 relative">
         <select
           bind:value={currency}
-          class="appearance-none w-full h-12 bg-transparent text-lg font-bold text-teren-text-main text-center cursor-pointer focus:outline-none hover:bg-teren-primary-subtle transition-colors"
+          class="appearance-none w-full h-12 text-lg font-bold text-teren-text-main text-center cursor-pointer focus:outline-none hover:bg-teren-primary-subtle transition-colors"
         >
           {#each COMMON_CURRENCIES as c (c.code)}
             <option value={c.code}>{c.symbol}</option>

@@ -176,7 +176,7 @@
       allowInheritCurrency={true}
       iconType="place"
       durationLabel={calculateDuration(place.start_date, place.end_date)}
-      hideDescription={true}
+      hideDescription={false}
       onSave={savePlaceInfo}
       onUpdateCurrency={savePlaceCurrency}
       onBack={() => goto(`/trips/${tripId}`)}
@@ -208,21 +208,6 @@
         onOpenDrawer={() => (isDrawerOpen = true)}
       />
 
-      {#if place.notes}
-        <section
-          in:fly={{ y: 20, duration: 400, delay: 100 }}
-          class="bg-teren-background p-6 rounded-xl border border-teren-border"
-        >
-          <h3
-            class="text-sm font-semibold text-teren-text-muted uppercase tracking-wider mb-3"
-          >
-            {$t("detail.description")}
-          </h3>
-          <p class="text-teren-text-main leading-relaxed whitespace-pre-wrap">
-            {place.notes}
-          </p>
-        </section>
-      {/if}
 
       <UpcomingActivityCard
         {tripId}
