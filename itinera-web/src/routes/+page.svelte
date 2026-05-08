@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import { apiFetch } from "$lib/api";
   import type { Trip } from "$lib/types/Trip";
@@ -45,6 +46,8 @@
   function handleTripCreated(newTrip: Trip) {
     trips = [newTrip, ...trips];
     isCreatingTrip = false;
+    Events.tripCreated(newTrip.id, newTrip.name);
+    goto(`/trips/${newTrip.id}`);
   }
 
   // Lógica de Borrado
