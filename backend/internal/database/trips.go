@@ -492,3 +492,65 @@ func (r *TripRepository) GetTripMeta(ctx context.Context, tripID string, userID 
 	}
 	return isOwner, isDemo, nil
 }
+func (r *TripRepository) ListPublicDemos(ctx context.Context, limit int) ([]models.Trip, error) {
+	query := `
+		SELECT 
+			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, 
+			is_public_demo, forked_from, created_at,
+			COALESCE((SELECT SUM(amount) FROM expenses WHERE trip_id = trips.id), 0) as total_spent,
+			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count
+		FROM trips
+		WHERE is_public_demo = true
+		ORDER BY created_at DESC
+		LIMIT $1
+	`
+	rows, err := r.Pool.Query(ctx, query, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var trips []models.Trip
+	for rows.Next() {
+		var trip models.Trip
+		var startDate, endDate, createdAt time.Time
+		if err := rows.Scan(
+			&trip.ID,
+			&trip.UserId,
+			&trip.SessionId,
+			&trip.Name,
+			&trip.Description,
+			&startDate,
+			&endDate,
+			&trip.BaseCurrency,
+			&trip.DefaultExpenseCurrency,
+			&trip.IsPublicDemo,
+			&trip.ForkedFrom,
+			&createdAt,
+			&trip.TotalSpent,
+			&trip.PlaceCount,
+		); err != nil {
+			return nil, err
+		}
+		trip.StartDate = startDate.Format("2006-01-02")
+		trip.EndDate = endDate.Format("2006-01-02")
+		trip.CreatedAt = createdAt.Format(time.RFC3339)
+		trips = append(trips, trip)
+	}
+
+	if trips == nil {
+		trips = []models.Trip{}
+	}
+
+	return trips, nil
+}
+
+func (r *TripRepository) GetPublicStats(ctx context.Context) (int, error) {
+	var count int
+	err := r.Pool.QueryRow(ctx, "SELECT total_trips_count FROM public_stats WHERE id = 1").Scan(&count)
+	if err != nil {
+		// Fallback to real count if stats table fails
+		err = r.Pool.QueryRow(ctx, "SELECT COUNT(*) FROM trips").Scan(&count)
+	}
+	return count, err
+}

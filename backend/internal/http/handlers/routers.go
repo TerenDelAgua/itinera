@@ -11,6 +11,7 @@ func RegisterApiRoutes(r chi.Router, h *Handlers) {
 	r.Use(middleware.AuthMiddleware(h.Config.JWTSecret))
 
 	r.Get("/health", h.healthCheck)
+	r.Get("/stats/public", h.GetPublicStats)
 
 	r.Group(func(r chi.Router) {
 		r.Post("/auth/register", h.Register)

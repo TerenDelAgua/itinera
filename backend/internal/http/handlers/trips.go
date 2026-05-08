@@ -71,6 +71,13 @@ func (h *Handlers) CreateTrip(w http.ResponseWriter, r *http.Request) {
 // @Failure      500  {string}  string "Internal Server Error"
 // @Router       /trips [get]
 func (h *Handlers) ListTrips(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Query().Get("demos_only") == "true" {
+		trips, _ := h.TripSvc.ListPublicDemos(r.Context(), 6) // Allow up to 6 for grid variety
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]any{"trips": trips})
+		return
+	}
+
 	// 1. Try authenticated user first
 	var userID *uuid.UUID
 	if uid, ok := r.Context().Value(middleware.ContextKeyUserId{}).(uuid.UUID); ok {
@@ -269,4 +276,15 @@ func (h *Handlers) DeleteTrip(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+func (h *Handlers) GetPublicStats(w http.ResponseWriter, r *http.Request) {
+	count, err := h.TripSvc.GetPublicStats(r.Context())
+	if err != nil {
+		log.Printf("ERROR fetching public stats: %v", err)
+		http.Error(w, "Error fetching stats", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]int{"total_trips": count})
 }

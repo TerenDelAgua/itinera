@@ -35,3 +35,11 @@ func (s *TripService) UpdateTrip(ctx context.Context, id string, userId *uuid.UU
 func (s *TripService) DeleteTrip(ctx context.Context, id string, userId *uuid.UUID, sessionId *string) error {
 	return s.store.DeleteTrip(ctx, id, userId, sessionId)
 }
+
+func (s *TripService) ListPublicDemos(ctx context.Context, limit int) ([]models.Trip, error) {
+	return s.store.ListPublicDemos(ctx, limit)
+}
+
+func (s *TripService) GetPublicStats(ctx context.Context) (int, error) {
+	return s.store.GetPublicStats(ctx)
+}
