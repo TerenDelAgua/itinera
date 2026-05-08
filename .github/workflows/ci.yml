@@ -154,7 +154,7 @@ jobs:
           ./backend/itinera-api > backend.log 2>&1 &
           
           echo "Waiting for backend to be ready..."
-          timeout 30s bash -c 'until curl -s http://localhost:8080/swagger/index.html > /dev/null; do sleep 1; done' || (cat backend.log && exit 1)
+          timeout 60s bash -c 'until curl -s http://localhost:8080/swagger/index.html > /dev/null; do sleep 1; done' || (cat backend.log && exit 1)
           
           pnpm --filter itinera-web test:e2e || (cat backend.log && exit 1)
 
