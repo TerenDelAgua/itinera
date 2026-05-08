@@ -28,10 +28,8 @@ test.describe('Currency and Conversions', () => {
     await page.getByTestId('trip-name-input').fill(tripName);
     await page.locator('form button[type="submit"]').click();
 
-    // 2. Navigate to details
-    const tripCard = page.getByText(tripName);
-    await expect(tripCard).toBeVisible({ timeout: 10000 });
-    await tripCard.click();
+    // 2. Auto-navigated to details
+    await expect(page).toHaveURL(/\/trips\/[0-9a-f-]+/, { timeout: 10000 });
 
     // 3. Add an expense of 100.00 EUR (default currency)
     // Wait for page to load
@@ -56,7 +54,7 @@ test.describe('Currency and Conversions', () => {
     await expect(totalLabel).toContainText('€');
 
     // 4. Change Trip Base Currency to JPY in the header
-    const currencySelector = page.locator('header select');
+    const currencySelector = page.getByTestId('currency-selector');
     await currencySelector.selectOption('JPY');
     
     // Verify symbol change first (¥)
@@ -87,10 +85,8 @@ test.describe('Currency and Conversions', () => {
     await page.getByTestId('trip-name-input').fill(tripName);
     await page.locator('form button[type="submit"]').click();
 
-    // Wait for the trip card to appear and be stable
-    const tripCard = page.getByText(tripName).first();
-    await expect(tripCard).toBeVisible({ timeout: 10000 });
-    await tripCard.click();
+    // Auto-navigated to details
+    await expect(page).toHaveURL(/\/trips\/[0-9a-f-]+/, { timeout: 10000 });
 
     // 2. Add a Place
     await page.getByTestId('add-place-button').click();
@@ -128,7 +124,7 @@ test.describe('Currency and Conversions', () => {
     await expect(totalLabel).toContainText('€');
 
     // 4. Change Place currency to JPY
-    const placeCurrencySelector = page.locator('header select');
+    const placeCurrencySelector = page.getByTestId('currency-selector');
     await placeCurrencySelector.selectOption('JPY');
 
     // Verify symbol change to JPY (¥)
