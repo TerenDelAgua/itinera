@@ -152,14 +152,18 @@
         </div>
 
         {#if !hideDescription}
-          <input
-            type="text"
+          <textarea
             bind:value={description}
             onblur={onSave}
-            onkeydown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+            oninput={(e) => {
+              const target = e.currentTarget;
+              target.style.height = "auto";
+              target.style.height = target.scrollHeight + "px";
+            }}
             placeholder={$t("detail.description")}
-            class="bg-transparent border-none p-0 focus:ring-0 text-sm text-teren-text-muted outline-none w-full truncate mt-0.5 italic"
-          />
+            class="bg-transparent border-none p-0 focus:ring-0 text-sm text-teren-text-muted outline-none w-full mt-0.5 italic resize-none overflow-hidden"
+            rows="1"
+          ></textarea>
         {/if}
       </div>
     </div>

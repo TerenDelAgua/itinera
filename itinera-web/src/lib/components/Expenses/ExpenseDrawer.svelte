@@ -233,7 +233,7 @@
                           >
                             <select
                               bind:value={draft.category_id}
-                              class="appearance-none w-full h-full bg-transparent text-xl text-center cursor-pointer focus:outline-none"
+                              class="appearance-none w-full h-full text-xl text-center cursor-pointer focus:outline-none"
                             >
                               {#each categories as cat (cat.id)}
                                 <option value={cat.id}
@@ -249,7 +249,7 @@
                           >
                             <select
                               bind:value={draft.currency}
-                              class="appearance-none w-full h-full bg-transparent text-sm font-bold text-teren-text-main text-center cursor-pointer focus:outline-none"
+                              class="appearance-none w-full h-full text-sm font-bold text-teren-text-main text-center cursor-pointer focus:outline-none"
                             >
                               {#each COMMON_CURRENCIES as c (c.code)}
                                 <option value={c.code}>{c.code}</option>
