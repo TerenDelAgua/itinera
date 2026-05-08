@@ -4,9 +4,6 @@
   import { resolve } from "$app/paths";
   import { onMount } from "svelte";
 
-  function toggleLang() {
-    locale.update((lang) => (lang === "en" ? "es" : "en"));
-  }
 
   // ─── Theme Management ────────────────────────────────────────────────────────
   let theme = $state<'light' | 'dark' | null>(null);
@@ -70,12 +67,14 @@
       <!-- Menu Derecha -->
       <div class="flex items-center gap-2 sm:gap-4">
         <!-- Idioma -->
-        <button
-          onclick={toggleLang}
-          class="text-sm font-bold text-teren-text-muted hover:text-teren-primary transition px-2 py-1 rounded hover:bg-teren-interactive-hover uppercase"
+        <select
+          bind:value={$locale}
+          class="bg-transparent text-sm font-bold text-teren-text-muted hover:text-teren-primary transition px-2 py-1 rounded hover:bg-teren-interactive-hover uppercase focus:outline-none cursor-pointer border-none"
         >
-          {$locale}
-        </button>
+          <option value="en" class="bg-teren-surface text-teren-text-main">EN</option>
+          <option value="es" class="bg-teren-surface text-teren-text-main">ES</option>
+          <option value="ja" class="bg-teren-surface text-teren-text-main">JP</option>
+        </select>
 
         <!-- Theme Toggle -->
         <button
