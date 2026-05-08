@@ -123,6 +123,32 @@
     "expenses": {
         "notes_placeholder": "メモ（任意）..."
     },
+    "landing": {
+        "travelers_planning": "人の旅行者が現在計画中",
+        "hero_title_plan": "旅の計画を",
+        "hero_title_frictionless": "もっと自由に",
+        "hero_subtitle": "Itineraはあなたの計画パートナー：ゲスト優先、オフライン対応、日本特化。数秒で始められます。",
+        "cta_primary": "計画を始める — 登録不要",
+        "cta_secondary": "インスピレーションを見る",
+        "value_guest_title": "ゲスト優先",
+        "value_guest_desc": "登録の壁も広告もありません。こだわりを持つ旅行者のための、エレガントな計画ツールです。",
+        "value_offline_title": "オフライン対応",
+        "value_offline_desc": "飛行機、地下鉄、山。インターネットがなくても、どこでもプランにアクセスできます。",
+        "value_japan_title": "日本特化",
+        "value_japan_desc": "日本旅行のための専用ツール：JRパスの最適化、駅タグ、マナーガイドを搭載。",
+        "inspiration_title": "インスピレーションから始める",
+        "inspiration_subtitle": "あなたの好みにカスタマイズできる厳選された旅程",
+        "customize": "カスタマイズする",
+        "how_title": "アカウント不要",
+        "how_subtitle": "次の冒険への3つのステップ",
+        "how_step1_title": "旅程を選ぶか、新しく始める",
+        "how_step1_desc": "厳選された旅程を見るか、自分だけのプランを作成。登録は不要です。",
+        "how_step2_title": "旅を計画する",
+        "how_step2_desc": "場所の追加、支出の記録。データは30日間保存されます。",
+        "how_step3_title": "準備ができたら保存",
+        "how_step3_desc": "いつでも登録してデバイス間で同期し、プランを永久に保存できます。",
+        "give_feedback": "フィードバックを送る"
+    },
     "errors": {
         "generic": "エラーが発生しました。もう一度お試しください。",
         "date_out_of_bounds": "日付は {tripStart} から {tripEnd} の間である必要があります。",

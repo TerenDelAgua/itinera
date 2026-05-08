@@ -219,7 +219,7 @@
     defaultCurrency={baseCurrency}
     onSave={saveTripInfo}
     onUpdateCurrency={updateTripCurrency}
-    onBack={() => goto("/")}
+    onBack={() => goto("/trips")}
   />
 
   <main class="max-w-3xl mx-auto px-4 py-8 space-y-10">

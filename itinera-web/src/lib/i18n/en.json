@@ -123,6 +123,32 @@
     "expenses": {
         "notes_placeholder": "Notes (optional)..."
     },
+    "landing": {
+        "travelers_planning": "travelers planning right now",
+        "hero_title_plan": "Plan your journeys",
+        "hero_title_frictionless": "without friction",
+        "hero_subtitle": "Itinera is your planning companion: guest-first, offline-ready, and specialized in Japan. Start in seconds.",
+        "cta_primary": "Start Planning — No Sign Up",
+        "cta_secondary": "See Inspiration",
+        "value_guest_title": "Guest-First",
+        "value_guest_desc": "No registration walls. No ads. Just elegant trip planning for thoughtful travelers.",
+        "value_offline_title": "Offline-Ready",
+        "value_offline_desc": "Airplanes, subways, mountains. Access your plans anywhere, even without internet.",
+        "value_japan_title": "Japan Edge",
+        "value_japan_desc": "Specialized tools for Japan: JR Pass optimization, station tagging, and etiquette guides.",
+        "inspiration_title": "Start from inspiration",
+        "inspiration_subtitle": "Curated itineraries you can make your own",
+        "customize": "Customize",
+        "how_title": "No account required",
+        "how_subtitle": "Three steps to your next adventure",
+        "how_step1_title": "Pick a template or start fresh",
+        "how_step1_desc": "Browse our curated itineraries or create your own. No signup needed.",
+        "how_step2_title": "Plan your trip",
+        "how_step2_desc": "Edit, add places, track expenses. All your data stays for 30 days.",
+        "how_step3_title": "Save when you're ready",
+        "how_step3_desc": "Register anytime to sync across devices and keep your plans forever.",
+        "give_feedback": "Give feedback"
+    },
     "errors": {
         "generic": "Something went wrong. Please try again.",
         "date_out_of_bounds": "The date must be between {tripStart} and {tripEnd}.",

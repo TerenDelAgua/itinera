@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Itinerary Flow', () => {
   test('should create a new trip and navigate to its details', async ({ page }) => {
     // 1. Go to home
-    await page.goto('/');
+    await page.goto('/trips');
     
     // Wait for loading to finish
     await expect(page.locator('.animate-spin')).not.toBeVisible({ timeout: 15000 });
@@ -32,16 +32,10 @@ test.describe('Itinerary Flow', () => {
     const submitBtn = page.locator('form button[type="submit"]');
     await submitBtn.click();
 
-    // 5. Verify it appears in the list
-    const tripCard = page.getByText(tripName);
-    await expect(tripCard).toBeVisible({ timeout: 10000 });
-
-    // 6. Navigate to details
-    await tripCard.click();
+    // 5. Verify auto-navigation to details
+    await expect(page).toHaveURL(/\/trips\/[0-9a-f-]+/, { timeout: 10000 });
     
-    // 7. Verify we are on the trip page
-    await expect(page).toHaveURL(/\/trips\/[0-9a-f-]+/);
-    // The name is in an input field in the header
+    // 6. Verify the name in the header input
     const titleInput = page.getByPlaceholder(/Trip Name/i);
     await expect(titleInput).toHaveValue(tripName, { timeout: 10000 });
 
@@ -54,7 +48,7 @@ test.describe('Itinerary Flow', () => {
   });
 
   test('should persist session via cookie', async ({ page, context }) => {
-    await page.goto('/');
+    await page.goto('/trips');
     
     // Wait for the page to load and cookies to be set
     await page.waitForLoadState('networkidle');
@@ -67,7 +61,7 @@ test.describe('Itinerary Flow', () => {
   });
 
   test('should only show local activities in place view', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/trips');
     await expect(page.locator('.animate-spin')).not.toBeVisible({ timeout: 15000 });
     
     // Create a trip
@@ -81,12 +75,9 @@ test.describe('Itinerary Flow', () => {
     
     const tripName = `Filter Test ${Date.now()}`;
     await page.getByPlaceholder(/Trip name/i).fill(tripName);
+    // 4. Submit and verify auto-navigation
     await page.locator('form button[type="submit"]').click();
-    
-    // Navigate to it
-    const tripCard = page.getByText(tripName);
-    await tripCard.click();
-    await expect(page).toHaveURL(/\/trips\/[0-9a-f-]+/);
+    await expect(page).toHaveURL(/\/trips\/[0-9a-f-]+/, { timeout: 10000 });
     
     // Add a global activity via UpcomingActivityCard
     // The button has "+ Add" or similar text
