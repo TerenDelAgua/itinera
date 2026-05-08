@@ -16,7 +16,7 @@
     onSuccess,
     placeId,
     baseCurrency = "EUR",
-    insertionCurrency = "EUR",
+    insertionCurrency,
     tripStart,
     tripEnd,
   }: {
@@ -36,14 +36,19 @@
   let isSubmitting = $state(false);
   let errorMessage = $state<string | null>(null);
 
-  let currency = $state(
-    (typeof localStorage !== "undefined"
-      ? localStorage.getItem("last_expense_currency")
-      : null) ||
-      insertionCurrency ||
-      baseCurrency ||
-      "EUR",
-  );
+  let currency = $state("EUR");
+
+  // Sync with props/storage
+  $effect(() => {
+    // If parent provides a specific insertion currency (e.g. Place currency), use it.
+    // Otherwise fallback to last used or base currency.
+    if (insertionCurrency) {
+      currency = insertionCurrency;
+    } else {
+      const saved = typeof localStorage !== "undefined" ? localStorage.getItem("last_expense_currency") : null;
+      currency = saved || baseCurrency || "EUR";
+    }
+  });
 
   $effect(() => {
     if (typeof localStorage !== "undefined" && currency) {
@@ -177,6 +182,7 @@
       <div class="flex-shrink-0 w-16 relative group">
         <select
           bind:value={categoryId}
+          data-testid="expense-category-selector"
           class="appearance-none w-full h-12 text-2xl text-center cursor-pointer focus:outline-none hover:bg-teren-primary-subtle transition-colors"
         >
           {#each sortedCategories as cat (cat.id)}

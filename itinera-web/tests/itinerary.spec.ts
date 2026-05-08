@@ -87,10 +87,14 @@ test.describe('Itinerary Flow', () => {
     await expect(activityInput).toBeVisible();
     await activityInput.fill('Global Activity 1');
     
-    // Wait for the POST to finish
+    // Wait for the POST to finish and the subsequent list refresh
     const postPromise = page.waitForResponse(resp => resp.url().includes('/activities') && resp.request().method() === 'POST');
+    const getPromise = page.waitForResponse(resp => resp.url().includes('/activities') && resp.request().method() === 'GET');
+    
     await activityInput.press('Enter');
+    
     await postPromise;
+    await getPromise;
     
     // Verify it's added
     await expect(page.getByText('Global Activity 1').first()).toBeVisible({ timeout: 5000 });

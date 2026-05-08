@@ -8,7 +8,7 @@
     description = $bindable(),
     startDate = $bindable(),
     endDate = $bindable(),
-    defaultCurrency,
+    defaultCurrency = $bindable(),
     currencyFallbackLabel,
     allowInheritCurrency = false,
     iconType = "trip",
@@ -22,7 +22,7 @@
     description?: string;
     startDate?: string;
     endDate?: string;
-    defaultCurrency: string;
+    defaultCurrency: string | undefined;
     currencyFallbackLabel?: string;
     allowInheritCurrency?: boolean;
     iconType?: "trip" | "place";
@@ -36,6 +36,7 @@
 
 <header
   class="bg-teren-background border-b border-teren-border py-4"
+  data-testid={iconType === "place" ? "place-header" : "trip-header"}
 >
   <div class="max-w-3xl mx-auto px-4 flex items-start justify-between">
     <div class="flex items-start gap-3 w-full">
@@ -143,7 +144,7 @@
 
           <div class="relative">
             <CurrencySelector
-              value={defaultCurrency || ""}
+              bind:value={defaultCurrency}
               fallbackLabel={currencyFallbackLabel}
               allowInherit={allowInheritCurrency}
               onSave={onUpdateCurrency}

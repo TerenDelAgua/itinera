@@ -171,7 +171,7 @@
       bind:description={place.notes}
       bind:startDate={place.start_date}
       bind:endDate={place.end_date}
-      defaultCurrency={place.default_expense_currency || ""}
+      bind:defaultCurrency={place.default_expense_currency}
       currencyFallbackLabel={`${$t("common.inherit")} (${tripDefaultCurrency})`}
       allowInheritCurrency={true}
       iconType="place"
@@ -183,7 +183,10 @@
     />
   {/if}
 
-  <main class="max-w-3xl mx-auto px-4 py-8 space-y-8">
+  <main 
+    class="max-w-3xl mx-auto px-4 py-8 space-y-8"
+    data-place-id={placeId}
+  >
     {#if isLoading}
       <div class="animate-pulse space-y-6">
         <div

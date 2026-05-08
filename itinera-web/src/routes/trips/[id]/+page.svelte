@@ -216,7 +216,7 @@
     bind:description={tripDescription}
     bind:startDate={tripStartDate}
     bind:endDate={tripEndDate}
-    defaultCurrency={baseCurrency}
+    bind:defaultCurrency={baseCurrency}
     onSave={saveTripInfo}
     onUpdateCurrency={updateTripCurrency}
     onBack={() => goto("/trips")}

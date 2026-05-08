@@ -52,7 +52,7 @@ test.describe('Currency and Conversions', () => {
     await expect(totalLabel).toContainText('€');
 
     // 4. Change Trip Base Currency to JPY in the header
-    const currencySelector = page.getByTestId('currency-selector').first();
+    const currencySelector = page.getByTestId('trip-header').getByTestId('currency-selector');
     await currencySelector.selectOption('JPY');
     
     // Verify symbol change first (¥)
@@ -96,31 +96,44 @@ test.describe('Currency and Conversions', () => {
     await expect(placeCard).toBeVisible({ timeout: 10000 });
     await placeCard.click();
 
-    // 3. Add expense in Place (inherits Trip EUR)
-    const amountInput = page.getByTestId('expense-amount-input').last();
-    await expect(amountInput).toBeVisible({ timeout: 10000 });
-    await amountInput.click();
-    await amountInput.fill('50');
-    
-    // Wait for the POST and summary reload
-    const postExpPromise = page.waitForResponse(resp => resp.url().includes('/expenses') && resp.request().method() === 'POST');
-    const summaryExpPromise = page.waitForResponse(resp => resp.url().includes('/summary') && resp.request().method() === 'GET');
+    // Ensure the place page is fully loaded and ID is set in the DOM
+    const main = page.locator('main[data-place-id]');
+    await expect(main).toHaveAttribute('data-place-id', /[0-9a-f-]+/, { timeout: 10000 });
 
-    // Ensure the button is enabled before clicking
-    const addBtn = page.getByTestId('add-expense-button').last();
-    await expect(addBtn).toBeEnabled({ timeout: 10000 });
-    await addBtn.click();
+    // Ensure categories are loaded and a default is selected
+    const categorySelector = main.getByTestId('expense-category-selector');
+    await expect(categorySelector).not.toHaveValue('', { timeout: 10000 });
+
+    const amountInput = page.locator('main').getByTestId('expense-amount-input');
+    await expect(amountInput).toBeVisible({ timeout: 10000 });
+    await amountInput.fill('50');
+    await expect(amountInput).toHaveValue('50');
+    
+    // Wait for the POST first
+    const postExpPromise = page.waitForResponse(resp => 
+      resp.url().includes('/expenses') && 
+      resp.request().method() === 'POST' &&
+      resp.status() === 201
+    );
+    
+    await amountInput.press('Enter');
+
+    // Define summary promise immediately after trigger to catch the reload
+    const summaryExpPromise = page.waitForResponse(resp => 
+      resp.url().includes('/summary') && 
+      resp.status() === 200
+    );
 
     await postExpPromise;
     await summaryExpPromise;
 
     // Total should be 50.00 €
     const totalLabel = page.getByTestId('grand-total').last();
-    await expect(totalLabel).toContainText('50.00');
+    await expect(totalLabel).toContainText('50.00', { timeout: 15000 });
     await expect(totalLabel).toContainText('€');
 
     // 4. Change Place currency to JPY
-    const placeCurrencySelector = page.getByTestId('currency-selector').first();
+    const placeCurrencySelector = page.getByTestId('place-header').getByTestId('currency-selector');
     await placeCurrencySelector.selectOption('JPY');
 
     // Verify symbol change to JPY (¥)
