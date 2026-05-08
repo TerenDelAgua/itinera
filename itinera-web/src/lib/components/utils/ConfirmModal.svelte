@@ -43,7 +43,7 @@
       
       <div class="flex justify-end gap-3">
         <button 
-          class="px-4 py-2 text-sm font-medium text-teren-text-muted hover:text-teren-text-main rounded-lg hover:bg-gray-100 transition active:scale-95"
+          class="px-4 py-2 text-sm font-medium text-teren-text-muted hover:text-teren-text-main rounded-lg hover:bg-teren-interactive-hover transition active:scale-95"
           onclick={onCancel}
         >
           {cancelText}

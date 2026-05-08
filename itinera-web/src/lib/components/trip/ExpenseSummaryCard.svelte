@@ -17,7 +17,7 @@
   }
 </script>
 
-<div class="bg-white rounded-2xl border border-teren-border p-6 shadow-sm">
+<div class="bg-teren-card rounded-2xl border border-teren-border p-6 shadow-sm">
   <div class="flex items-center justify-between mb-6">
     <h3 class="font-bold text-teren-text-main flex items-center gap-2">
       <span class="text-teren-primary">📊</span>
