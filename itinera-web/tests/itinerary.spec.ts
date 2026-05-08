@@ -32,12 +32,8 @@ test.describe('Itinerary Flow', () => {
     const submitBtn = page.locator('form button[type="submit"]');
     await submitBtn.click();
 
-    // 5. Verify it appears in the list
-    const tripCard = page.getByText(tripName);
-    await expect(tripCard).toBeVisible({ timeout: 10000 });
-
-    // 6. Navigate to details
-    await tripCard.click();
+    // 5. Verify we are navigated to details automatically
+    await expect(page).toHaveURL(/\/trips\/[0-9a-f-]+/, { timeout: 10000 });
     
     // 7. Verify we are on the trip page
     await expect(page).toHaveURL(/\/trips\/[0-9a-f-]+/);
@@ -83,10 +79,8 @@ test.describe('Itinerary Flow', () => {
     await page.getByPlaceholder(/Trip name/i).fill(tripName);
     await page.locator('form button[type="submit"]').click();
     
-    // Navigate to it
-    const tripCard = page.getByText(tripName);
-    await tripCard.click();
-    await expect(page).toHaveURL(/\/trips\/[0-9a-f-]+/);
+    // Auto-navigation
+    await expect(page).toHaveURL(/\/trips\/[0-9a-f-]+/, { timeout: 10000 });
     
     // Add a global activity via UpcomingActivityCard
     // The button has "+ Add" or similar text

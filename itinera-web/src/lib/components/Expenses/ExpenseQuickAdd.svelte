@@ -8,6 +8,7 @@
   import { fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
   import { COMMON_CURRENCIES } from "$lib/types/Currency";
+  import { Events } from "$lib/services/tracking";
 
   let {
     tripId,
@@ -86,6 +87,7 @@
         }),
       });
 
+      Events.expenseCreated(tripId, parseFloat(amount), currency, categoryId);
       onSuccess(exp);
       amount = "";
       notes = "";

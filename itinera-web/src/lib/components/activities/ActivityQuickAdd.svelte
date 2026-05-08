@@ -7,6 +7,7 @@
   import { getFriendlyErrorMessage } from "$lib/utils/errorMapper";
   import { locale } from "$lib/i18n/store";
   import { tick } from "svelte";
+  import { Events } from "$lib/services/tracking";
 
   let {
     tripId,
@@ -55,6 +56,7 @@
         result = await activityApi.update(tripId, activity.id, data);
       } else {
         result = await activityApi.create(tripId, data);
+        Events.activityCreated(tripId, result.id, result.title);
       }
 
       if (!activity) {
