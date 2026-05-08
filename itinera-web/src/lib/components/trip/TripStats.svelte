@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <div class="bg-white px-5 py-3 rounded-2xl border border-teren-border shadow-sm flex items-center gap-4 group transition-all hover:border-teren-primary/30">
+    <div class="bg-teren-card px-5 py-3 rounded-2xl border border-teren-border shadow-sm flex items-center gap-4 group transition-all hover:border-teren-primary/30">
       <div class="w-10 h-10 rounded-full bg-teren-primary-subtle flex items-center justify-center text-teren-primary">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="12" x2="12" y1="1" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>

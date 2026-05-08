@@ -6,7 +6,7 @@
 
 <div class="flex flex-col items-center justify-center py-20 text-center">
   <div
-    class="w-20 h-20 mb-6 rounded-full bg-white border border-teren-border flex items-center justify-center shadow-sm"
+    class="w-20 h-20 mb-6 rounded-full bg-teren-card border border-teren-border flex items-center justify-center shadow-sm"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"

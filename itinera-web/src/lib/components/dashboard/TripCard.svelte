@@ -23,7 +23,7 @@
 </script>
 
 <article
-  class="group relative bg-white rounded-xl border border-teren-border transition-all duration-300 hover:-translate-y-1 overflow-hidden focus-within:ring-2 focus-within:ring-teren-primary focus-within:ring-offset-2
+  class="group relative bg-teren-card rounded-xl border border-teren-border transition-all duration-300 hover:-translate-y-1 overflow-hidden focus-within:ring-2 focus-within:ring-teren-primary focus-within:ring-offset-2
          {trip.is_public_demo
     ? 'hover:border-teren-primary/30 shadow-sm hover:shadow-lg hover:shadow-teren-primary/10'
     : 'hover:border-teren-primary/30 shadow-sm hover:shadow-lg hover:shadow-teren-primary/5'}"

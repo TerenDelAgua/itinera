@@ -41,7 +41,7 @@
 </script>
 
 <div
-  class="bg-white p-5 rounded-xl border border-teren-border shadow-sm flex flex-col gap-4"
+  class="bg-teren-card p-5 rounded-xl border border-teren-border shadow-sm flex flex-col gap-4"
   transition:fly={{ y: -10, duration: 250, easing: cubicOut }}
 >
   <!-- Header: Título + ADD (Top-Right) -->

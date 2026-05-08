@@ -42,7 +42,7 @@
       <button
         onclick={onBack}
         aria-label={$t("detail.back")}
-        class="p-2 -ml-2 mt-0.5 text-teren-text-muted hover:text-teren-text-main hover:bg-gray-100 rounded-lg transition active:scale-95 flex-shrink-0"
+        class="p-2 -ml-2 mt-0.5 text-teren-text-muted hover:text-teren-text-main hover:bg-teren-interactive-hover rounded-lg transition active:scale-95 flex-shrink-0"
       >
         <svg
           class="w-5 h-5"
