@@ -24,6 +24,7 @@
     {value}
     data-testid="currency-selector"
     onchange={handleChange}
+    data-testid="currency-selector"
     class="appearance-none bg-teren-card border border-teren-border hover:border-teren-primary/50 text-teren-text-main font-bold px-2.5 py-0.5 rounded-lg text-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-teren-primary/30 transition-colors w-auto min-w-[3.5rem] text-center"
   >
     {#if allowInherit}
