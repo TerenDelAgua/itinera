@@ -251,7 +251,7 @@
 
       <UpcomingActivityCard
         {tripId}
-        activities={activities.filter((a) => !a.place_id)}
+        {activities}
         tripStart={tripStartDate}
         tripEnd={tripEndDate}
         onOpenDrawer={() => (isAgendaOpen = true)}

@@ -1,11 +1,17 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { t } from "$lib/i18n/store";
   import LandingHero from "$lib/components/landing/LandingHero.svelte";
   import DemoCard from "$lib/components/landing/DemoCard.svelte";
   import LandingFooter from "$lib/components/landing/LandingFooter.svelte";
   import { resolve } from "$app/paths";
+  import { Events } from "$lib/services/tracking";
 
   let { data } = $props();
+
+  onMount(() => {
+    Events.landingView();
+  });
 </script>
 
 <svelte:head>
