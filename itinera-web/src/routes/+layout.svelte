@@ -10,7 +10,7 @@
   let isDark = $state(false);
 
   let logoHref = $derived(
-    page.url.pathname.startsWith("/trips") ? resolve("/trips") : resolve("/")
+    page.url.pathname.startsWith("/") ? resolve("/") : resolve("/"),
   );
 
   onMount(() => {

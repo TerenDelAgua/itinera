@@ -31,7 +31,6 @@
       const data = await apiFetch<Trip[]>("/trips");
       trips = data;
       Events.sessionStarted(document.referrer || "direct");
-      Events.landingView();
     } catch (err) {
       error = err instanceof Error ? err.message : "Failed to load trips";
     } finally {
