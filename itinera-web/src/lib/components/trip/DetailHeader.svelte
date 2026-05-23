@@ -107,7 +107,7 @@
             /></svg
           >
 
-          <div class="relative flex items-center cursor-pointer group px-1.5 py-0.5 rounded-md hover:bg-teren-primary-subtle transition-all">
+          <div class="relative flex items-center cursor-pointer group px-2 py-0.5 rounded-md bg-teren-primary-subtle hover:bg-teren-primary/15 border border-teren-primary/20 transition-all">
             <span
               class="text-teren-text-main group-hover:text-teren-primary transition"
               >{formatDate(startDate, $locale)}</span
@@ -123,7 +123,7 @@
 
           <span class="opacity-70 mx-0.5">—</span>
 
-          <div class="relative flex items-center cursor-pointer group px-1.5 py-0.5 rounded-md hover:bg-teren-primary-subtle transition-all">
+          <div class="relative flex items-center cursor-pointer group px-2 py-0.5 rounded-md bg-teren-primary-subtle hover:bg-teren-primary/15 border border-teren-primary/20 transition-all">
             <span
               class="text-teren-text-main group-hover:text-teren-primary transition"
               >{formatDate(endDate, $locale)}</span

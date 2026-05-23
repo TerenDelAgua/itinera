@@ -9,6 +9,7 @@ export const EventTypes = {
   DEMO_VIEWED: "demo_viewed",
   DEMO_DEEP_FORKED: "demo_deep_forked",
   TRIP_CREATED: "trip_created",
+  TRIP_VIEWED: "trip_viewed",
   PLACE_CREATED: "place_created",
   ACTIVITY_CREATED: "activity_created",
   EXPENSE_CREATED: "expense_created",
@@ -86,6 +87,9 @@ export const Events = {
 
   tripCreated: (tripId: string, name: string) =>
     trackEvent(EventTypes.TRIP_CREATED, { name }, tripId),
+
+  tripViewed: (tripId: string, metadata: Record<string, unknown> = {}) =>
+    trackEvent(EventTypes.TRIP_VIEWED, metadata, tripId),
 
   placeCreated: (tripId: string, placeId: string, name: string) =>
     trackEvent(EventTypes.PLACE_CREATED, { name, place_id: placeId }, tripId),

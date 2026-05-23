@@ -62,7 +62,7 @@
         onclick={() => (isMobileExpenseOpen = !isMobileExpenseOpen)}
         class="sm:hidden text-sm font-medium text-teren-primary hover:text-teren-primary-hover transition px-3 py-1.5 rounded-lg bg-teren-primary-subtle active:scale-95 flex-shrink-0"
       >
-        + {$t("common.add")}
+        + {$t("expenses.add_expense")}
       </button>
     </div>
     <div class="flex items-center">
