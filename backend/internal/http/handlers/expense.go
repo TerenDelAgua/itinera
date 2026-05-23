@@ -256,3 +256,34 @@ func (h *Handlers) GetPlaceExpenseSummary(w http.ResponseWriter, r *http.Request
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(summary)
 }
+
+// GetExchangeRate godoc
+// @Summary      Get exchange rate
+// @Description  Get a single exchange rate between two currencies via the backend ExchangeRateService
+// @Tags         expenses
+// @Produce      json
+// @Param        id    path      string  true  "Trip ID (UUID)"
+// @Param        from  query     string  true  "Base Currency (e.g. JPY)"
+// @Param        to    query     string  true  "Target Currency (e.g. EUR)"
+// @Success      200   {object}  map[string]float64
+// @Failure      400   {string}  string "Missing query parameters"
+// @Failure      500   {string}  string "Failed to fetch rate"
+// @Router       /trips/{id}/rates [get]
+func (h *Handlers) GetExchangeRate(w http.ResponseWriter, r *http.Request) {
+	from := r.URL.Query().Get("from")
+	to := r.URL.Query().Get("to")
+
+	if from == "" || to == "" {
+		http.Error(w, "Missing 'from' or 'to' query parameters", http.StatusBadRequest)
+		return
+	}
+
+	rate, err := h.ExpenseSvc.ExchangeRate.GetRate(r.Context(), from, to)
+	if err != nil {
+		http.Error(w, "Failed to fetch rate: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]float64{"rate": rate})
+}

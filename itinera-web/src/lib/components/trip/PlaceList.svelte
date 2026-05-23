@@ -69,9 +69,9 @@
     <button
       onclick={() => (isCreatingPlace = !isCreatingPlace)}
       data-testid="add-place-button"
-      class="text-sm font-medium text-teren-primary hover:text-teren-primary-hover transition px-3 py-1.5 rounded-lg hover:bg-teren-primary-subtle active:scale-95"
+      class="text-sm font-medium text-teren-primary hover:text-teren-primary-hover transition px-3 py-1.5 rounded-lg bg-teren-primary-subtle active:scale-95"
     >
-      + {$t("common.add")}
+      + {$t("detail.add_place")}
     </button>
   </div>
 
@@ -153,14 +153,21 @@
 
   {#if !places || places.length === 0}
     <div
-      class="text-center py-12 bg-teren-surface rounded-xl border border-teren-border border-dashed"
+      class="text-center py-10 px-4 bg-teren-surface rounded-xl border border-teren-border border-dashed flex flex-col items-center justify-center"
     >
-      <p class="text-teren-text-muted text-sm">
+      <span class="text-3xl mb-3 filter select-none">📍</span>
+      <p class="text-sm font-semibold text-teren-text-main">
         {$t("detail.destinations_empty")}
       </p>
-      <p class="text-xs text-teren-text-muted mt-1">
-        {$t("detail.destinations_empty_sub")}
+      <p class="text-xs text-teren-text-muted mt-1 max-w-sm">
+        {$t("detail.places_empty_subtitle")}
       </p>
+      <button
+        onclick={() => (isCreatingPlace = true)}
+        class="mt-4 inline-flex items-center gap-1.5 px-4 py-2 bg-teren-primary hover:bg-teren-primary-hover text-white text-xs font-semibold rounded-lg shadow-sm shadow-teren-primary/10 active:scale-95 transition-all cursor-pointer"
+      >
+        + {$t("detail.add_first_place")}
+      </button>
     </div>
   {:else}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
