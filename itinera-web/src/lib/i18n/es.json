@@ -77,7 +77,10 @@
         "destinations": "Destinos",
         "add_destination": "Añadir Destino",
         "destinations_empty": "No se han añadido destinos todavía.",
-        "destinations_empty_sub": "Añade lugares para organizar tus gastos por ubicación."
+        "destinations_empty_sub": "Añade lugares para organizar tus gastos por ubicación.",
+        "add_place": "Añadir lugar",
+        "places_empty_subtitle": "Añade lugares para organizar tu itinerario y gastos por destino.",
+        "add_first_place": "Añade tu primer lugar"
     },
     "place": {
         "view_place_expenses": "Ver gastos del lugar",
@@ -103,7 +106,9 @@
         "add_to_agenda": "Añadir a la agenda",
         "local_activity": "Actividad local",
         "empty_state": "Aún no hay actividades añadidas.",
-        "add": "Añadir"
+        "add": "Añadir",
+        "empty_state_subtitle": "Organiza tus vuelos, hoteles y visitas en un solo lugar.",
+        "plan_first_activity": "Planifica tu primera actividad"
     },
     "confirm": {
         "delete_place_title": "Eliminar destino",
@@ -121,7 +126,8 @@
         "end_date": "Fecha de fin (Opcional)"
     },
     "expenses": {
-        "notes_placeholder": "Notas (opcional)..."
+        "notes_placeholder": "Notas (opcional)...",
+        "add_expense": "Añadir gasto"
     },
     "landing": {
         "travelers_planning": "viajeros han planificado sus viajes",
@@ -155,5 +161,18 @@
         "required_fields": "Por favor, completa todos los campos requeridos.",
         "trip_not_found": "No hemos podido encontrar este viaje.",
         "invalid_place": "El destino seleccionado no es válido."
+    },
+    "transport": {
+        "savings_estimated": "Ahorro estimado",
+        "jr_transport": "Transporte JR",
+        "no_savings": "Transporte: {total} (sin ahorro con JR Pass)",
+        "total_individual_tickets": "Total billetes individuales",
+        "algorithm_note": "Estimado por orden de lugares. Añade fechas a los destinos para más precisión.",
+        "no_routes": "Sin rutas JR conocidas en este itinerario.",
+        "significant_savings": "{passName} recomendado. Ahorro significativo.",
+        "modest_savings": "Ahorro modesto. Evalúa conveniencia vs flexibilidad.",
+        "cheaper_individual": "Para este itinerario, billetes individuales son más económicos.",
+        "fallback_note": "Estimado por orden de lugares. Añade fechas para precisión.",
+        "closest_note": "Origen: {origin} (fecha aproximada)"
     }
 }

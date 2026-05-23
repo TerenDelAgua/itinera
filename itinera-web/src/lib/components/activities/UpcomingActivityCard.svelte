@@ -56,7 +56,7 @@
       onclick={() => (showQuickAdd = !showQuickAdd)}
       class="text-sm font-medium text-teren-primary hover:text-teren-primary-hover transition px-3 py-1.5 rounded-lg bg-teren-primary-subtle active:scale-95 flex-shrink-0"
     >
-      + {$t("itinerary.add")}
+      + {$t("itinerary.add_activity")}
     </button>
   </div>
 
@@ -133,10 +133,20 @@
     </button>
   {:else}
     <!-- Empty State -->
-    <div class="text-center py-6">
-      <p class="text-sm text-teren-text-muted">
+    <div class="text-center py-8 px-4 flex flex-col items-center justify-center border border-dashed border-teren-border rounded-xl bg-teren-background/30">
+      <span class="text-3xl mb-3 filter select-none">📋</span>
+      <p class="text-sm font-semibold text-teren-text-main">
         {$t("itinerary.no_activities")}
       </p>
+      <p class="text-xs text-teren-text-muted mt-1 max-w-sm">
+        {$t("itinerary.empty_state_subtitle")}
+      </p>
+      <button
+        onclick={() => (showQuickAdd = true)}
+        class="mt-4 inline-flex items-center gap-1.5 px-4 py-2 bg-teren-primary hover:bg-teren-primary-hover text-white text-xs font-semibold rounded-lg shadow-sm shadow-teren-primary/10 active:scale-95 transition-all cursor-pointer"
+      >
+        + {$t("itinerary.plan_first_activity")}
+      </button>
     </div>
 
     <!-- View All (Bottom-Left) -->

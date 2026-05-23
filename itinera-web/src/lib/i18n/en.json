@@ -77,7 +77,10 @@
         "destinations": "Destinations",
         "add_destination": "Add Destination",
         "destinations_empty": "No destinations added yet.",
-        "destinations_empty_sub": "Add places to organize your expenses by location."
+        "destinations_empty_sub": "Add places to organize your expenses by location.",
+        "add_place": "Add Place",
+        "places_empty_subtitle": "Add places to organize your itinerary and expenses by destination.",
+        "add_first_place": "Add your first place"
     },
     "place": {
         "view_place_expenses": "View place expenses",
@@ -103,7 +106,9 @@
         "add_to_agenda": "Add to Agenda",
         "local_activity": "Local Activity",
         "empty_state": "No activities added yet.",
-        "add": "Add"
+        "add": "Add",
+        "empty_state_subtitle": "Keep track of your flights, hotels, and sights in one place.",
+        "plan_first_activity": "Plan your first activity"
     },
     "confirm": {
         "delete_place_title": "Delete Destination",
@@ -121,7 +126,8 @@
         "end_date": "End Date (Optional)"
     },
     "expenses": {
-        "notes_placeholder": "Notes (optional)..."
+        "notes_placeholder": "Notes (optional)...",
+        "add_expense": "Add Expense"
     },
     "landing": {
         "travelers_planning": "travelers have planned their trips",
@@ -155,5 +161,18 @@
         "required_fields": "Please complete all required fields.",
         "trip_not_found": "We couldn't find this trip.",
         "invalid_place": "The selected destination is invalid."
+    },
+    "transport": {
+        "savings_estimated": "Estimated savings",
+        "jr_transport": "JR Transport",
+        "no_savings": "Transport: {total} (no JR Pass savings)",
+        "total_individual_tickets": "Total individual tickets",
+        "algorithm_note": "Estimated by place order. Add dates to destinations for accuracy.",
+        "no_routes": "No known JR routes in this itinerary.",
+        "significant_savings": "{passName} recommended. Significant savings.",
+        "modest_savings": "Modest savings. Evaluate convenience vs flexibility.",
+        "cheaper_individual": "For this itinerary, individual tickets are cheaper.",
+        "fallback_note": "Estimated by place order. Add dates for accuracy.",
+        "closest_note": "Origin: {origin} (approximate date)"
     }
 }
