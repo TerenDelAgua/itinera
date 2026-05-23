@@ -1,0 +1,172 @@
+{
+  "version": "2026-05-18",
+  "currency_base": "JPY",
+  "last_updated": "2026-05-18",
+  "passes": {
+    "7_day":  { "price": 50000, "name": "JR Pass 7 días",  "daily_cost": 7143 },
+    "14_day": { "price": 80000, "name": "JR Pass 14 días", "daily_cost": 5714 },
+    "21_day": { "price": 100000, "name": "JR Pass 21 días", "daily_cost": 4762 }
+  },
+  "routes": [
+    {
+      "id": "tokyo-kyoto",
+      "from": "Tokyo", "to": "Kyoto",
+      "fare": 13320, "time_min": 135,
+      "shinkansen": true, "jr_covered": true,
+      "line": "Tokaido Shinkansen",
+      "notes": "Nozomi no incluido en JR Pass (toma Hikari/Kodama)"
+    },
+    {
+      "id": "osaka-hiroshima",
+      "from": "Osaka", "to": "Hiroshima",
+      "fare": 9710, "time_min": 82,
+      "shinkansen": true, "jr_covered": true,
+      "line": "Sanyo Shinkansen"
+    },
+    {
+      "id": "fukuoka-kumamoto",
+      "from": "Fukuoka", "to": "Kumamoto",
+      "fare": 4740, "time_min": 42,
+      "shinkansen": true, "jr_covered": true,
+      "line": "Kyushu Shinkansen"
+    },
+    {
+      "id": "tokyo-osaka",
+      "from": "Tokyo", "to": "Osaka",
+      "fare": 13620, "time_min": 150,
+      "shinkansen": true, "jr_covered": true,
+      "line": "Tokaido Shinkansen"
+    },
+    {
+      "id": "kyoto-hiroshima",
+      "from": "Kyoto", "to": "Hiroshima",
+      "fare": 10710, "time_min": 96,
+      "shinkansen": true, "jr_covered": true,
+      "line": "Sanyo Shinkansen"
+    },
+    {
+      "id": "hakata-beppu",
+      "from": "Hakata", "to": "Beppu",
+      "fare": 3850, "time_min": 118,
+      "shinkansen": false, "jr_covered": true,
+      "line": "JR Sonic / Limited Express",
+      "notes": "Ruta escénica por costa de Kyushu"
+    },
+    {
+      "id": "tokyo-nagoya",
+      "from": "Tokyo", "to": "Nagoya",
+      "fare": 10780, "time_min": 98,
+      "shinkansen": true, "jr_covered": true,
+      "line": "Tokaido Shinkansen"
+    },
+    {
+      "id": "nagoya-kyoto",
+      "from": "Nagoya", "to": "Kyoto",
+      "fare": 5070, "time_min": 36,
+      "shinkansen": true, "jr_covered": true,
+      "line": "Tokaido Shinkansen"
+    },
+    {
+      "id": "osaka-kobe",
+      "from": "Osaka", "to": "Kobe",
+      "fare": 410, "time_min": 13,
+      "shinkansen": false, "jr_covered": true,
+      "line": "JR Kobe Line (Rapid)",
+      "notes": "Más rápido y barato que Shinkansen para esta distancia"
+    },
+    {
+      "id": "hakata-kagoshima",
+      "from": "Hakata", "to": "Kagoshima",
+      "fare": 10290, "time_min": 80,
+      "shinkansen": true, "jr_covered": true,
+      "line": "Kyushu Shinkansen"
+    },
+    {
+      "id": "tokyo-himeji",
+      "from": "Tokyo", "to": "Himeji",
+      "fare": 15100, "time_min": 185,
+      "shinkansen": true, "jr_covered": true,
+      "line": "Tokaido + Sanyo Shinkansen",
+      "notes": "Cambio en Shin-Osaka. Incluye parada en Himeji Castle."
+    },
+    {
+      "id": "nara-kyoto",
+      "from": "Nara", "to": "Kyoto",
+      "fare": 720, "time_min": 45,
+      "shinkansen": false, "jr_covered": true,
+      "line": "JR Nara Line / Kintetsu Nara Line",
+      "notes": "JR Pass cubre JR. Kintetsu más rápido (35min) pero no cubierto.",
+      "alternatives": [
+        { "operator": "Kintetsu", "fare": 1160, "time_min": 35, "jr_covered": false }
+      ]
+    },
+    {
+      "id": "narita-tokyo",
+      "from": "Narita Airport", "to": "Tokyo",
+      "fare": 3070, "time_min": 53,
+      "shinkansen": false, "jr_covered": true,
+      "line": "JR Narita Express (N'EX)",
+      "notes": "JR Pass cubre N'EX. Keisei Skyliner más rápido pero no cubierto.",
+      "alternatives": [
+        { "operator": "Keisei", "line": "Skyliner", "fare": 2520, "time_min": 36, "jr_covered": false }
+      ]
+    },
+    {
+      "id": "kyoto-nara",
+      "from": "Kyoto", "to": "Nara",
+      "fare": 720, "time_min": 45,
+      "shinkansen": false, "jr_covered": true,
+      "line": "JR Nara Line",
+      "alternatives": [
+        { "operator": "Kintetsu", "line": "Kyoto Line", "fare": 1160, "time_min": 35, "jr_covered": false }
+      ]
+    },
+    {
+      "id": "osaka-nara",
+      "from": "Osaka", "to": "Nara",
+      "fare": 820, "time_min": 50,
+      "shinkansen": false, "jr_covered": true,
+      "line": "JR Yamatoji Line",
+      "alternatives": [
+        { "operator": "Kintetsu", "line": "Nara Line", "fare": 570, "time_min": 40, "jr_covered": false }
+      ]
+    },
+    {
+      "id": "tokyo-kamakura",
+      "from": "Tokyo", "to": "Kamakura",
+      "fare": 940, "time_min": 55,
+      "shinkansen": false, "jr_covered": true,
+      "line": "JR Yokosuka Line"
+    },
+    {
+      "id": "kyoto-osaka",
+      "from": "Kyoto", "to": "Osaka",
+      "fare": 580, "time_min": 29,
+      "shinkansen": false, "jr_covered": true,
+      "line": "JR Kyoto Line (Special Rapid)",
+      "notes": "Tokaido Shinkansen cuesta 1440 JPY pero Special Rapid es casi igual de rápido centro a centro."
+    },
+    {
+      "id": "hiroshima-fukuoka",
+      "from": "Hiroshima", "to": "Fukuoka",
+      "fare": 8570, "time_min": 65,
+      "shinkansen": true, "jr_covered": true,
+      "line": "Sanyo Shinkansen"
+    },
+    {
+      "id": "fukuoka-himeji",
+      "from": "Fukuoka", "to": "Himeji",
+      "fare": 14180, "time_min": 130,
+      "shinkansen": true, "jr_covered": true,
+      "line": "Sanyo Shinkansen"
+    },
+    {
+      "id": "fukuoka-kyoto",
+      "from": "Fukuoka", "to": "Kyoto",
+      "fare": 16370, "time_min": 170,
+      "shinkansen": true, "jr_covered": true,
+      "line": "Sanyo + Tokaido Shinkansen",
+      "notes": "Cambio en Shin-Osaka para Tokaido Shinkansen"
+    }
+  ]
+}

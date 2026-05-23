@@ -77,7 +77,10 @@
         "destinations": "目的地",
         "add_destination": "目的地を追加",
         "destinations_empty": "目的地はまだ追加されていません。",
-        "destinations_empty_sub": "場所を追加して、支出を地域別に整理しましょう。"
+        "destinations_empty_sub": "場所を追加して、支出を地域別に整理しましょう。",
+        "add_place": "場所を追加",
+        "places_empty_subtitle": "目的地を追加して、計画や支出を整理しましょう。",
+        "add_first_place": "最初の場所を追加"
     },
     "place": {
         "view_place_expenses": "場所の支出を表示",
@@ -103,7 +106,9 @@
         "add_to_agenda": "アジェンダに追加",
         "local_activity": "ローカルアクティビティ",
         "empty_state": "アクティビティはまだ追加されていません。",
-        "add": "追加"
+        "add": "追加",
+        "empty_state_subtitle": "フライト、ホテル、観光地を一元管理しましょう。",
+        "plan_first_activity": "最初の計画を作成"
     },
     "confirm": {
         "delete_place_title": "目的地を削除",
@@ -121,7 +126,8 @@
         "end_date": "終了日（任意）"
     },
     "expenses": {
-        "notes_placeholder": "メモ（任意）..."
+        "notes_placeholder": "メモ（任意）...",
+        "add_expense": "支出を追加"
     },
     "landing": {
         "travelers_planning": "人の旅行者が旅を計画しました",
@@ -155,5 +161,18 @@
         "required_fields": "必須項目をすべて入力してください。",
         "trip_not_found": "旅行が見つかりませんでした。",
         "invalid_place": "選択された目的地は無効です。"
+    },
+    "transport": {
+        "savings_estimated": "推定節約額",
+        "jr_transport": "JR交通費",
+        "no_savings": "交通費: {total} (JRパスでの節約なし)",
+        "total_individual_tickets": "個別チケット合計",
+        "algorithm_note": "場所の順序による推定です。目的地に日付を追加すると精度が上がります。",
+        "no_routes": "この旅程には既知のJR路線がありません。",
+        "significant_savings": "{passName} がおすすめです。大幅な節約になります。",
+        "modest_savings": "わずかな節約です。利便性と柔軟性を考慮してください。",
+        "cheaper_individual": "この旅程では、個別チケットの方が安くなります。",
+        "fallback_note": "場所の順序による推定です。日付を追加すると精度が上がります。",
+        "closest_note": "出発地: {origin} (概算日)"
     }
 }

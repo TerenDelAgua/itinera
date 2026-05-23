@@ -25,6 +25,7 @@
   import DetailHeader from "$lib/components/trip/DetailHeader.svelte";
   import ExpensesSummaryCard from "$lib/components/trip/ExpensesSummaryCard.svelte";
   import PlaceList from "$lib/components/trip/PlaceList.svelte";
+  import TransportBadge from "$lib/components/trip/TransportBadge.svelte";
 
   let tripId = $state("");
 
@@ -38,6 +39,14 @@
   let effectiveCurrency = $derived(
     tripDefaultCurrency || baseCurrency || "EUR",
   );
+
+  let tripDurationDays = $derived.by(() => {
+    if (!tripStartDate || !tripEndDate) return 0;
+    const start = new Date(tripStartDate);
+    const end = new Date(tripEndDate);
+    const diff = end.getTime() - start.getTime();
+    return Math.max(0, Math.ceil(diff / (1000 * 3600 * 24))) + 1;
+  });
 
   let places = $state<Place[]>([]);
   let summary = $state<TripExpenseSummary | null>(null);
@@ -234,29 +243,31 @@
       </div>
     {:else}
       <div in:fly={{ y: 20, duration: 400, easing: cubicOut }}>
-        <ExpensesSummaryCard
+        <UpcomingActivityCard
           {tripId}
-          {categories}
-          categorySummary={summary?.by_category || []}
-          displayCurrency={baseCurrency}
-          tripDefaultCurrency={tripDefaultCurrency}
-          effectiveCurrency={effectiveCurrency}
-          grandTotalValue={$animatedGrandTotal}
+          {activities}
           tripStart={tripStartDate}
           tripEnd={tripEndDate}
+          onOpenDrawer={() => (isAgendaOpen = true)}
           onRefresh={loadAllData}
-          onOpenDrawer={() => (isDrawerOpen = true)}
         />
       </div>
 
-      <UpcomingActivityCard
+      <ExpensesSummaryCard
         {tripId}
-        {activities}
+        {categories}
+        categorySummary={summary?.by_category || []}
+        displayCurrency={baseCurrency}
+        tripDefaultCurrency={tripDefaultCurrency}
+        effectiveCurrency={effectiveCurrency}
+        grandTotalValue={$animatedGrandTotal}
         tripStart={tripStartDate}
         tripEnd={tripEndDate}
-        onOpenDrawer={() => (isAgendaOpen = true)}
         onRefresh={loadAllData}
+        onOpenDrawer={() => (isDrawerOpen = true)}
       />
+
+      <TransportBadge {places} {tripDurationDays} {tripId} {baseCurrency} />
 
       <PlaceList
         {places}
