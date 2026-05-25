@@ -12,5 +12,6 @@ type Place struct {
 	Lat                    *float64  `json:"lat"`
 	Lon                    *float64  `json:"lon"`
 	DefaultExpenseCurrency *string   `json:"default_expense_currency,omitempty"`
+	City                   *string   `json:"city,omitempty"`
 	CreatedAt              string    `json:"created_at"`
 }

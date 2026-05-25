@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <!--
+    ========================================================================
+    NAGOYA STATION SCHEMATIC MAP
+    Minimalist 2D transit map design
+    Philosophy: Clean, flat UI, high-contrast, optimized for mobile reading
+    ========================================================================
+  -->
+  <defs>
+    <!-- Crisp drop shadow for UI elements -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#1c1917" flood-opacity="0.12" filter-units="userSpaceOnUse" />
+    </filter>
+  </defs>
+
+  <!-- Layer 1: Background (transparent for dark/light mode compatibility) -->
+  <g id="background">
+    <rect width="800" height="600" fill="transparent" />
+  </g>
+
+  <!-- Layer 2: Connecting Passages & Central Walkways -->
+  <g id="connecting-paths">
+    <!-- Central Walkway (1F - Connecting East and West) -->
+    <rect x="180" y="250" width="340" height="70" rx="10" fill="#f5ebd6" stroke="#e8dcc0" stroke-width="2" opacity="0.95" />
+
+    <!-- Meitetsu & Subway Connecting Hall (B1F/B2F Area) -->
+    <rect x="420" y="320" width="120" height="150" rx="8" fill="#f5ebd6" stroke="#e8dcc0" stroke-width="1.5" opacity="0.9" />
+
+    <!-- Higashiyama Subway Walkway (North B2F) -->
+    <line x1="300" y1="120" x2="300" y2="250" stroke="#e8dcc0" stroke-width="14" stroke-linecap="round" opacity="0.8" />
+  </g>
+
+  <!-- Layer 3: Operator Zones & Platforms -->
+  <!-- 1. Tokaido Shinkansen (JR Central - Blue - Platforms 14-17) - WEST SIDE -->
+  <g id="line-shinkansen">
+    <rect x="220" y="150" width="36" height="240" rx="18" fill="#0055A5" stroke="#ffffff" stroke-width="2.5" filter="url(#shadow)" />
+    <line x1="210" y1="110" x2="210" y2="410" stroke="#0055A5" stroke-width="3" opacity="0.5" stroke-linecap="round" />
+    <text x="238" y="270" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" fill="#ffffff" text-anchor="middle" transform="rotate(-90 238 270)" letter-spacing="0.5">SHINKANSEN</text>
+    <text x="238" y="170" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="8" font-weight="800" fill="#ffffff" text-anchor="middle">P14-17</text>
+  </g>
+
+  <!-- 2. JR Central Conventional Lines (1F/2F) -->
+  <!-- Chuo Main Line (Orange - Platforms 7-8) -->
+  <g id="line-chuo">
+    <rect x="300" y="160" width="28" height="200" rx="14" fill="#F15A22" stroke="#ffffff" stroke-width="2.5" filter="url(#shadow)" />
+    <line x1="290" y1="120" x2="290" y2="390" stroke="#F15A22" stroke-width="3.5" opacity="0.45" stroke-linecap="round" />
+    <text x="314" y="260" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="8" font-weight="700" fill="#ffffff" text-anchor="middle" transform="rotate(-90 314 260)">CHUO LINE</text>
+    <text x="314" y="180" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="8" font-weight="800" fill="#ffffff" text-anchor="middle">P7/8</text>
+  </g>
+
+  <!-- Kansai Main Line (Green - Platforms 11-12) -->
+  <g id="line-kansai">
+    <rect x="350" y="180" width="24" height="160" rx="12" fill="#00AC9B" stroke="#ffffff" stroke-width="2" filter="url(#shadow)" />
+    <text x="362" y="260" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="8" font-weight="700" fill="#ffffff" text-anchor="middle" transform="rotate(-90 362 260)">KANSAI LINE</text>
+  </g>
+
+  <!-- 3. Meitetsu Railway Terminal (B1F/1F - Red - Platforms 1-4) - SOUTHEAST -->
+  <g id="line-meitetsu">
+    <rect x="470" y="340" width="30" height="110" rx="15" fill="#E60012" stroke="#ffffff" stroke-width="2" filter="url(#shadow)" />
+    <text x="485" y="395" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="8" font-weight="700" fill="#ffffff" text-anchor="middle" transform="rotate(-90 485 395)">MEITETSU</text>
+  </g>
+
+  <!-- 4. Subway Higashiyama Line (Underground B2F - Yellow) - NORTH -->
+  <g id="line-subway">
+    <rect x="180" y="80" width="340" height="24" rx="12" fill="#FFD400" stroke="#ffffff" stroke-width="2" filter="url(#shadow)" />
+    <text x="350" y="96" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" fill="#1c1917" text-anchor="middle" letter-spacing="0.3">SUBWAY HIGASHIYAMA LINE (B2F)</text>
+  </g>
+
+  <!-- Layer 4: Exit Pins -->
+  <g id="exits">
+    <!-- Taiko-dori Exit (West - Shinkansen side) -->
+    <g id="exit-west" filter="url(#shadow)">
+      <circle cx="110" cy="285" r="22" fill="#e25c3d" stroke="#ffffff" stroke-width="3" />
+      <text x="110" y="292" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle">W</text>
+    </g>
+
+    <!-- Sakura-dori Exit (East - Gold Clock side) -->
+    <g id="exit-east" filter="url(#shadow)">
+      <circle cx="570" cy="285" r="22" fill="#e25c3d" stroke="#ffffff" stroke-width="3" />
+      <text x="570" y="292" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle">E</text>
+    </g>
+  </g>
+
+  <!-- Layer 5: Gold & Silver Clock Markers (Meeting Points) -->
+  <g id="clocks" filter="url(#shadow)">
+    <!-- Gold Clock (East Entrance 1F) -->
+    <circle cx="500" cy="285" r="9" fill="#FFD700" stroke="#ffffff" stroke-width="1.5" />
+    <text x="500" y="305" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="8" font-weight="800" fill="currentColor" text-anchor="middle">Gold Clock</text>
+
+    <!-- Silver Clock (West Entrance 1F) -->
+    <circle cx="200" cy="285" r="9" fill="#C0C0C0" stroke="#ffffff" stroke-width="1.5" />
+    <text x="200" y="305" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="8" font-weight="800" fill="currentColor" text-anchor="middle">Silver Clock</text>
+  </g>
+
+  <!-- Layer 6: Labels & Warnings -->
+  <g id="labels" font-family="Inter, system-ui, -apple-system, sans-serif">
+    <!-- Title -->
+    <text x="40" y="48" font-size="22" font-weight="800" fill="currentColor" letter-spacing="-0.5">Nagoya Station</text>
+    <text x="40" y="68" font-size="11" font-weight="600" fill="currentColor" opacity="0.6" letter-spacing="1.2">SCHEMATIC MAP • B3F TO 3F</text>
+
+    <!-- Exit Labels (Symmetrically aligned above exit pins) -->
+    <text x="110" y="245" font-size="10" font-weight="700" fill="currentColor" opacity="0.6" letter-spacing="0.5" text-anchor="middle">TAIKO-DORI EXIT (WEST / SHINKANSEN)</text>
+    <text x="570" y="245" font-size="10" font-weight="700" fill="currentColor" opacity="0.6" letter-spacing="0.5" text-anchor="middle">SAKURA-DORI EXIT (EAST / GOLD CLOCK)</text>
+
+    <!-- Airport Access Card -->
+    <g id="airport-access">
+      <rect x="420" y="470" width="220" height="46" rx="8" fill="#EFF6FF" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)" />
+      <text x="432" y="488" font-size="9" font-weight="700" fill="#1E40AF">✈ CENTRAIR AIRPORT</text>
+      <text x="432" y="499" font-size="8" font-weight="600" fill="#2563EB">Take Meitetsu Airport Limited Express</text>
+      <text x="432" y="508" font-size="8" font-weight="600" fill="#2563EB">(Mu-Sky) for a fast 28-min connection.</text>
+    </g>
+  </g>
+
+  <!-- Layer 7: Legend -->
+  <g id="legend" font-family="Inter, system-ui, -apple-system, sans-serif">
+    <text x="40" y="540" font-size="11" font-weight="700" fill="currentColor" letter-spacing="0.8">LEGEND</text>
+
+    <circle cx="48" cy="558" r="6" fill="#0055A5" />
+    <text x="62" y="561" font-size="10" font-weight="600" fill="currentColor">Tokaido Shinkansen</text>
+
+    <circle cx="190" cy="558" r="6" fill="#F15A22" />
+    <text x="204" y="561" font-size="10" font-weight="600" fill="currentColor">JR Chuo Line</text>
+
+    <circle cx="290" cy="558" r="6" fill="#E60012" />
+    <text x="304" y="561" font-size="10" font-weight="600" fill="currentColor">Meitetsu Line (Airport)</text>
+
+    <circle cx="430" cy="558" r="6" fill="#FFD400" />
+    <text x="444" y="561" font-size="10" font-weight="600" fill="currentColor">Higashiyama Subway</text>
+
+    <circle cx="560" cy="558" r="6" fill="#f5ebd6" stroke="#e8dcc0" stroke-width="1.5" />
+    <text x="574" y="561" font-size="10" font-weight="600" fill="currentColor">Central Passage</text>
+  </g>
+</svg>

@@ -9,4 +9,5 @@ export interface Place {
     lon: number | null;
     default_expense_currency?: string;
     total_expenses?: number;
+    city?: string;
 }

@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <!-- 
+    ========================================================================
+    TEREN NAVIGATION SYSTEM - STATION GUIDE SCHEMATIC LAYOUT TEMPLATE
+    Station: Tokyo Station (東京駅)
+    Philosophy: High-contrast, logical orientation, WCAG AA compliant.
+    ========================================================================
+  -->
+  <defs>
+    <!-- Grid Pattern for designer alignment in Figma -->
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#f1ede4" stroke-width="1" />
+    </pattern>
+    
+    <!-- Drop Shadow for high-contrast pins & cards -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#1c1917" flood-opacity="0.08" />
+    </filter>
+    
+    <!-- Linear Gradients for pathways -->
+    <linearGradient id="long-walk-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E60012" stop-opacity="0.8" />
+      <stop offset="50%" stop-color="#f5ebd6" stop-opacity="0.5" />
+      <stop offset="100%" stop-color="#E60012" stop-opacity="0.8" />
+    </linearGradient>
+  </defs>
+
+  <!-- Layer 1: Background & Grid (Toggle visibility in Figma) -->
+  <g id="background" class="layer">
+    <rect width="800" height="600" fill="#fcfbfa" />
+    <rect width="800" height="600" fill="url(#grid)" />
+  </g>
+
+  <!-- Layer 2: Main Station Core / Physical Outlines (Red Brick Facade & Station Hall) -->
+  <g id="station-facade" class="layer" opacity="0.9">
+    <!-- Historic Brick Building Facade Outline (West Side / Marunouchi) -->
+    <path d="M 120 150 L 120 450 L 140 450 L 140 370 L 160 370 L 160 230 L 140 230 L 140 150 Z" 
+          fill="#fbf7f0" stroke="#d6cbb5" stroke-width="2.5" stroke-dasharray="0" filter="url(#shadow)" />
+    <!-- Center Dome Accent -->
+    <circle cx="160" cy="300" r="24" fill="#ebdcb9" stroke="#bda678" stroke-width="2" />
+    <text x="140" y="304" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#786c56">WEST</text>
+  </g>
+
+  <!-- Layer 3: Main Pedestrian Transfer Corridors (Underground Pathways & Central Halls) -->
+  <g id="connecting-paths" class="layer">
+    <!-- Central Passage (North-South Main Corridor inside Gates) -->
+    <rect x="240" y="160" width="160" height="280" rx="8" fill="#f5ebd6" stroke="#ebdcb9" stroke-width="1.5" />
+    
+    <!-- Central Walkway to Yamanote platforms (E-W Transfer Hall) -->
+    <rect x="160" y="270" width="340" height="60" rx="6" fill="#f5ebd6" stroke="#ebdcb9" stroke-width="1.5" />
+    
+    <!-- North Passage -->
+    <line x1="240" y1="180" x2="500" y2="180" stroke="#ebdcb9" stroke-width="14" stroke-linecap="round" />
+    
+    <!-- South Passage -->
+    <line x1="240" y1="420" x2="500" y2="420" stroke="#ebdcb9" stroke-width="14" stroke-linecap="round" />
+
+    <!-- Keiyo Line Long Connection (Way down South) -->
+    <path d="M 320 440 L 320 540 C 320 550, 480 550, 520 550" 
+          fill="none" stroke="url(#long-walk-grad)" stroke-width="8" stroke-dasharray="6,4" />
+  </g>
+
+  <!-- Layer 4: Operators & Train Line Platforms -->
+  <!-- Yamanote Line Platforms (JR East - Green Line) -->
+  <g id="line-yamanote" class="layer">
+    <!-- Platform 4/5 Yamanote Line -->
+    <rect x="360" y="210" width="24" height="180" rx="4" fill="#9ACD32" stroke="#ffffff" stroke-width="1.5" filter="url(#shadow)" />
+    <!-- Tracks -->
+    <line x1="352" y1="160" x2="352" y2="440" stroke="#9ACD32" stroke-width="3" opacity="0.6" />
+    <line x1="392" y1="160" x2="392" y2="440" stroke="#9ACD32" stroke-width="3" opacity="0.6" />
+  </g>
+
+  <!-- Tokaido Shinkansen Platforms (JR Central - Blue Line) -->
+  <g id="line-shinkansen" class="layer">
+    <!-- Platform 14-19 Shinkansen -->
+    <rect x="440" y="160" width="36" height="280" rx="4" fill="#0055A5" stroke="#ffffff" stroke-width="1.5" filter="url(#shadow)" />
+    <line x1="430" y1="130" x2="430" y2="470" stroke="#0055A5" stroke-width="3" opacity="0.5" />
+    <line x1="486" y1="130" x2="486" y2="470" stroke="#0055A5" stroke-width="3" opacity="0.5" />
+  </g>
+
+  <!-- Keiyo Line Platforms (Disney - Red Line way South) -->
+  <g id="line-keiyo" class="layer">
+    <rect x="520" y="534" width="180" height="32" rx="6" fill="#E60012" stroke="#ffffff" stroke-width="1.5" filter="url(#shadow)" />
+    <text x="610" y="554" font-family="system-ui, sans-serif" font-size="11" font-weight="black" fill="#ffffff" text-anchor="middle">KEIYO LINE PLATFORMS (B4F)</text>
+  </g>
+
+  <!-- Layer 5: Exits (Marunouchi West vs Yaesu East) -->
+  <g id="exits" class="layer">
+    <!-- West Exit Group (Marunouchi Side) -->
+    <g id="exit-marunouchi" transform="translate(100, 300)" cursor="pointer" filter="url(#shadow)">
+      <circle cx="0" cy="0" r="18" fill="#e25c3d" stroke="#ffffff" stroke-width="2" />
+      <text x="0" y="5" font-family="system-ui, sans-serif" font-size="13" font-weight="black" fill="#ffffff" text-anchor="middle">W</text>
+    </g>
+    
+    <!-- East Exit Group (Yaesu Side) -->
+    <g id="exit-yaesu" transform="translate(520, 300)" cursor="pointer" filter="url(#shadow)">
+      <circle cx="0" cy="0" r="18" fill="#e25c3d" stroke="#ffffff" stroke-width="2" />
+      <text x="0" y="5" font-family="system-ui, sans-serif" font-size="13" font-weight="black" fill="#ffffff" text-anchor="middle">E</text>
+    </g>
+  </g>
+
+  <!-- Layer 6: Annotations & Text Labels (system font-family optimized for crisp rendering) -->
+  <g id="labels" class="layer" font-family="system-ui, -apple-system, sans-serif" fill="#1c1917">
+    <!-- Title & Metadata -->
+    <text x="32" y="44" font-size="18" font-weight="bold" fill="#1c1917">TOKYO STATION LOGICAL LAYOUT</text>
+    <text x="32" y="62" font-size="11" font-weight="bold" fill="#786c56" letter-spacing="1">MAP SCHEMATIC TEMPLATE • B1F / 1F</text>
+    
+    <!-- West Facade Hall Label -->
+    <text x="90" y="295" font-size="12" font-weight="black" fill="#786c56" transform="rotate(-90 90 295)" text-anchor="middle">MARUNOUCHI SIDE</text>
+    
+    <!-- East Side Label -->
+    <text x="565" y="295" font-size="12" font-weight="black" fill="#786c56" transform="rotate(90 565 295)" text-anchor="middle">YAESU SIDE</text>
+    
+    <!-- Connection Hall Label -->
+    <text x="320" y="304" font-size="11" font-weight="bold" fill="#786c56" text-anchor="middle">Central Passage</text>
+    
+    <!-- Platform Labels -->
+    <text x="372" y="195" font-size="10" font-weight="black" fill="#ffffff" text-anchor="middle">P 4/5</text>
+    <text x="372" y="390" font-size="10" font-weight="black" fill="#ffffff" text-anchor="middle">JR</text>
+    <text x="458" y="185" font-size="11" font-weight="black" fill="#ffffff" text-anchor="middle">P 14-19</text>
+    <text x="458" y="395" font-size="10" font-weight="black" fill="#ffffff" text-anchor="middle">SHINKANSEN</text>
+
+    <!-- Navigation Warning Annotations -->
+    <g id="transfer-warning" transform="translate(240, 480)">
+      <rect x="0" y="0" width="220" height="34" rx="6" fill="#FEE2E2" stroke="#ef4444" stroke-width="1" />
+      <text x="10" y="20" font-size="10" font-weight="black" fill="#991B1B">⚠️ WARNING: LONG WALK TO KEIYO LINE</text>
+      <text x="194" y="21" font-size="9" font-weight="medium" fill="#991B1B">12 MIN</text>
+    </g>
+  </g>
+
+  <!-- Layer 7: Legend (Standard navigation philosophies keys) -->
+  <g id="legend" transform="translate(32, 510)" font-family="system-ui, sans-serif" font-size="10" font-weight="bold" fill="#786c56">
+    <text x="0" y="0" font-size="11" font-weight="bold" fill="#1c1917" letter-spacing="0.5">LEGEND</text>
+    
+    <!-- Legend item 1 -->
+    <circle cx="10" cy="18" r="5" fill="#9ACD32" />
+    <text x="24" y="21" font-weight="bold" fill="#1c1917">Yamanote Line (JR East)</text>
+    
+    <!-- Legend item 2 -->
+    <circle cx="10" cy="38" r="5" fill="#0055A5" />
+    <text x="24" y="41" font-weight="bold" fill="#1c1917">Tokaido Shinkansen (JR Central)</text>
+    
+    <!-- Legend item 3 -->
+    <circle cx="200" cy="18" r="5" fill="#f5ebd6" stroke="#ebdcb9" stroke-width="1" />
+    <text x="214" y="21" font-weight="bold" fill="#1c1917">Connecting Corridor</text>
+
+    <!-- Legend item 4 -->
+    <circle cx="200" cy="38" r="5" fill="#e25c3d" />
+    <text x="214" y="41" font-weight="bold" fill="#1c1917">Main Gate / Exit Points</text>
+  </g>
+</svg>

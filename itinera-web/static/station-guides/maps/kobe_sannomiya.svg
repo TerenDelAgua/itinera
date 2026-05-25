@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <!--
+    ========================================================================
+    KOBE (SANNOMIYA) STATION SCHEMATIC MAP
+    Minimalist 2D transit map design
+    Philosophy: Clean, flat UI, high-contrast, optimized for mobile reading
+    ========================================================================
+  -->
+  <defs>
+    <!-- Crisp drop shadow for UI elements -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#1c1917" flood-opacity="0.12" filter-units="userSpaceOnUse" />
+    </filter>
+  </defs>
+
+  <!-- Layer 1: Background (transparent for dark/light mode compatibility) -->
+  <g id="background">
+    <rect width="800" height="600" fill="transparent" />
+  </g>
+
+  <!-- Layer 2: Connecting Conways & Pedestrian Paths -->
+  <g id="connecting-paths">
+    <!-- Main Ground Level Central Concourse (Passageway connecting East &amp; West) -->
+    <rect x="180" y="230" width="340" height="80" rx="10" fill="#f5ebd6" stroke="#e8dcc0" stroke-width="2" opacity="0.95" />
+
+    <!-- Connecting corridor from JR Sannomiya to elevated Port Liner station -->
+    <rect x="440" y="170" width="90" height="80" rx="8" fill="#f5ebd6" stroke="#e8dcc0" stroke-width="2" opacity="0.9" />
+
+    <!-- Escalator Shaft from Ground Concourse to B1F Hanshin Subway -->
+    <line x1="330" y1="280" x2="330" y2="360" stroke="#e8dcc0" stroke-width="14" stroke-linecap="round" opacity="0.8" />
+  </g>
+
+  <!-- Layer 3: Operator Zones & Platforms -->
+  <!-- 1. JR West Sannomiya Station (Ground/Elevated 1F/2F - Platforms 1-4) -->
+  <g id="line-jr-west">
+    <rect x="220" y="180" width="280" height="26" rx="13" fill="#0072BC" stroke="#ffffff" stroke-width="2" filter="url(#shadow)" />
+    <text x="360" y="196" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.3">JR KOBE LINE (P1-4)</text>
+  </g>
+
+  <!-- 2. Hankyu Railway Kobe-Sannomiya Station (Elevated 1F/2F - Platforms 1-4) - NORTHWEST -->
+  <g id="line-hankyu">
+    <rect x="160" y="130" width="220" height="24" rx="12" fill="#800000" stroke="#ffffff" stroke-width="2" filter="url(#shadow)" />
+    <text x="270" y="146" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="8" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.3">HANKYU KOBE LINE (P1-4)</text>
+  </g>
+
+  <!-- 3. Hanshin Electric Railway Kobe-Sannomiya Station (Underground B1F) -->
+  <g id="line-hanshin">
+    <rect x="220" y="364" width="280" height="26" rx="13" fill="#004499" stroke="#ffffff" stroke-width="2" filter="url(#shadow)" />
+    <text x="360" y="380" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.3">HANSHIN MAIN LINE (B1F)</text>
+  </g>
+
+  <!-- 4. Kobe New Transit - Port Liner (Elevated 2F Terminal - Red - Platforms 1-2) - SOUTHEAST -->
+  <g id="line-portliner">
+    <rect x="470" y="210" width="30" height="110" rx="15" fill="#E60012" stroke="#ffffff" stroke-width="2" filter="url(#shadow)" />
+    <text x="485" y="265" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="8" font-weight="700" fill="#ffffff" text-anchor="middle" transform="rotate(-90 485 265)">PORT LINER (2F)</text>
+  </g>
+
+  <!-- Layer 4: Exit Pins -->
+  <g id="exits">
+    <!-- West Exit (Hankyu / Dining / Subway link) -->
+    <g id="exit-west" filter="url(#shadow)">
+      <circle cx="110" cy="270" r="22" fill="#e25c3d" stroke="#ffffff" stroke-width="3" />
+      <text x="110" y="277" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle">W</text>
+    </g>
+
+    <!-- East Exit (JR / Port Liner Link / Bus Terminal) -->
+    <g id="exit-east" filter="url(#shadow)">
+      <circle cx="560" cy="270" r="22" fill="#e25c3d" stroke="#ffffff" stroke-width="3" />
+      <text x="560" y="277" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle">E</text>
+    </g>
+  </g>
+
+  <!-- Layer 5: Labels & Warnings -->
+  <g id="labels" font-family="Inter, system-ui, -apple-system, sans-serif">
+    <!-- Title -->
+    <text x="40" y="48" font-size="22" font-weight="800" fill="currentColor" letter-spacing="-0.5">Kobe (Sannomiya) Station</text>
+    <text x="40" y="68" font-size="11" font-weight="600" fill="currentColor" opacity="0.6" letter-spacing="1.2">SCHEMATIC MAP • B1F TO 2F (STATION CLUSTER)</text>
+
+    <!-- Orientations (Symmetrically aligned above exit pins) -->
+    <text x="110" y="230" font-size="10" font-weight="700" fill="currentColor" opacity="0.6" letter-spacing="0.5" text-anchor="middle">WEST EXIT (HANKYU / DINING / SUBWAY)</text>
+    <text x="560" y="230" font-size="10" font-weight="700" fill="currentColor" opacity="0.6" letter-spacing="0.5" text-anchor="middle">EAST EXIT (PORT LINER / BUS TERMINAL)</text>
+
+    <!-- Airport Access Card -->
+    <g id="airport-card">
+      <rect x="420" y="430" width="340" height="46" rx="8" fill="#EFF6FF" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)" />
+      <text x="432" y="448" font-size="9" font-weight="700" fill="#1E40AF">✈ KOBE AIRPORT ACCESS</text>
+      <text x="432" y="459" font-size="8" font-weight="600" fill="#2563EB">Sannomiya is the sole rail connection! Walk to the elevated</text>
+      <text x="432" y="468" font-size="8" font-weight="600" fill="#2563EB">Port Liner terminal from East Exit for an 18-minute ride.</text>
+    </g>
+  </g>
+
+  <!-- Layer 6: Legend -->
+  <g id="legend" font-family="Inter, system-ui, -apple-system, sans-serif">
+    <text x="40" y="540" font-size="11" font-weight="700" fill="currentColor" letter-spacing="0.8">LEGEND</text>
+
+    <circle cx="48" cy="558" r="6" fill="#0072BC" />
+    <text x="62" y="561" font-size="10" font-weight="600" fill="currentColor">JR West</text>
+
+    <circle cx="150" cy="558" r="6" fill="#800000" />
+    <text x="164" y="561" font-size="10" font-weight="600" fill="currentColor">Hankyu Railway</text>
+
+    <circle cx="270" cy="558" r="6" fill="#004499" />
+    <text x="284" y="561" font-size="10" font-weight="600" fill="currentColor">Hanshin Railway</text>
+
+    <circle cx="390" cy="558" r="6" fill="#E60012" />
+    <text x="404" y="561" font-size="10" font-weight="600" fill="currentColor">Port Liner Terminal</text>
+
+    <circle cx="530" cy="558" r="6" fill="#f5ebd6" stroke="#e8dcc0" stroke-width="1.5" />
+    <text x="544" y="561" font-size="10" font-weight="600" fill="currentColor">Central Concourse</text>
+  </g>
+</svg>

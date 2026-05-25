@@ -24,10 +24,15 @@
   import ExpensesSummaryCard from "$lib/components/trip/ExpensesSummaryCard.svelte";
   import type { Activity } from "$lib/types/Activity";
 
+  // Station Guides v1.2 imports
+  import StationGuide from "$lib/components/station-guide/StationGuide.svelte";
+  import { matchStationGuide } from "$lib/services/stationGuide";
+
   let tripId = $state("");
   let placeId = $state("");
 
   let place = $state<Place | null>(null);
+  let matchedGuide = $derived(place ? matchStationGuide(place.name, place.city) : null);
   let expenses = $state<Expense[]>([]);
   let categorySummary = $state<CategorySummary[]>([]);
   let categories = $state<Expense_Category[]>([]);
@@ -145,6 +150,7 @@
       if (place.end_date)
         payload.end_date = new Date(place.end_date).toISOString();
       payload.notes = place.notes || "";
+      payload.city = place.city || "";
 
       const updated = await apiFetch<Place>(
         `/trips/${tripId}/places/${placeId}`,
@@ -172,6 +178,7 @@
       bind:startDate={place.start_date}
       bind:endDate={place.end_date}
       bind:defaultCurrency={place.default_expense_currency}
+      bind:city={place.city}
       currencyFallbackLabel={`${$t("common.inherit")} (${tripDefaultCurrency})`}
       allowInheritCurrency={true}
       iconType="place"
@@ -221,6 +228,22 @@
         onOpenDrawer={() => (isAgendaOpen = true)}
         onRefresh={loadAllData}
       />
+
+      <!-- ============================================================ -->
+      <!-- STATION GUIDE: Rendered fully expanded inside Place detail   -->
+      <!-- ============================================================ -->
+      {#if matchedGuide}
+        <div class="space-y-4 pt-4 border-t border-dashed border-teren-border/60">
+          <h2 class="text-lg font-semibold text-teren-text-main tracking-tight flex items-center gap-2">
+            <span>🚉</span> {$t("station_guide.section_title" as any)}
+          </h2>
+          <StationGuide
+            cityName={matchedGuide.id}
+            compact={false}
+            locale={$locale}
+          />
+        </div>
+      {/if}
     {/if}
   </main>
 
