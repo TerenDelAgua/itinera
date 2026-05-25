@@ -19,14 +19,18 @@
     $t('station_guide.exit_time_to_surface', { time: exit.time_to_surface })
   );
 
-  // Localized exit name and tips for seamless ES/EN fallbacks
-  let exitName = $derived(
-    locale === 'es' && (exit as any).name_es ? (exit as any).name_es : exit.name
-  );
+  // Localized exit name and tips for seamless ES/JA/EN fallbacks
+  let exitName = $derived.by(() => {
+    if (locale === 'ja' && exit.name_ja) return exit.name_ja;
+    if (locale === 'es' && (exit as any).name_es) return (exit as any).name_es;
+    return exit.name;
+  });
 
-  let exitTips = $derived(
-    locale === 'es' && (exit as any).tips_es ? (exit as any).tips_es : exit.tips
-  );
+  let exitTips = $derived.by(() => {
+    if (locale === 'ja' && (exit as any).tips_ja) return (exit as any).tips_ja;
+    if (locale === 'es' && (exit as any).tips_es) return (exit as any).tips_es;
+    return exit.tips;
+  });
 </script>
 
 <div

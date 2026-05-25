@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <!--
+    ========================================================================
+    HIROSHIMA STATION SCHEMATIC MAP
+    Minimalist 2D transit map design
+    Philosophy: Clean, flat UI, high-contrast, optimized for mobile reading
+    ========================================================================
+  -->
+  <defs>
+    <!-- Crisp drop shadow for UI elements -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#1c1917" flood-opacity="0.12" filter-units="userSpaceOnUse" />
+    </filter>
+  </defs>
+
+  <!-- Layer 1: Background (transparent for dark/light mode compatibility) -->
+  <g id="background">
+    <rect width="800" height="600" fill="transparent" />
+  </g>
+
+  <!-- Layer 2: Connecting Corridors & Pedestrian Halls -->
+  <g id="connecting-paths">
+    <!-- Central Pedestrian Passage (1F/2F - Connecting North and South) -->
+    <rect x="330" y="130" width="80" height="190" rx="10" fill="#f5ebd6" stroke="#e8dcc0" stroke-width="2" opacity="0.95" />
+
+    <!-- Ekie Mall & Ticket Office area -->
+    <rect x="220" y="230" width="300" height="46" rx="8" fill="#f5ebd6" stroke="#e8dcc0" stroke-width="1.5" opacity="0.9" />
+
+    <!-- Tram station pedestrian ramp (South exit link) -->
+    <line x1="370" y1="310" x2="370" y2="360" stroke="#e8dcc0" stroke-width="14" stroke-linecap="round" opacity="0.8" />
+  </g>
+
+  <!-- Layer 3: Operator Zones & Platforms -->
+  <!-- 1. JR West Sanyo Shinkansen (Elevated 2F - Blue - Platforms 11-14) -->
+  <g id="line-shinkansen">
+    <rect x="210" y="150" width="320" height="26" rx="13" fill="#0055A5" stroke="#ffffff" stroke-width="2" filter="url(#shadow)" />
+    <text x="370" y="166" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.3">SANYO SHINKANSEN (P11-14)</text>
+  </g>
+
+  <!-- 2. JR West Conventional Lines (Ground 1F) -->
+  <!-- Sanyo Main Line (Red - Platforms 1-2 - For Miyajimaguchi/Miyajima) -->
+  <g id="line-sanyo-main">
+    <rect x="210" y="190" width="320" height="26" rx="13" fill="#E60012" stroke="#ffffff" stroke-width="2" filter="url(#shadow)" />
+    <text x="370" y="206" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.3">JR SANYO MAIN LINE (P1/2 - MIYAJIMA ACCESS)</text>
+  </g>
+
+  <!-- 3. Hiroden Streetcar (Hiroshima Electric Railway - Ground level) -->
+  <!-- Hiroden Tram Station (Green - Route 1, 2, 5, 6) -->
+  <g id="line-hiroden">
+    <rect x="250" y="360" width="240" height="50" rx="10" fill="#009944" stroke="#ffffff" stroke-width="2.5" filter="url(#shadow)" />
+    <text x="370" y="380" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.3">HIRODEN TRAM STATION (1F)</text>
+    <text x="370" y="394" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="7" font-weight="600" fill="#ffffff" text-anchor="middle" opacity="0.9">ROUTE 2 &amp; 6 TO PEACE MEMORIAL PARK / DOMB</text>
+  </g>
+
+  <!-- Layer 4: Exit Pins -->
+  <g id="exits">
+    <!-- North Exit (Shinkansen-guchi - Near Granvia / Airport Bus) -->
+    <g id="exit-north" filter="url(#shadow)">
+      <circle cx="370" cy="100" r="22" fill="#e25c3d" stroke="#ffffff" stroke-width="3" />
+      <text x="370" y="107" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle">N</text>
+    </g>
+
+    <!-- South Exit (Minami-guchi - Near Hiroden Trams / ekie) -->
+    <g id="exit-south" filter="url(#shadow)">
+      <circle cx="370" cy="300" r="22" fill="#e25c3d" stroke="#ffffff" stroke-width="3" />
+      <text x="370" y="307" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle">S</text>
+    </g>
+  </g>
+
+  <!-- Layer 5: Labels & Warnings -->
+  <g id="labels" font-family="Inter, system-ui, -apple-system, sans-serif">
+    <!-- Title -->
+    <text x="40" y="48" font-size="22" font-weight="800" fill="currentColor" letter-spacing="-0.5">Hiroshima Station</text>
+    <text x="40" y="68" font-size="11" font-weight="600" fill="currentColor" opacity="0.6" letter-spacing="1.2">SCHEMATIC MAP • 1F / 2F</text>
+
+    <!-- Orientations (Symmetrically aligned above exit pins) -->
+    <text x="370" y="60" font-size="10" font-weight="700" fill="currentColor" opacity="0.6" letter-spacing="0.5" text-anchor="middle">SHINKANSEN EXIT (NORTH / AIRPORT BUSES)</text>
+    <text x="370" y="265" font-size="10" font-weight="700" fill="currentColor" opacity="0.6" letter-spacing="0.5" text-anchor="middle">SOUTH EXIT (HIRODEN TRAMS / PEACE PARK)</text>
+
+    <!-- Peace Park & Miyajima Travel Helper Cards -->
+    <!-- Card 1: Peace Park Tram -->
+    <g id="peace-park-card">
+      <rect x="40" y="430" width="340" height="46" rx="8" fill="#F0FDF4" stroke="#16a34a" stroke-width="1.5" filter="url(#shadow)" />
+      <text x="52" y="448" font-size="9" font-weight="700" fill="#166534">⛲ PEACE MEMORIAL PARK</text>
+      <text x="52" y="459" font-size="8" font-weight="600" fill="#15803d">Exit South, take Hiroden Tram Route 2 or 6</text>
+      <text x="52" y="468" font-size="8" font-weight="600" fill="#15803d">to Genbaku-Dome-mae stop (flat fare ¥220).</text>
+    </g>
+
+    <!-- Card 2: Miyajima Access -->
+    <g id="miyajima-card">
+      <rect x="420" y="430" width="340" height="46" rx="8" fill="#FFF7ED" stroke="#ea580c" stroke-width="1.5" filter="url(#shadow)" />
+      <text x="432" y="448" font-size="9" font-weight="700" fill="#9a3412">⛩ MIYAJIMA ISLAND</text>
+      <text x="432" y="459" font-size="8" font-weight="600" fill="#c2410c">Take JR Sanyo Line from Platform 1 to Miyajimaguchi</text>
+      <text x="432" y="468" font-size="8" font-weight="600" fill="#c2410c">(26 min), then walk 5 min to the JR Ferry.</text>
+    </g>
+  </g>
+
+  <!-- Layer 6: Legend -->
+  <g id="legend" font-family="Inter, system-ui, -apple-system, sans-serif">
+    <text x="40" y="540" font-size="11" font-weight="700" fill="currentColor" letter-spacing="0.8">LEGEND</text>
+
+    <circle cx="48" cy="558" r="6" fill="#0055A5" />
+    <text x="62" y="561" font-size="10" font-weight="600" fill="currentColor">Sanyo Shinkansen</text>
+
+    <circle cx="190" cy="558" r="6" fill="#E60012" />
+    <text x="204" y="561" font-size="10" font-weight="600" fill="currentColor">JR Sanyo Main Line</text>
+
+    <circle cx="330" cy="558" r="6" fill="#009944" />
+    <text x="344" y="561" font-size="10" font-weight="600" fill="currentColor">Hiroden Tram System</text>
+
+    <circle cx="480" cy="558" r="6" fill="#f5ebd6" stroke="#e8dcc0" stroke-width="1.5" />
+    <text x="494" y="561" font-size="10" font-weight="600" fill="currentColor">Central Concourse</text>
+  </g>
+</svg>

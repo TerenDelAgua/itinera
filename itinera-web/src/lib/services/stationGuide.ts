@@ -128,6 +128,15 @@ export function matchStationGuide(placeName: string, cityName?: string): Station
     }
   }
 
+  // 1.5. Si la ciudad especificada coincide exactamente con el ID de alguna estación (ej. "shibuya", "shinjuku", "kyoto", "hakata"),
+  // le damos prioridad antes de caer en coincidencias parciales o difusas del nombre del lugar.
+  if (cleanCity) {
+    const directGuide = stations.find(s => s.id.toLowerCase() === cleanCity);
+    if (directGuide) {
+      return directGuide;
+    }
+  }
+
   // 2. Coincidencia parcial en el nombre del lugar (ej. "Estación de Tokio" -> "tokyo_station")
   for (const s of stations) {
     const sName = s.name.toLowerCase().replace(" station", ""); // remove station suffix for flexible match
