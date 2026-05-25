@@ -123,7 +123,8 @@
     "place_form": {
         "name_placeholder": "Destination name (e.g. Kyoto)",
         "start_date": "Start Date (Optional)",
-        "end_date": "End Date (Optional)"
+        "end_date": "End Date (Optional)",
+        "city_placeholder": "City (e.g. Tokyo, Kyoto, Fukuoka)"
     },
     "expenses": {
         "notes_placeholder": "Notes (optional)...",
@@ -174,5 +175,40 @@
         "cheaper_individual": "For this itinerary, individual tickets are cheaper.",
         "fallback_note": "Estimated by place order. Add dates for accuracy.",
         "closest_note": "Origin: {origin} (approximate date)"
+    },
+    "station_guide": {
+        "section_title": "Station Guide",
+        "badge_label": "{station} — {complexity}",
+        "complexity_low": "Station guide",
+        "complexity_medium": "Station guide",
+        "complexity_high": "Complex station",
+        "complexity_extreme": "Complex station",
+        "tabs_tips": "Tips",
+        "tabs_exits": "Exits",
+        "tabs_map": "Map",
+        "tip_category_navigation": "Navigation",
+        "tip_category_practical": "Practical",
+        "tip_category_safety": "Safety",
+        "tip_category_cultural": "Cultural",
+        "priority_critical": "Critical",
+        "priority_high": "Important",
+        "priority_medium": "Good to know",
+        "priority_low": "Extra",
+        "exit_time_to_surface": "{time} to surface",
+        "exit_best_for": "Best for: {categories}",
+        "best_for_nightlife": "Nightlife & Bars",
+        "best_for_shopping": "Shopping & Department Stores",
+        "best_for_hotels": "Hotels & Stays",
+        "best_for_business": "Business & Skyscrapers",
+        "best_for_parks": "Parks & Gardens",
+        "best_for_buses": "Buses & Airport Transit",
+        "best_for_day_trips": "Day Trips & Excursions",
+        "best_for_sightseeing": "Sightseeing & Monuments",
+        "best_for_transit": "Rail Transit & Connections",
+        "best_for_dining": "Dining & Local Eats",
+        "map_placeholder": "Station Navigation Map — Coming Soon",
+        "map_placeholder_subtitle": "We are designing custom simplified maps to help you navigate {station_name} effortlessly. Check back soon!",
+        "map_insight_title": "Insight",
+        "map_insight_body": "This is not a confusing satellite map. It is a logical, rapid-orientation diagram for the critical 30 seconds after stepping off the train."
     }
 }

@@ -86,11 +86,17 @@ body {
 }
 
 /* Multimedia en modo oscuro: evitar deslumbramiento */
-.dark img,
+.dark img:not(.station-guide-map),
 .dark .emoji,
 .dark span[role="img"],
 .dark .text-xl.select-none { /* Target emojis in spans without class */
   filter: brightness(0.95) saturate(0.9);
+  transition: filter 0.3s ease;
+}
+
+/* Station Guide Schematic Maps in Dark Mode: mathematical inversion & hue rotation */
+.dark .station-guide-map {
+  filter: invert(0.88) hue-rotate(180deg) brightness(1.05) saturate(0.95) !important;
   transition: filter 0.3s ease;
 }
 

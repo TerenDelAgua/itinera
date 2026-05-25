@@ -1,0 +1,977 @@
+{
+  "version": "2026-05-25",
+  "stations": [
+    {
+      "id": "shinjuku",
+      "name": "Shinjuku Station",
+      "name_ja": "新宿駅",
+      "name_ja_romaji": "Shinjuku-eki",
+      "city": "Tokyo",
+      "region": "kanto",
+      "complexity": "extreme",
+      "daily_passengers_millions": 3.6,
+      "operators": [
+        {
+          "name": "JR East",
+          "name_ja": "JR東日本",
+          "lines": [
+            { "name": "Yamanote Line", "name_ja": "山手線", "color": "#9ACD32", "platforms": ["14", "15"], "directions": ["Shibuya", "Ikebukuro", "Ueno"] },
+            { "name": "Chuo Line (Rapid)", "name_ja": "中央線快速", "color": "#F15A22", "platforms": ["8", "9"], "directions": ["Tachikawa", "Hachioji", "Takao"] },
+            { "name": "Chuo-Sobu Line", "name_ja": "中央・総武線", "color": "#FFD400", "platforms": ["1", "2"], "directions": ["Akihabara", "Chiba"] },
+            { "name": "Shonan-Shinjuku Line", "name_ja": "湘南新宿ライン", "color": "#E21F26", "platforms": ["2", "3"], "directions": ["Yokohama", "Odawara"] },
+            { "name": "Saikyo Line", "name_ja": "埼京線", "color": "#00AC9B", "platforms": ["2", "3"], "directions": ["Ikebukuro", "Omiya"] }
+          ]
+        },
+        {
+          "name": "Odakyu Electric Railway",
+          "name_ja": "小田急電鉄",
+          "lines": [
+            { "name": "Odakyu Line", "name_ja": "小田原線", "color": "#1B9AD8", "platforms": ["1-6"], "directions": ["Odawara", "Hakone-Yumoto", "Katase-Enoshima"] }
+          ]
+        },
+        {
+          "name": "Keio Corporation",
+          "name_ja": "京王電鉄",
+          "lines": [
+            { "name": "Keio Line", "name_ja": "京王線", "color": "#DD2C00", "platforms": ["1-4"], "directions": ["Keio-Hachioji", "Takahatafudo"] }
+          ]
+        },
+        {
+          "name": "Tokyo Metro",
+          "name_ja": "東京メトロ",
+          "lines": [
+            { "name": "Marunouchi Line", "name_ja": "丸ノ内線", "color": "#F62E36", "platforms": ["B1"], "directions": ["Ikebukuro", "Ginza", "Tokyo"] }
+          ]
+        }
+      ],
+      "exits": {
+        "east": {
+          "name": "East Exit (Higashi-guchi)",
+          "name_es": "Salida Este (Higashi-guchi)",
+          "name_ja": "東口",
+          "landmarks": ["Kabukicho", "Golden Gai", "Isetan Shinjuku", "Lumine Est"],
+          "best_for": ["nightlife", "shopping", "hotels"],
+          "time_to_surface": "3 min",
+          "tips": [
+            "Kabukicho is 5 min walk from East Exit. Ignore touts.",
+            "Isetan closes at 20:00. Last entry 19:30.",
+            "Golden Gai: 200+ tiny bars, cash only, cover charge ¥500-1000"
+          ],
+          "tips_es": [
+            "Kabukicho está a 5 min a pie de la salida Este. Ignora a los captadores.",
+            "Isetan cierra a las 20:00. Último acceso a las 19:30.",
+            "Golden Gai: más de 200 bares diminutos, solo efectivo, cover charge de ¥500-1000."
+          ]
+        },
+        "west": {
+          "name": "West Exit (Nishi-guchi)",
+          "name_es": "Salida Oeste (Nishi-guchi)",
+          "name_ja": "西口",
+          "landmarks": ["Tokyo Metropolitan Government", "Park Hyatt Tokyo", "Shinjuku Central Park"],
+          "best_for": ["business", "parks", "hotels"],
+          "time_to_surface": "2 min",
+          "tips": [
+            "Tokyo Metropolitan Government: free observation deck, 9:30-23:00",
+            "Park Hyatt: Lost in Translation bar (52F), dress code smart casual"
+          ],
+          "tips_es": [
+            "Gobierno Metropolitano de Tokio: observatorio gratuito, 9:30-23:00.",
+            "Park Hyatt: Bar de Lost in Translation (piso 52), código de vestimenta elegante sport."
+          ]
+        },
+        "south": {
+          "name": "South Exit (Minami-guchi)",
+          "name_es": "Salida Sur (Minami-guchi)",
+          "name_ja": "南口",
+          "landmarks": ["Takashimaya", "Shinjuku Bus Terminal (Busta)", "Lumine 1/2"],
+          "best_for": ["buses", "shopping", "day trips"],
+          "time_to_surface": "4 min",
+          "tips": [
+            "Busta Shinjuku: buses to Mt. Fuji, Kawaguchiko, Nikko, Hakone",
+            "Buy bus tickets at counter or vending machines. Cash + IC card.",
+            "Takashimaya: tax-free 8F, closes 20:00"
+          ],
+          "tips_es": [
+            "Busta Shinjuku: autobuses a Monte Fuji, Kawaguchiko, Nikko, Hakone.",
+            "Compra billetes de autobús en ventanilla o máquinas. Efectivo + tarjeta IC.",
+            "Takashimaya: libre de impuestos en piso 8, cierra a las 20:00."
+          ]
+        },
+        "new_south": {
+          "name": "New South Exit (Shin-minami-guchi)",
+          "name_es": "Nueva Salida Sur (Shin-minami-guchi)",
+          "name_ja": "新南口",
+          "landmarks": ["JR Shinjuku Miraina Tower", "Flags"],
+          "best_for": ["business"],
+          "time_to_surface": "5 min",
+          "tips": ["Less crowded. Good for accessing southern hotels."],
+          "tips_es": ["Menos concurrida. Buena para acceder a hoteles del sur."]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "Follow the colored line signs on the floor. JR = green, Odakyu = blue, Keio = red.",
+          "text_es": "Sigue las líneas de colores en el suelo. JR = verde, Odakyu = azul, Keio = rojo.",
+          "text_ja": "床の色分けされたラインサインに従ってください。JR＝緑、小田急＝青、京王＝赤。"
+        },
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "The JR East and Odakyu/Keio areas are NOT connected inside the gates. You must exit and re-enter.",
+          "text_es": "Las áreas de JR East y Odakyu/Keio NO están conectadas por dentro de los tornos. Debes salir y volver a entrar.",
+          "text_ja": "JR東日本と小田急・京王 de la zona de tornos no conectan. Hay que salir."
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "Coin lockers: ¥300-700. South Exit has the most. Fill up by 10:00 on weekends.",
+          "text_es": "Consignas (lockers): ¥300-700. La salida Sur (South Exit) tiene la mayoría. Se llenan para las 10:00 los fines de semana.",
+          "text_ja": "コインロッカー：300〜700円。南口が最も多い। 週末は10時までに埋まります。"
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "JR Pass covers all JR lines here. Odakyu and Keio are NOT covered.",
+          "text_es": "El JR Pass cubre todas las líneas de JR aquí. Odakyu y Keio NO están cubiertas.",
+          "text_ja": "JRパスはここの全JR線をカバーします。小田急と京王は対象外です。"
+        },
+        {
+          "category": "safety",
+          "priority": "medium",
+          "text": "Kabukicho at night: stay on main streets. Ignore 'massage' touts.",
+          "text_es": "Kabukicho por la noche: quédate en las calles principales. Ignora a los promotores de 'masajes'.",
+          "text_ja": "夜の歌舞伎町：大通りを歩いてください。『マッサージ』の客引きは無視してください。"
+        }
+      ],
+      "svg_map": "shinjuku.svg",
+      "svg_map_simplified": "shinjuku_simple.svg"
+    },
+    {
+      "id": "kyoto",
+      "name": "Kyoto Station",
+      "name_ja": "京都駅",
+      "name_ja_romaji": "Kyoto-eki",
+      "city": "Kyoto",
+      "region": "kansai",
+      "complexity": "high",
+      "daily_passengers_millions": 0.2,
+      "operators": [
+        {
+          "name": "JR West",
+          "name_ja": "JR西日本",
+          "lines": [
+            { "name": "Tokaido Shinkansen", "name_ja": "東海道新幹線", "color": "#0055A5", "platforms": ["11-14"], "directions": ["Tokyo", "Shin-Osaka", "Hakata"] },
+            { "name": "JR Kyoto Line", "name_ja": "JR京都線", "color": "#0072BC", "platforms": ["4-5"], "directions": ["Osaka", "Sannomiya", "Himeji"] },
+            { "name": "Sagano Line (San-in)", "name_ja": "嵯峨野線", "color": "#93278F", "platforms": ["31-34"], "directions": ["Saga-Arashiyama", "Kameoka"] },
+            { "name": "Nara Line", "name_ja": "奈良線", "color": "#8CBB26", "platforms": ["8-10"], "directions": ["Inari (Fushimi Inari)", "Uji", "Nara"] }
+          ]
+        },
+        {
+          "name": "Kintetsu Railway",
+          "name_ja": "近畿日本鉄道",
+          "lines": [
+            { "name": "Kintetsu Kyoto Line", "name_ja": "近鉄京都線", "color": "#F39200", "platforms": ["1-4"], "directions": ["Tambabashi", "Nara", "Ise-Shima"] }
+          ]
+        },
+        {
+          "name": "Kyoto Municipal Subway",
+          "name_ja": "京都市営地下鉄",
+          "lines": [
+            { "name": "Karasuma Line", "name_ja": "烏丸線", "color": "#009944", "platforms": ["1-2"], "directions": ["Shijo (Gion)", "Karasuma Oike", "Kokusaikaikan"] }
+          ]
+        }
+      ],
+      "exits": {
+        "central": {
+          "name": "Central Exit (Karasuma-guchi)",
+          "name_es": "Salida Central (Karasuma-guchi)",
+          "name_ja": "中央口 (烏丸口)",
+          "landmarks": ["Kyoto Tower", "Kyoto Station Bus Terminal", "Porta Underground Mall"],
+          "best_for": ["buses", "shopping", "sightseeing"],
+          "time_to_surface": "2 min",
+          "tips": [
+            "Main bus terminal is directly outside Central Exit. Follow lines for A, B, C bus platforms.",
+            "Porta Mall closes at 20:30 (restaurants 22:00). Excellent tax-free shopping.",
+            "Luggage service (Crosta Kyoto) is on B1F near central elevators."
+          ],
+          "tips_es": [
+            "La terminal principal de autobuses está fuera de la salida Central. Sigue las líneas para las plataformas A, B, C.",
+            "El centro comercial Porta cierra a las 20:30 (restaurantes 22:00). Compras tax-free excelentes.",
+            "El servicio de equipajes (Crosta Kyoto) está en el sótano B1F, cerca de los ascensores centrales."
+          ]
+        },
+        "hachijo": {
+          "name": "Hachijo Exit (Hachijo-guchi)",
+          "name_es": "Salida Hachijo (Hachijo-guchi)",
+          "name_ja": "八条口",
+          "landmarks": ["Shinkansen Gates", "Airport Limousine Bus", "Kyoto Avanti Mall", "Don Quijote"],
+          "best_for": ["transit", "shopping", "hotels"],
+          "time_to_surface": "3 min",
+          "tips": [
+            "Limousine Bus to Kansai Airport (KIX) and Itami Airport departs from Hachijo-guchi.",
+            "Don Quijote (Kyoto Avanti 2F) is open until 00:00. Great for tax-free snacks and gifts.",
+            "Best access to Kintetsu and Shinkansen gates."
+          ],
+          "tips_es": [
+            "El autobús Limousine a los aeropuertos de Kansai (KIX) e Itami sale de Hachijo-guchi.",
+            "Don Quijote (Kyoto Avanti 2F) abre hasta las 00:00. Ideal para snacks y regalos tax-free.",
+            "El mejor acceso a los tornos de Kintetsu y Shinkansen."
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "The Sagano Line platforms (31-34) for Arashiyama are extremely far to the west of the main gate. Allow 5-8 min walking time.",
+          "text_es": "Los andenes de la línea Sagano (31-34) hacia Arashiyama están extremadamente lejos al oeste de la puerta principal. Reserva 5-8 min de caminata.",
+          "text_ja": "嵐山行き嵯峨野線ホーム（31-34）は中央口から非常に西側に離れています。歩いて5〜8分ほど余裕を見てください。"
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "Bus tickets: Buy a one-day pass at the vending machines near the bus stands for best value. Cash or IC card accepted.",
+          "text_es": "Billetes de autobús: Compra un pase de un día en las máquinas expendedoras junto a las paradas para ahorrar más. Se acepta efectivo o tarjeta IC.",
+          "text_ja": "バスの乗車券：乗り場近くの自動販売機で1日乗車券を購入するとお得です。現金またはICカードが使えます。"
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "JR Pass covers all JR lines and Shinkansen. Kintetsu and Subway lines are NOT covered and require separate tickets or IC card.",
+          "text_es": "El JR Pass cubre todas las líneas JR y el Shinkansen. Las líneas de Kintetsu y el metro NO están cubiertas y requieren billete aparte o tarjeta IC.",
+          "text_ja": "JRパスはすべてのJR線と新幹線をカバーしています。近鉄と地下鉄は対象外のため、別途切符かICカードが必要です。"
+        },
+        {
+          "category": "navigation",
+          "priority": "medium",
+          "text": "The pedestrian corridor '南北自由通路' connects the Central (Karasuma) and Hachijo exits directly on the 2nd floor.",
+          "text_es": "El corredor peatonal libre conecta las salidas Central (Karasuma) y Hachijo directamente en el segundo piso.",
+          "text_ja": "南北自由通路（2階）を通れば、中央口（烏丸口）と八条口の間を直接移動できます。"
+        }
+      ],
+      "svg_map": "kyoto.svg",
+      "svg_map_simplified": "kyoto_simple.svg"
+    },
+    {
+      "id": "hakata",
+      "name": "Hakata Station",
+      "name_ja": "博多駅",
+      "name_ja_romaji": "Hakata-eki",
+      "city": "Fukuoka",
+      "region": "kyushu",
+      "complexity": "medium",
+      "daily_passengers_millions": 0.12,
+      "operators": [
+        {
+          "name": "JR Kyushu",
+          "name_ja": "JR九州",
+          "lines": [
+            { "name": "Kyushu Shinkansen", "name_ja": "九州新幹線", "color": "#E60012", "platforms": ["11-16"], "directions": ["Kumamoto", "Kagoshima-Chuo"] },
+            { "name": "Kagoshima Main Line", "name_ja": "鹿児島本線", "color": "#E60012", "platforms": ["1-4"], "directions": ["Kokura", "Mojiko", "Kurume", "Omuta"] },
+            { "name": "Fukuhoku Yutaka Line", "name_ja": "福北ゆたか線", "color": "#ECE51B", "platforms": ["8"], "directions": ["Nogata", "Iizuka"] }
+          ]
+        },
+        {
+          "name": "JR West",
+          "name_ja": "JR西日本",
+          "lines": [
+            { "name": "Sanyo Shinkansen", "name_ja": "山陽新幹線", "color": "#0072BC", "platforms": ["11-16"], "directions": ["Hiroshima", "Shin-Osaka", "Tokyo"] }
+          ]
+        },
+        {
+          "name": "Fukuoka City Subway",
+          "name_ja": "福岡市営地下鉄",
+          "lines": [
+            { "name": "Kuko (Airport) Line", "name_ja": "空港線", "color": "#FFA500", "platforms": ["B2F"], "directions": ["Fukuoka Airport (5 min)", "Tenjin", "Meinohama"] },
+            { "name": "Nanakuma Line", "name_ja": "七隈線", "color": "#00A0E9", "platforms": ["B3F"], "directions": ["Yakuin", "Ropponmatsu", "Hashimoto"] }
+          ]
+        }
+      ],
+      "exits": {
+        "hakata": {
+          "name": "Hakata Exit (Hakata-guchi)",
+          "name_es": "Salida Hakata (Hakata-guchi)",
+          "name_ja": "博多口",
+          "landmarks": ["JR Hakata City (Amu Plaza)", "Canal City Hakata (10 min walk)", "Kushida Shrine", "Hakata Bus Terminal"],
+          "best_for": ["shopping", "sightseeing", "buses"],
+          "time_to_surface": "2 min",
+          "tips": [
+            "Best exit for main shopping malls and sightseeing (Canal City is a pleasant 10 min walk or short bus ride).",
+            "Hakata Bus Terminal is adjacent, offering local and highway buses."
+          ],
+          "tips_es": [
+            "Mejor salida para centros comerciales y turismo (Canal City está a 10 min a pie o en autobús corto).",
+            "La terminal de autobuses de Hakata está contigua, con autobuses locales y de larga distancia."
+          ],
+          "tips_ja": [
+            "主要なショッピングモールや観光に最適な出口です（キャナルシティへは快適な徒歩10分、またはバスで至近）。",
+            "博多バスターミナルが隣接しており、市内バスおよび高速バスが利用可能です。"
+          ]
+        },
+        "chikushi": {
+          "name": "Chikushi Exit (Chikushi-guchi)",
+          "name_es": "Salida Chikushi (Chikushi-guchi)",
+          "name_ja": "筑紫口",
+          "landmarks": ["Shinkansen Gates", "Deitos Street (Food court)", "Eastern Hotels"],
+          "best_for": ["transit", "dining", "hotels"],
+          "time_to_surface": "1 min",
+          "tips": [
+            "Nearest exit for Shinkansen travelers.",
+            "Deitos and Hakata Men-kaido (Ramen Street, 2F) offer Fukuoka's famous Tonkotsu Ramen."
+          ],
+          "tips_es": [
+            "La salida más cercana para viajeros del Shinkansen.",
+            "Deitos y Hakata Men-kaido (calle del Ramen, piso 2) ofrecen el famoso ramen Tonkotsu de Fukuoka."
+          ],
+          "tips_ja": [
+            "新幹線を利用する乗客に最も近い出口です。",
+            "デイトスおよび博多めん街道（2階ラーメン街道）では、福岡名物のとんこつラーメンが味わえます。"
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "Fukuoka Airport is incredibly close. Take the Kuko (Airport) Subway Line; it's only 2 stops (5 minutes) away.",
+          "text_es": "El aeropuerto de Fukuoka está increíblemente cerca. Toma la línea de metro Kuko (Airport); está a solo 2 paradas (5 minutos).",
+          "text_ja": "福岡空港は非常に近いです。地下鉄空港線に乗れば、わずか2駅（5分）で到着します。"
+        },
+        {
+          "category": "navigation",
+          "priority": "high",
+          "text": "The Nanakuma Subway Line extension connects directly at Hakata B3F level. Perfect for reaching central areas like Yakuin.",
+          "text_es": "La extensión de la línea de metro Nanakuma conecta directamente en el nivel B3F de Hakata. Ideal para llegar a zonas céntricas como Yakuin.",
+          "text_ja": "地下鉄七隈線は博多駅地下3階レベルで直接接続しています。薬院などの中央エリアへの移動に便利です。"
+        },
+        {
+          "category": "practical",
+          "priority": "medium",
+          "text": "Yatai food stalls: Famous Hakata yatai stalls are located near Nakasu riverfront (15 min walk) or in Tenjin.",
+          "text_es": "Puestos de comida Yatai: Los famosos puestos de Hakata están en la ribera de Nakasu (15 min a pie) o en Tenjin.",
+          "text_ja": "屋台：有名な中洲の屋台街までは徒歩15分ほど、または天神エリアにあります。"
+        }
+      ],
+      "svg_map": "hakata.svg",
+      "svg_map_simplified": "hakata_simple.svg"
+    },
+    {
+      "id": "shibuya",
+      "name": "Shibuya Station",
+      "name_ja": "渋谷駅",
+      "name_ja_romaji": "Shibuya-eki",
+      "city": "Tokyo",
+      "region": "kanto",
+      "complexity": "extreme",
+      "daily_passengers_millions": 2.4,
+      "operators": [
+        {
+          "name": "JR East",
+          "name_ja": "JR東日本",
+          "lines": [
+            { "name": "Yamanote Line", "name_ja": "山手線", "color": "#9ACD32", "platforms": ["1", "2"], "directions": ["Shinjuku", "Shinagawa"] },
+            { "name": "Saikyo Line", "name_ja": "埼京線", "color": "#00AC9B", "platforms": ["3", "4"], "directions": ["Omiya", "Shinjuku"] }
+          ]
+        },
+        {
+          "name": "Tokyo Metro",
+          "name_ja": "東京メトロ",
+          "lines": [
+            { "name": "Hanzomon Line", "name_ja": "半蔵門線", "color": "#8B4513", "platforms": ["B3F"], "directions": ["Otemachi", "Oshiage"] },
+            { "name": "Ginza Line", "name_ja": "銀座線", "color": "#FF9900", "platforms": ["3F"], "directions": ["Asakusa", "Ginza"] }
+          ]
+        }
+      ],
+      "exits": {
+        "hachiko": {
+          "name": "Hachiko Exit",
+          "name_es": "Salida Hachiko",
+          "name_ja": "ハチ公口",
+          "landmarks": ["Shibuya Crossing", "Hachiko Statue", "Shibuya 109"],
+          "best_for": ["sightseeing", "shopping", "nightlife"],
+          "time_to_surface": "1 min",
+          "tips": [
+            "Hachiko crossing is directly outside this exit. Watch out for crowds.",
+            "The Hachiko dog statue is right next to the green historic train car."
+          ],
+          "tips_es": [
+            "El cruce de Shibuya está saliendo de Hachiko. Cuidado con las multitudes.",
+            "La estatua del perro Hachiko está justo al lado del vagón verde histórico."
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "high",
+          "text": "The Tokyu Toyoko and Fukutoshin lines are located deep underground (B5F). Allow 10 min for transfers.",
+          "text_es": "Las líneas Tokyu Toyoko y Fukutoshin están muy profundas (piso B5F). Reserva 10 min para transbordos.",
+          "text_ja": "東急東横線と副都心線は地下深く（B5F）にあります。乗り換えに10分ほど見てください。"
+        }
+      ],
+      "svg_map": "shibuya.svg",
+      "svg_map_simplified": "shibuya_simple.svg"
+    },
+    {
+      "id": "tokyo_station",
+      "name": "Tokyo Station",
+      "name_ja": "東京駅",
+      "name_ja_romaji": "Tokyo-eki",
+      "city": "Tokyo",
+      "region": "kanto",
+      "complexity": "extreme",
+      "daily_passengers_millions": 0.45,
+      "operators": [
+        {
+          "name": "JR East",
+          "name_ja": "JR東日本",
+          "lines": [
+            { "name": "Yamanote Line", "name_ja": "山手線", "color": "#9ACD32", "platforms": ["4", "5"], "directions": ["Ueno", "Shinagawa"] },
+            { "name": "Keiyo Line (Disney)", "name_ja": "京葉線", "color": "#E60012", "platforms": ["B4F"], "directions": ["Maihama (Disneyland)"] }
+          ]
+        },
+        {
+          "name": "JR Central",
+          "name_ja": "JR東海",
+          "lines": [
+            { "name": "Tokaido Shinkansen", "name_ja": "東海道新幹線", "color": "#0055A5", "platforms": ["14-19"], "directions": ["Kyoto", "Shin-Osaka", "Nagoya"] }
+          ]
+        },
+        {
+          "name": "Tokyo Metro",
+          "name_ja": "東京メトロ",
+          "lines": [
+            { "name": "Marunouchi Line", "name_ja": "丸ノ内線", "color": "#F62E36", "platforms": ["B2F"], "directions": ["Shinjuku", "Ikebukuro"] }
+          ]
+        }
+      ],
+      "exits": {
+        "marunouchi": {
+          "name": "Marunouchi Exit (West side)",
+          "name_es": "Salida Marunouchi (Lado Oeste)",
+          "name_ja": "丸の内口",
+          "landmarks": ["Imperial Palace", "Marunouchi Brick Facade", "Gyoko-dori"],
+          "best_for": ["sightseeing", "business", "parks"],
+          "time_to_surface": "2 min",
+          "tips": [
+            "Best exit to view the historic 1914 red brick station facade.",
+            "Direct straight walk (10 min) to the Imperial Palace Gardens."
+          ],
+          "tips_es": [
+            "La mejor salida para contemplar la histórica fachada de ladrillo rojo de 1914.",
+            "Caminata directa (10 min) a los Jardines del Palacio Imperial."
+          ]
+        },
+        "yaesu": {
+          "name": "Yaesu Exit (East side)",
+          "name_es": "Salida Yaesu (Lado Este)",
+          "name_ja": "八重洲口",
+          "landmarks": ["Shinkansen Gates", "Daimaru Department Store", "Tokyo Character Street (B1F)"],
+          "best_for": ["transit", "shopping", "dining"],
+          "time_to_surface": "1 min",
+          "tips": [
+            "Nearest exit to the Shinkansen gates.",
+            "Tokyo Character Street (Pokemon, Ghibli, anime shops) is B1F on Yaesu North side."
+          ],
+          "tips_es": [
+            "La salida más cercana a los tornos del Shinkansen.",
+            "Tokyo Character Street (tiendas de anime, Ghibli, Pokemon) está en el sótano B1F del lado Yaesu Norte."
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "The Keiyo Line platforms (for Disneyland) are located extremely far to the south. Allow 10-15 min transfer walk inside the gates.",
+          "text_es": "Los andenes de la línea Keiyo (para Disneyland) están extremadamente lejos. Reserva 10-15 min de caminata interna.",
+          "text_ja": "ディズニー行きの京葉線ホームは非常に離れています。改札内での乗り換えに10〜15分ほど余裕を見てください。"
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "JR Pass covers all JR lines and Shinkansen here. Tokyo Metro Marunouchi is NOT covered.",
+          "text_es": "El JR Pass cubre todas las líneas de JR y el Shinkansen. El metro Tokyo Metro Marunouchi NO está cubierto.",
+          "text_ja": "JRパスはすべてのJR線と新幹線をカバーします。東京メトロ丸ノ内線は対象外です。"
+        }
+      ],
+      "svg_map": "tokyo_station.svg",
+      "svg_map_simplified": "tokyo_station_simple.svg"
+    },
+    {
+      "id": "osaka_umeda",
+      "name": "Osaka (Umeda) Station",
+      "name_ja": "大阪・梅田駅",
+      "name_ja_romaji": "Osaka-Umeda-eki",
+      "city": "Osaka",
+      "region": "kansai",
+      "complexity": "high",
+      "operators": [
+        {
+          "name": "JR West",
+          "name_ja": "JR西日本",
+          "lines": [
+            { "name": "Osaka Loop Line", "name_ja": "大阪環状線", "color": "#EA5404", "platforms": ["1", "2"], "directions": ["Kyobashi", "Tennoji", "Universal City (USJ)"] },
+            { "name": "JR Kyoto/Kobe Line", "name_ja": "JR京都線・神戸線", "color": "#0072BC", "platforms": ["3-6"], "directions": ["Kyoto", "Sannomiya (Kobe)", "Himeji"] }
+          ]
+        },
+        {
+          "name": "Hankyu Railway",
+          "name_ja": "阪急電鉄",
+          "lines": [
+            { "name": "Hankyu Kyoto Line", "name_ja": "阪急京都線", "color": "#800000", "platforms": ["1-3"], "directions": ["Kyoto-Kawaramachi"] },
+            { "name": "Hankyu Kobe Line", "name_ja": "阪急神戸線", "color": "#800000", "platforms": ["7-9"], "directions": ["Kobe-Sannomiya"] }
+          ]
+        },
+        {
+          "name": "Osaka Metro",
+          "name_ja": "大阪メトロ",
+          "lines": [
+            { "name": "Midosuji Line", "name_ja": "御堂筋線", "color": "#E51937", "platforms": ["B2F"], "directions": ["Namba", "Tennoji", "Shin-Osaka (Shinkansen)"] }
+          ]
+        }
+      ],
+      "exits": {
+        "central": {
+          "name": "Central Exit (JR Osaka)",
+          "name_es": "Salida Central (JR Osaka)",
+          "name_ja": "中央口",
+          "landmarks": ["Grand Front Osaka", "Yodobashi Camera", "Lucua Osaka"],
+          "best_for": ["shopping", "sightseeing", "transfers"],
+          "time_to_surface": "2 min",
+          "tips": [
+            "Best exit to access the northern skyscrapers and Yodobashi Camera.",
+            "Clear access to the Hankyu Osaka-Umeda station link."
+          ],
+          "tips_es": [
+            "La mejor salida para acceder a los rascacielos del norte y Yodobashi Camera.",
+            "Acceso despejado al enlace de la estación Hankyu Osaka-Umeda."
+          ]
+        },
+        "midosuji": {
+          "name": "Midosuji Exit (East)",
+          "name_es": "Salida Midosuji (Este)",
+          "name_ja": "御堂筋口",
+          "landmarks": ["Hankyu Department Store", "Hankyu Sanbangai", "Midosuji Subway"],
+          "best_for": ["metro", "shopping"],
+          "time_to_surface": "3 min",
+          "tips": [
+            "Direct escalator down to the Midosuji Subway Line.",
+            "Perfect for accessing the famous Hankyu Department Store."
+          ],
+          "tips_es": [
+            "Escalera mecánica directa a la línea de metro Midosuji.",
+            "Perfecto para acceder a los famosos almacenes Hankyu."
+          ]
+        },
+        "south_gate": {
+          "name": "South Gate (Minami)",
+          "name_es": "Puerta Sur (Minami)",
+          "name_ja": "南ゲート",
+          "landmarks": ["Hanshin Department Store", "Kitashinchi Area", "Diamor Osaka"],
+          "best_for": ["dining", "hotels"],
+          "time_to_surface": "3 min",
+          "tips": [
+            "Connects directly to the Hanshin Umeda station.",
+            "Access to the Kitashinchi nightlife and restaurant district via B1F."
+          ],
+          "tips_es": [
+            "Conecta directamente con la estación Hanshin Umeda.",
+            "Acceso al distrito de vida nocturna y restaurantes de Kitashinchi a través de B1F."
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "The Umeda Dungeon: Underground shopping malls (Whity, Diamor) are extremely complex. If lost, go up to 1F street level to orient yourself with the skyscrapers.",
+          "text_es": "La Mazmorra de Umeda: Los centros subterráneos (Whity, Diamor) son hipercomplejos. Si te pierdes, sube a la superficie (1F) para orientarte con los rascacielos.",
+          "text_ja": "梅田ダンジョン：地下街（ホワイティ、ディアモール）は非常に複雑です。迷ったら1階の地上に出て、高層ビルを目印にしてください。"
+        },
+        {
+          "category": "navigation",
+          "priority": "high",
+          "text": "JR Osaka Station and Osaka-Umeda Station (Hankyu/Hanshin) are different stations but fully connected by walkways.",
+          "text_es": "La estación JR Osaka y la estación Osaka-Umeda (Hankyu/Hanshin) son terminales distintas pero totalmente conectadas por pasarelas.",
+          "text_ja": "JR大阪駅と大阪梅田駅（阪急・阪神）は異なる駅ですが、連絡通路で完全に繋がっています。"
+        },
+        {
+          "category": "practical",
+          "priority": "medium",
+          "text": "Shin-Osaka (for Shinkansen bullet trains) is NOT this station. It is 1 stop away via Midosuji Line or 4 minutes via JR Kyoto Line.",
+          "text_es": "Shin-Osaka (para el tren bala Shinkansen) NO es esta estación. Está a 1 parada por la línea Midosuji o 4 minutos por la línea JR Kyoto.",
+          "text_ja": "新大阪駅（新幹線乗り場）はこの駅ではありません。御堂筋線で1駅、またはJR京都線で4分です。"
+        }
+      ],
+      "svg_map": "osaka_umeda.svg",
+      "svg_map_simplified": "osaka_umeda_simple.svg"
+    },
+    {
+      "id": "nagoya",
+      "name": "Nagoya Station",
+      "name_ja": "名古屋駅",
+      "name_ja_romaji": "Nagoya-eki",
+      "city": "Nagoya",
+      "region": "chubu",
+      "complexity": "high",
+      "operators": [
+        {
+          "name": "JR Central",
+          "name_ja": "JR東海",
+          "lines": [
+            { "name": "Tokaido Shinkansen", "name_ja": "東海道新幹線", "color": "#0055A5", "platforms": ["14-17"], "directions": ["Tokyo", "Kyoto", "Shin-Osaka"] },
+            { "name": "Chuo Main Line", "name_ja": "中央本線", "color": "#F15A22", "platforms": ["7-8"], "directions": ["Tajimi", "Nakatsugawa"] }
+          ]
+        },
+        {
+          "name": "Meitetsu Railway",
+          "name_ja": "名古屋鉄道",
+          "lines": [
+            { "name": "Meitetsu Nagoya Line", "name_ja": "名鉄名古屋本線", "color": "#E60012", "platforms": ["1-4"], "directions": ["Central Japan Int'l Airport (Centrair)", "Toyohashi"] }
+          ]
+        },
+        {
+          "name": "Nagoya Municipal Subway",
+          "name_ja": "名古屋市営地下鉄",
+          "lines": [
+            { "name": "Higashiyama Line", "name_ja": "東山線", "color": "#FFD400", "platforms": ["B2F"], "directions": ["Sakae", "Fujigaoka"] }
+          ]
+        }
+      ],
+      "exits": {
+        "sakuradori": {
+          "name": "Sakura-dori Exit (East)",
+          "name_es": "Salida Sakura-dori (Este)",
+          "name_ja": "桜通口",
+          "landmarks": ["Midland Square", "JR Central Towers", "Gold Clock Meeting Point"],
+          "best_for": ["shopping", "business", "hotels"],
+          "time_to_surface": "2 min",
+          "tips": [
+            "Direct access to local buses and Higashiyama Subway Line.",
+            "Best exit for viewing the famous Gold Clock meeting point."
+          ],
+          "tips_es": [
+            "Acceso directo a autobuses locales y a la línea de metro Higashiyama.",
+            "La mejor salida para ver el famoso punto de encuentro del Reloj de Oro."
+          ],
+          "tips_ja": [
+            "市バスおよび地下鉄東山線への直接アクセスが可能です。",
+            "待ち合わせ場所として有名な金時計のすぐ近くです。"
+          ]
+        },
+        "taikodori": {
+          "name": "Taiko-dori Exit (West)",
+          "name_es": "Salida Taiko-dori (Oeste)",
+          "name_ja": "太閤通口",
+          "landmarks": ["Shinkansen Gates", "Bic Camera", "Silver Clock Meeting Point"],
+          "best_for": ["transit", "shopping"],
+          "time_to_surface": "1 min",
+          "tips": [
+            "Nearest exit to the Shinkansen gates and highway bus stops.",
+            "Silver Clock is located near this exit."
+          ],
+          "tips_es": [
+            "La salida más cercana a las puertas del Shinkansen y paradas de autobús de larga distancia.",
+            "El Reloj de Plata (Silver Clock) está situado cerca de esta salida."
+          ],
+          "tips_ja": [
+            "新幹線改札口および高速バス乗り場に最も近い出口です。",
+            "銀時計はこの出口のすぐ近くにあります。"
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "Gold vs. Silver Clock: The Gold Clock (金時計) is at the East (Sakura-dori) exit. The Silver Clock (銀時計) is at the West (Taiko-dori) exit. These are the two primary meeting points.",
+          "text_es": "Reloj de Oro vs. Reloj de Plata: El Reloj de Oro (Gold Clock) está en la salida Este (Sakura-dori). El Reloj de Plata (Silver Clock) está en la salida Oeste (Taiko-dori). Son los dos puntos de encuentro clave.",
+          "text_ja": "金時計と銀時計：金時計は東口（桜通口）、銀時計は西口（太閤通口）にあります。駅構内の二大待ち合わせスポットです。"
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "Central Japan Airport (Centrair): Take the Meitetsu Airport Rapid Limited Express (Mu-Sky) from Meitetsu Nagoya Station for a fast 28-minute connection.",
+          "text_es": "Aeropuerto de Nagoya (Centrair): Toma el tren rápido Meitetsu (Mu-Sky) desde la estación Meitetsu Nagoya para llegar en solo 28 minutos.",
+          "text_ja": "中部国際空港（セントレア）：名鉄名古屋駅から快速特急「ミュースカイ」を利用すれば、最速28分でアクセス可能です。"
+        }
+      ],
+      "svg_map": "nagoya.svg",
+      "svg_map_simplified": "nagoya_simple.svg"
+    },
+    {
+      "id": "sapporo",
+      "name": "Sapporo Station",
+      "name_ja": "札幌駅",
+      "name_ja_romaji": "Sapporo-eki",
+      "city": "Sapporo",
+      "region": "hokkaido",
+      "complexity": "medium",
+      "operators": [
+        {
+          "name": "JR Hokkaido",
+          "name_ja": "JR北海道",
+          "lines": [
+            { "name": "Hakodate Main Line", "name_ja": "函館本線", "color": "#00A0E9", "platforms": ["1-10"], "directions": ["Otaru", "New Chitose Airport", "Asahikawa"] }
+          ]
+        },
+        {
+          "name": "Sapporo Municipal Subway",
+          "name_ja": "札幌市営地下鉄",
+          "lines": [
+            { "name": "Namboku Line", "name_ja": "南北線", "color": "#009944", "platforms": ["B2F"], "directions": ["Odori", "Susukino", "Makomanai"] },
+            { "name": "Toho Line", "name_ja": "東豊線", "color": "#0072BC", "platforms": ["B2F"], "directions": ["Odori", "Fukuzumi"] }
+          ]
+        }
+      ],
+      "exits": {
+        "north": {
+          "name": "North Exit (Kita-guchi)",
+          "name_es": "Salida Norte (Kita-guchi)",
+          "name_ja": "北口",
+          "landmarks": ["Hokkaido University Campus", "North Exit Plaza"],
+          "best_for": ["sightseeing", "university"],
+          "time_to_surface": "1 min",
+          "tips": [
+            "Best exit to visit the historic and scenic Hokkaido University campus (5 min walk).",
+            "Less crowded exit with spacious taxi stands."
+          ],
+          "tips_es": [
+            "La mejor salida para visitar el histórico y pintoresco campus de la Universidad de Hokkaido (5 min a pie).",
+            "Salida menos concurrida con amplias paradas de taxi."
+          ],
+          "tips_ja": [
+            "歴史的で美しい北海道大学キャンパス（徒歩5分）へのアクセスに最適です。",
+            "タクシー乗り場が広く、比較的混雑が少ない出口です。"
+          ]
+        },
+        "south": {
+          "name": "South Exit (Minami-guchi)",
+          "name_es": "Salida Sur (Minami-guchi)",
+          "name_ja": "南口",
+          "landmarks": ["JR Tower", "Stellar Place", "Daimaru Sapporo", "Underground Walkway (Chi-Ka-Ho)"],
+          "best_for": ["shopping", "hotels", "city walk"],
+          "time_to_surface": "2 min",
+          "tips": [
+            "Direct access to Daimaru, Stellar Place, and the underground pedestrian walkway (Chi-Ka-Ho).",
+            "Best starting point to walk to Odori Park and Susukino underground during winter."
+          ],
+          "tips_es": [
+            "Acceso directo a Daimaru, Stellar Place y al paseo peatonal subterráneo (Chi-Ka-Ho).",
+            "El mejor punto de partida para caminar hacia el Parque Odori y Susukino de forma subterránea durante el invierno."
+          ],
+          "tips_ja": [
+            "大丸、ステラプレイス、および地下歩行空間（チ・カ・ホ）に直結しています。",
+            "冬場に大通公園やすすきの方面へ地下を通って移動する際の最適な出発点です。"
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "Chi-Ka-Ho Walkway: Sapporo has a massive underground pedestrian street (Chi-Ka-Ho) connecting Sapporo Station directly to Odori Park and Susukino. Essential in winter to stay warm and avoid snow.",
+          "text_es": "Paseo Subterráneo Chi-Ka-Ho: Sapporo cuenta con una enorme calle peatonal subterránea (Chi-Ka-Ho) que conecta la estación directamente con el Parque Odori y Susukino. Esencial en invierno para evitar la nieve y el frío.",
+          "text_ja": "地下歩行空間（チ・カ・ホ）：札幌駅から大通、すすきのまでを一直線に繋ぐ巨大な地下歩行空間があります。冬の積雪や寒さを避けて移動するのに必須のルートです。"
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "New Chitose Airport: The JR Rapid Airport service runs every 12 minutes, taking exactly 37 minutes to reach the airport from JR platforms.",
+          "text_es": "Aeropuerto de Nuevo Chitose: El servicio rápido de JR (Rapid Airport) sale cada 12 minutos y tarda exactamente 37 minutos desde los andenes de JR.",
+          "text_ja": "新千歳空港：JR快速エアポートが12分間隔で運行しており、JRホームから空港まで最速37分でアクセス可能です。"
+        }
+      ],
+      "svg_map": "sapporo.svg",
+      "svg_map_simplified": "sapporo_simple.svg"
+    },
+    {
+      "id": "hiroshima",
+      "name": "Hiroshima Station",
+      "name_ja": "広島駅",
+      "name_ja_romaji": "Hiroshima-eki",
+      "city": "Hiroshima",
+      "region": "chugoku",
+      "complexity": "medium",
+      "operators": [
+        {
+          "name": "JR West",
+          "name_ja": "JR西日本",
+          "lines": [
+            { "name": "Sanyo Shinkansen", "name_ja": "山陽新幹線", "color": "#0055A5", "platforms": ["11-14"], "directions": ["Shin-Osaka", "Tokyo", "Hakata"] },
+            { "name": "Sanyo Main Line", "name_ja": "山陽本線", "color": "#E60012", "platforms": ["1", "2"], "directions": ["Miyajimaguchi (for Miyajima Ferry)", "Iwakuni"] }
+          ]
+        },
+        {
+          "name": "Hiroden Trams",
+          "name_ja": "広島電鉄",
+          "lines": [
+            { "name": "Hiroden Tram System", "name_ja": "市内電車", "color": "#009944", "platforms": ["South Exit (1F)"], "directions": ["Genbaku-Dome-mae (Peace Park)", "Miyajimaguchi"] }
+          ]
+        }
+      ],
+      "exits": {
+        "south": {
+          "name": "South Exit (Minami-guchi)",
+          "name_es": "Salida Sur (Minami-guchi)",
+          "name_ja": "南口",
+          "landmarks": ["Hiroden Tram Station", "Ekie Shopping Mall", "Fukuya Dept Store"],
+          "best_for": ["sightseeing", "tram", "shopping"],
+          "time_to_surface": "2 min",
+          "tips": [
+            "Direct connection to the Hiroden streetcar (tram) station for going to the Peace Memorial Park and Miyajima Ferry.",
+            "The newly renovated Ekie Mall (1F/2F) offers famous local Hiroshima Okonomiyaki."
+          ],
+          "tips_es": [
+            "Conexión directa con la estación de tranvía Hiroden para ir al Parque de la Paz y al Ferry de Miyajima.",
+            "El centro comercial Ekie (1F/2F) ofrece el famoso Okonomiyaki estilo Hiroshima."
+          ],
+          "tips_ja": [
+            "平和記念公園や宮島フェリー方面へ向かう広電路面電車（トラム）乗り場に直結しています。",
+            "駅ビル「ekie」では、広島名物の「お好み焼き」が楽しめます。"
+          ]
+        },
+        "shinkansen": {
+          "name": "Shinkansen Exit (North)",
+          "name_es": "Salida Shinkansen (Norte)",
+          "name_ja": "新幹線口 (北口)",
+          "landmarks": ["Shinkansen Gates", "Airport Limousine Bus", "Hotel Granvia"],
+          "best_for": ["transit", "airport bus", "hotels"],
+          "time_to_surface": "1 min",
+          "tips": [
+            "Nearest exit to the Shinkansen gates.",
+            "Direct connection to the Limousine Bus to Hiroshima Airport (50 min ride)."
+          ],
+          "tips_es": [
+            "La salida más cercana a los tornos del Shinkansen.",
+            "Conexión directa con el autobús Limousine al Aeropuerto de Hiroshima (50 min de viaje)."
+          ],
+          "tips_ja": [
+            "新幹線改札口に最も近い出口です。",
+            "広島空港行きのリムジンバス乗り場（所要時間約50分）に直結しています。"
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "Hiroden Tram: To visit the Peace Memorial Park (Atomic Bomb Dome), walk out the South Exit and board Tram Route 2 or 6. Pay flat fare (¥220) in cash or IC card when exiting the tram.",
+          "text_es": "Tranvía Hiroden: Para visitar el Parque de la Paz (Cúpula de la Bomba Atómica), sal por la Salida Sur y toma la ruta 2 o 6. Paga tarifa plana (¥220) al salir con efectivo o tarjeta IC.",
+          "text_ja": "広電路面電車：平和記念公園（原爆ドーム）へは、南口を出て路面電車（2号線または6号線）に乗車します。運賃（一律220円）は降車時に現金またはICカードで支払います。"
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "Miyajima Access: Take the JR Sanyo Line (Platform 1) to Miyajimaguchi Station (26 mins), then walk 5 mins to the JR Ferry (fully covered by JR Pass) to reach Miyajima Island.",
+          "text_es": "Acceso a Miyajima: Toma la línea JR Sanyo (Andén 1) hasta la estación Miyajimaguchi (26 min), luego camina 5 min hacia el Ferry de JR (100% cubierto por el JR Pass) para llegar a la isla.",
+          "text_ja": "宮島へのアクセス：JR山陽本線（1番のりば）で宮島口駅まで乗車し（約26分）、フェリー乗り場まで徒歩5分。JRフェリー（JRパス利用可能）で宮島に渡ります。"
+        }
+      ],
+      "svg_map": "hiroshima.svg",
+      "svg_map_simplified": "hiroshima_simple.svg"
+    },
+    {
+      "id": "kobe_sannomiya",
+      "name": "Kobe (Sannomiya) Station",
+      "name_ja": "三ノ宮駅",
+      "name_ja_romaji": "Sannomiya-eki",
+      "city": "Kobe",
+      "region": "kansai",
+      "complexity": "medium",
+      "operators": [
+        {
+          "name": "JR West",
+          "name_ja": "JR西日本",
+          "lines": [
+            { "name": "JR Kobe Line", "name_ja": "JR神戸線", "color": "#0072BC", "platforms": ["1-4"], "directions": ["Osaka", "Kyoto", "Himeji"] }
+          ]
+        },
+        {
+          "name": "Hankyu Railway",
+          "name_ja": "阪急電鉄",
+          "lines": [
+            { "name": "Hankyu Kobe Line", "name_ja": "阪急神戸線", "color": "#800000", "platforms": ["1-4"], "directions": ["Osaka-Umeda"] }
+          ]
+        },
+        {
+          "name": "Hanshin Electric Railway",
+          "name_ja": "阪神電気鉄道",
+          "lines": [
+            { "name": "Hanshin Main Line", "name_ja": "阪神本線", "color": "#004499", "platforms": ["1-3"], "directions": ["Osaka-Umeda", "Koshien"] }
+          ]
+        },
+        {
+          "name": "Kobe New Transit",
+          "name_ja": "神戸新交通",
+          "lines": [
+            { "name": "Port Island Line (Port Liner)", "name_ja": "ポートアイランド線", "color": "#E60012", "platforms": ["2F Terminal"], "directions": ["Kobe Airport", "Port Island"] }
+          ]
+        }
+      ],
+      "exits": {
+        "east": {
+          "name": "East Exit (JR / Port Liner Link)",
+          "name_es": "Salida Este (JR / Port Liner Link)",
+          "name_ja": "東口",
+          "landmarks": ["Port Liner Station", "Mint Kobe", "Bus Terminal"],
+          "best_for": ["airport access", "buses", "shopping"],
+          "time_to_surface": "1 min",
+          "tips": [
+            "Best exit to transfer to the Port Liner for Kobe Airport (18 mins) or the main highway bus terminal.",
+            "Direct access to Mint Kobe shopping center."
+          ],
+          "tips_es": [
+            "La mejor salida para hacer transbordo al Port Liner hacia el Aeropuerto de Kobe (18 min) o a la terminal principal de autobuses de larga distancia.",
+            "Acceso directo al centro comercial Mint Kobe."
+          ],
+          "tips_ja": [
+            "神戸空港行きのポートライナー（所要時間約18分）や高速バスターミナルへの乗り換えに最適な出口です。",
+            "ミント神戸ショッピングセンターに直結しています。"
+          ]
+        },
+        "west": {
+          "name": "West Exit (Hankyu / Subway Link)",
+          "name_es": "Salida Oeste (Hankyu / Subway Link)",
+          "name_ja": "西口",
+          "landmarks": ["Hankyu Station", "Ikuta Road", "Subway Seishin-Yamate Line"],
+          "best_for": ["sightseeing", "dining", "nightlife"],
+          "time_to_surface": "2 min",
+          "tips": [
+            "Direct connection to the Hankyu Kobe-Sannomiya station.",
+            "Best exit to access the famous Sannomiya dining and nightlife area along Ikuta Road."
+          ],
+          "tips_es": [
+            "Conexión directa con la estación Hankyu Kobe-Sannomiya.",
+            "La mejor salida para acceder a la famosa zona de restaurantes y vida nocturna de Sannomiya a lo largo de Ikuta Road."
+          ],
+          "tips_ja": [
+            "阪急神戸三宮駅に直結しています。",
+            "生田ロード沿いの有名な飲食店街や夜の繁華街へのアクセスに最適な出口です。"
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "Station Cluster: Sannomiya is a massive cluster of separate stations operated by JR (Sannomiya), Hankyu, Hanshin, Port Liner, and Subway. Follow the overhead color-coded signage for easy transfers.",
+          "text_es": "Complejo de Sannomiya: Sannomiya es una enorme red de estaciones separadas operadas por JR West, Hankyu, Hanshin, Port Liner y el Metro. Sigue los letreros de colores para cambiar de línea.",
+          "text_ja": "駅の集合体：三宮は、JR西日本（三ノ宮駅）、阪急、阪神、ポートライナー、地下鉄の各駅が密集する巨大な集合体です。頭上の色分けされた案内表示に従って移動してください。"
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "Kobe Airport: Sannomiya is the sole rail connection to Kobe Airport. Walk to the elevated Port Liner terminal from the East Exit; trains reach the airport in 18 minutes.",
+          "text_es": "Aeropuerto de Kobe: Sannomiya es la única conexión de tren al aeropuerto. Camina a la terminal elevada del Port Liner desde la Salida Este; llega al aeropuerto en 18 minutos.",
+          "text_ja": "神戸空港：三宮は神戸空港への唯一の鉄道路線（ポートライナー）の始発駅です。東口から高架のポートライナー乗り場へ進み、空港まで最速18分でアクセス可能です。"
+        }
+      ],
+      "svg_map": "kobe_sannomiya.svg",
+      "svg_map_simplified": "kobe_sannomiya_simple.svg"
+    }
+  ]
+}

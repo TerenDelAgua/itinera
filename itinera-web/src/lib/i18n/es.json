@@ -123,7 +123,8 @@
     "place_form": {
         "name_placeholder": "Nombre del destino (ej. Kioto)",
         "start_date": "Fecha de inicio (Opcional)",
-        "end_date": "Fecha de fin (Opcional)"
+        "end_date": "Fecha de fin (Opcional)",
+        "city_placeholder": "Ciudad (ej. Tokyo, Kyoto, Fukuoka)"
     },
     "expenses": {
         "notes_placeholder": "Notas (opcional)...",
@@ -174,5 +175,40 @@
         "cheaper_individual": "Para este itinerario, billetes individuales son más económicos.",
         "fallback_note": "Estimado por orden de lugares. Añade fechas para precisión.",
         "closest_note": "Origen: {origin} (fecha aproximada)"
+    },
+    "station_guide": {
+        "section_title": "Guía de estación",
+        "badge_label": "{station} — {complexity}",
+        "complexity_low": "Guía de estación",
+        "complexity_medium": "Guía de estación",
+        "complexity_high": "Estación compleja",
+        "complexity_extreme": "Estación compleja",
+        "tabs_tips": "Consejos",
+        "tabs_exits": "Salidas",
+        "tabs_map": "Mapa",
+        "tip_category_navigation": "Navegación",
+        "tip_category_practical": "Práctico",
+        "tip_category_safety": "Seguridad",
+        "tip_category_cultural": "Cultural",
+        "priority_critical": "Crítico",
+        "priority_high": "Importante",
+        "priority_medium": "Útil saber",
+        "priority_low": "Extra",
+        "exit_time_to_surface": "{time} a superficie",
+        "exit_best_for": "Ideal para: {categories}",
+        "best_for_nightlife": "Vida nocturna y bares",
+        "best_for_shopping": "Compras y tiendas",
+        "best_for_hotels": "Hoteles y estancias",
+        "best_for_business": "Negocios y rascacielos",
+        "best_for_parks": "Parques y jardines",
+        "best_for_buses": "Autobuses y traslados al aeropuerto",
+        "best_for_day_trips": "Excursiones de un día",
+        "best_for_sightseeing": "Atracciones turísticas y monumentos",
+        "best_for_transit": "Conexiones ferroviarias",
+        "best_for_dining": "Restaurantes y comida local",
+        "map_placeholder": "Mapa de navegación lógica — Próximamente",
+        "map_placeholder_subtitle": "Estamos diseñando diagramas simplificados a medida para ayudarte a navegar por la estación de {station_name} sin esfuerzo. ¡Vuelve pronto!",
+        "map_insight_title": "Insight",
+        "map_insight_body": "No es un mapa satélite confuso. Es un diagrama lógico de orientación rápida para los 30 segundos críticos tras bajar del tren."
     }
 }

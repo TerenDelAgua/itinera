@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <!--
+    ========================================================================
+    SHINJUKU STATION SCHEMATIC MAP
+    Minimalist 2D transit map design
+    Philosophy: Clean, flat UI, high-contrast, optimized for mobile reading
+    ========================================================================
+  -->
+  <defs>
+    <!-- Crisp drop shadow for UI elements -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#1c1917" flood-opacity="0.12" filter-units="userSpaceOnUse" />
+    </filter>
+  </defs>
+
+  <!-- Layer 1: Background (transparent for dark/light mode compatibility) -->
+  <g id="background">
+    <rect width="800" height="600" fill="transparent" />
+  </g>
+
+  <!-- Layer 2: Connecting Corridors & Halls (soft beige tunnels) -->
+  <g id="connecting-paths">
+    <!-- Main underground concourse (East-West Connection) -->
+    <rect x="180" y="240" width="440" height="80" rx="10" fill="#f5ebd6" stroke="#e8dcc0" stroke-width="2" opacity="0.95" />
+
+    <!-- North-South Free Passage (connecting South Exit and East/West passages) -->
+    <rect x="330" y="140" width="80" height="340" rx="10" fill="#f5ebd6" stroke="#e8dcc0" stroke-width="2" opacity="0.95" />
+
+    <!-- Lumine Underground Mall Pathway -->
+    <line x1="200" y1="410" x2="600" y2="410" stroke="#e8dcc0" stroke-width="16" stroke-linecap="round" opacity="0.8" />
+  </g>
+
+  <!-- Layer 3: Operator Zones & Platforms -->
+  <!-- JR East Zone (Green Line / Yamanote & Chuo) -->
+  <g id="line-jr-east">
+    <!-- Yamanote Line Platform (P14/15) -->
+    <rect x="300" y="160" width="24" height="260" rx="12" fill="#9ACD32" stroke="#ffffff" stroke-width="2.5" filter="url(#shadow)" />
+    <!-- Chuo Line Platforms (P8/9) -->
+    <rect x="360" y="160" width="24" height="260" rx="12" fill="#F15A22" stroke="#ffffff" stroke-width="2.5" filter="url(#shadow)" />
+    <!-- Tracks -->
+    <line x1="292" y1="120" x2="292" y2="460" stroke="#9ACD32" stroke-width="3" opacity="0.5" stroke-linecap="round" />
+    <line x1="392" y1="120" x2="392" y2="460" stroke="#F15A22" stroke-width="3" opacity="0.5" stroke-linecap="round" />
+
+    <!-- Labels -->
+    <text x="312" y="150" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" fill="currentColor" text-anchor="middle">JR Yamanote</text>
+    <text x="372" y="150" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" fill="currentColor" text-anchor="middle">JR Chuo</text>
+  </g>
+
+  <!-- Odakyu Electric Railway (Blue) -->
+  <g id="line-odakyu">
+    <rect x="220" y="180" width="30" height="200" rx="15" fill="#1B9AD8" stroke="#ffffff" stroke-width="2.5" filter="url(#shadow)" />
+    <line x1="210" y1="140" x2="210" y2="420" stroke="#1B9AD8" stroke-width="3.5" opacity="0.5" stroke-linecap="round" />
+    <text x="235" y="170" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" fill="currentColor" text-anchor="middle">Odakyu</text>
+  </g>
+
+  <!-- Keio Corporation (Red) -->
+  <g id="line-keio">
+    <rect x="150" y="200" width="30" height="160" rx="15" fill="#DD2C00" stroke="#ffffff" stroke-width="2.5" filter="url(#shadow)" />
+    <line x1="140" y1="160" x2="140" y2="400" stroke="#DD2C00" stroke-width="3.5" opacity="0.5" stroke-linecap="round" />
+    <text x="165" y="190" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" fill="currentColor" text-anchor="middle">Keio</text>
+  </g>
+
+  <!-- Tokyo Metro Marunouchi Line (Red B1F) -->
+  <g id="line-marunouchi">
+    <rect x="230" y="80" width="320" height="30" rx="15" fill="#F62E36" stroke="#ffffff" stroke-width="2.5" filter="url(#shadow)" />
+    <text x="390" y="99" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.3">TOKYO METRO MARUNOUCHI LINE (B1F)</text>
+  </g>
+
+  <!-- Layer 4: Exit Pins -->
+  <g id="exits">
+    <!-- East Exit (Higashi-guchi) - Near Kabukicho / Golden Gai -->
+    <g id="exit-east" filter="url(#shadow)">
+      <circle cx="630" cy="280" r="22" fill="#e25c3d" stroke="#ffffff" stroke-width="3" />
+      <text x="630" y="287" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle">E</text>
+    </g>
+
+    <!-- West Exit (Nishi-guchi) - Near Gov Building / Skyscrapers -->
+    <g id="exit-west" filter="url(#shadow)">
+      <circle cx="100" cy="280" r="22" fill="#e25c3d" stroke="#ffffff" stroke-width="3" />
+      <text x="100" y="287" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle">W</text>
+    </g>
+
+    <!-- South Exit (Minami-guchi) - Near Busta Terminal -->
+    <g id="exit-south" filter="url(#shadow)">
+      <circle cx="370" cy="490" r="22" fill="#e25c3d" stroke="#ffffff" stroke-width="3" />
+      <text x="370" y="497" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle">S</text>
+    </g>
+  </g>
+
+  <!-- Layer 5: Labels & Warnings -->
+  <g id="labels" font-family="Inter, system-ui, -apple-system, sans-serif">
+    <!-- Title -->
+    <text x="40" y="48" font-size="22" font-weight="800" fill="currentColor" letter-spacing="-0.5">Shinjuku Station</text>
+    <text x="40" y="68" font-size="11" font-weight="600" fill="currentColor" opacity="0.6" letter-spacing="1.2">SCHEMATIC MAP • B1F / 1F</text>
+
+    <!-- Orientations (Aligned with Exit Pins for better balance and no clipping) -->
+    <text x="630" y="240" font-size="10" font-weight="700" fill="currentColor" opacity="0.6" letter-spacing="0.5" text-anchor="middle">EAST (KABUKICHO)</text>
+    <text x="100" y="240" font-size="10" font-weight="700" fill="currentColor" opacity="0.6" letter-spacing="0.5" text-anchor="middle">WEST (GOVERNMENT)</text>
+    <text x="370" y="534" font-size="10" font-weight="700" fill="currentColor" opacity="0.6" letter-spacing="0.5" text-anchor="middle">SOUTH (BUSTA TERMINAL)</text>
+
+    <!-- Warning: JR Gates isolation -->
+    <g id="gate-warning">
+      <rect x="470" y="468" width="220" height="36" rx="8" fill="#FEE2E2" stroke="#ef4444" stroke-width="1.5" filter="url(#shadow)" />
+      <text x="482" y="487" font-size="10" font-weight="700" fill="#991B1B">⚠ SEPARATE GATES</text>
+      <text x="482" y="498" font-size="9" font-weight="600" fill="#DC2626">JR &amp; Odakyu do not connect inside</text>
+    </g>
+  </g>
+
+  <!-- Layer 6: Legend -->
+  <g id="legend" font-family="Inter, system-ui, -apple-system, sans-serif">
+    <text x="40" y="540" font-size="11" font-weight="700" fill="currentColor" letter-spacing="0.8">LEGEND</text>
+
+    <circle cx="48" cy="558" r="6" fill="#9ACD32" />
+    <text x="62" y="561" font-size="10" font-weight="600" fill="currentColor">JR Yamanote</text>
+
+    <circle cx="160" cy="558" r="6" fill="#F15A22" />
+    <text x="174" y="561" font-size="10" font-weight="600" fill="currentColor">JR Chuo</text>
+
+    <circle cx="250" cy="558" r="6" fill="#1B9AD8" />
+    <text x="264" y="561" font-size="10" font-weight="600" fill="currentColor">Odakyu Line</text>
+
+    <circle cx="360" cy="558" r="6" fill="#DD2C00" />
+    <text x="374" y="561" font-size="10" font-weight="600" fill="currentColor">Keio Line</text>
+
+    <circle cx="460" cy="558" r="6" fill="#f5ebd6" stroke="#e8dcc0" stroke-width="1.5" />
+    <text x="474" y="561" font-size="10" font-weight="600" fill="currentColor">Passage</text>
+  </g>
+</svg>

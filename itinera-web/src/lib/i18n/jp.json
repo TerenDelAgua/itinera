@@ -123,7 +123,8 @@
     "place_form": {
         "name_placeholder": "目的地名（例：京都）",
         "start_date": "開始日（任意）",
-        "end_date": "終了日（任意）"
+        "end_date": "終了日（任意）",
+        "city_placeholder": "都市名（例：東京、京都、福岡）"
     },
     "expenses": {
         "notes_placeholder": "メモ（任意）...",
@@ -174,5 +175,40 @@
         "cheaper_individual": "この旅程では、個別チケットの方が安くなります。",
         "fallback_note": "場所の順序による推定です。日付を追加すると精度が上がります。",
         "closest_note": "出発地: {origin} (概算日)"
+    },
+    "station_guide": {
+        "section_title": "駅ガイド",
+        "badge_label": "{station} — {complexity}",
+        "complexity_low": "駅ガイド",
+        "complexity_medium": "駅ガイド",
+        "complexity_high": "複雑な駅",
+        "complexity_extreme": "複雑な駅",
+        "tabs_tips": "ヒント",
+        "tabs_exits": "出口",
+        "tabs_map": "地図",
+        "tip_category_navigation": "ナビゲーション",
+        "tip_category_practical": "実用情報",
+        "tip_category_safety": "安全情報",
+        "tip_category_cultural": "マナー・文化",
+        "priority_critical": "重要",
+        "priority_high": "重要",
+        "priority_medium": "知っておくと便利",
+        "priority_low": "その他",
+        "exit_time_to_surface": "地上まで{time}",
+        "exit_best_for": "おすすめ：{categories}",
+        "best_for_nightlife": "夜遊び・バー",
+        "best_for_shopping": "ショッピング・デパート",
+        "best_for_hotels": "ホテル・宿泊",
+        "best_for_business": "ビジネス・高層ビル群",
+        "best_for_parks": "公園・庭園",
+        "best_for_buses": "バス・空港アクセス",
+        "best_for_day_trips": "日帰り旅行",
+        "best_for_sightseeing": "観光・歴史的建造物",
+        "best_for_transit": "乗り換え・鉄道接続",
+        "best_for_dining": "飲食店・ローカルフード",
+        "map_placeholder": "構内案内マップ — 近日公開",
+        "map_placeholder_subtitle": "現在、{station_name}をスムーズに移動できるよう、カスタムの簡易マップを準備しています。公開をお待ちください！",
+        "map_insight_title": "解説",
+        "map_insight_body": "複雑な衛星画像マップではありません。降車直後の最も重要な30秒間で素早く目的地を把握するための、論理的に簡略化された案内図です。"
     }
 }

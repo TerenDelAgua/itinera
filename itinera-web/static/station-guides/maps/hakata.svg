@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <!--
+    ========================================================================
+    HAKATA STATION SCHEMATIC MAP
+    Minimalist 2D transit map design
+    Philosophy: Clean, flat UI, high-contrast, optimized for mobile reading
+    ========================================================================
+  -->
+  <defs>
+    <!-- Crisp drop shadow for UI elements -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#1c1917" flood-opacity="0.12" filter-units="userSpaceOnUse" />
+    </filter>
+
+    <!-- Gradient for Airport Subway connection -->
+    <linearGradient id="airport-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFA500" />
+      <stop offset="100%" stop-color="#3b82f6" />
+    </linearGradient>
+  </defs>
+
+  <!-- Layer 1: Background (transparent for dark/light mode compatibility) -->
+  <g id="background">
+    <rect width="800" height="600" fill="transparent" />
+  </g>
+
+  <!-- Layer 2: Connecting Corridors & Pedestrian Halls -->
+  <g id="connecting-paths">
+    <!-- Main Station Concourse (1F Central Passage) -->
+    <rect x="160" y="240" width="360" height="70" rx="10" fill="#f5ebd6" stroke="#e8dcc0" stroke-width="2" opacity="0.95" />
+
+    <!-- Underground Subway Transfer Hall (B2F/B3F Area) -->
+    <rect x="140" y="350" width="220" height="130" rx="10" fill="#f5ebd6" stroke="#e8dcc0" stroke-width="1.5" opacity="0.9" />
+
+    <!-- Escalator Shaft connection from 1F Concourse to B2F Subway -->
+    <line x1="240" y1="280" x2="240" y2="380" stroke="#e8dcc0" stroke-width="14" stroke-linecap="round" opacity="0.8" />
+  </g>
+
+  <!-- Layer 3: Operator Zones & Platforms -->
+  <!-- 1. JR West / JR Kyushu Shinkansen (Elevated 2F/3F - Platforms 11-16) -->
+  <g id="line-shinkansen">
+    <rect x="440" y="140" width="36" height="240" rx="18" fill="#E60012" stroke="#ffffff" stroke-width="2.5" filter="url(#shadow)" />
+    <line x1="430" y1="100" x2="430" y2="400" stroke="#E60012" stroke-width="3" opacity="0.5" stroke-linecap="round" />
+    <text x="458" y="260" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" fill="#ffffff" text-anchor="middle" transform="rotate(-90 458 260)" letter-spacing="0.5">SHINKANSEN</text>
+    <text x="458" y="160" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="8" font-weight="800" fill="#ffffff" text-anchor="middle">P11-16</text>
+  </g>
+
+  <!-- 2. JR Kyushu Conventional Lines (1F/2F) -->
+  <!-- Kagoshima Main Line (Red - Platforms 1-4) -->
+  <g id="line-kagoshima">
+    <rect x="360" y="160" width="28" height="200" rx="14" fill="#E60012" stroke="#ffffff" stroke-width="2.5" filter="url(#shadow)" />
+    <line x1="350" y1="120" x2="350" y2="390" stroke="#E60012" stroke-width="3.5" opacity="0.45" stroke-linecap="round" />
+    <text x="374" y="260" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="8" font-weight="700" fill="#ffffff" text-anchor="middle" transform="rotate(-90 374 260)">KAGOSHIMA MAIN</text>
+    <text x="374" y="180" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="8" font-weight="800" fill="#ffffff" text-anchor="middle">P1-4</text>
+  </g>
+
+  <!-- Fukuhoku Yutaka Line (Yellow - Platform 8) -->
+  <g id="line-fukuhoku">
+    <rect x="412" y="180" width="16" height="120" rx="8" fill="#ECE51B" stroke="#ffffff" stroke-width="1.5" filter="url(#shadow)" />
+    <text x="422" y="240" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="6" font-weight="800" fill="#1c1917" text-anchor="middle" transform="rotate(-90 422 240)">FUKUHOKU P8</text>
+  </g>
+
+  <!-- 3. Fukuoka City Subway (Underground B2F/B3F) -->
+  <!-- Kuko (Airport) Line (Orange - B2F) -->
+  <g id="line-subway-kuko">
+    <rect x="80" y="384" width="320" height="26" rx="13" fill="#FFA500" stroke="#ffffff" stroke-width="2" filter="url(#shadow)" />
+    <text x="240" y="400" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.3">KUKO (AIRPORT) LINE (B2F)</text>
+  </g>
+
+  <!-- Nanakuma Line (Light Blue - B3F Extension) -->
+  <g id="line-subway-nanakuma">
+    <rect x="80" y="434" width="320" height="26" rx="13" fill="#00A0E9" stroke="#ffffff" stroke-width="2" filter="url(#shadow)" />
+    <text x="240" y="450" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.3">NANAKUMA LINE (B3F)</text>
+  </g>
+
+  <!-- Layer 4: Exit Pins -->
+  <g id="exits">
+    <!-- Hakata Exit (West - Near Canal City / Bus Terminal) -->
+    <g id="exit-west" filter="url(#shadow)">
+      <circle cx="100" cy="275" r="22" fill="#e25c3d" stroke="#ffffff" stroke-width="3" />
+      <text x="100" y="282" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle">W</text>
+    </g>
+
+    <!-- Chikushi Exit (East - Shinkansen Side) -->
+    <g id="exit-east" filter="url(#shadow)">
+      <circle cx="560" cy="275" r="22" fill="#e25c3d" stroke="#ffffff" stroke-width="3" />
+      <text x="560" y="282" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle">E</text>
+    </g>
+  </g>
+
+  <!-- Layer 5: Labels & Warnings -->
+  <g id="labels" font-family="Inter, system-ui, -apple-system, sans-serif">
+    <!-- Title -->
+    <text x="40" y="48" font-size="22" font-weight="800" fill="currentColor" letter-spacing="-0.5">Hakata Station</text>
+    <text x="40" y="68" font-size="11" font-weight="600" fill="currentColor" opacity="0.6" letter-spacing="1.2">SCHEMATIC MAP • B3F TO 3F</text>
+
+    <!-- Orientations (Symmetrically aligned above their exit pins) -->
+    <text x="100" y="235" font-size="10" font-weight="700" fill="currentColor" opacity="0.6" letter-spacing="0.5" text-anchor="middle">HAKATA EXIT (WEST / CANAL CITY)</text>
+    <text x="560" y="235" font-size="10" font-weight="700" fill="currentColor" opacity="0.6" letter-spacing="0.5" text-anchor="middle">CHIKUSHI EXIT (EAST / SHINKANSEN)</text>
+
+    <!-- Airport Proximity Card -->
+    <g id="airport-proximity">
+      <rect x="460" y="420" width="220" height="46" rx="8" fill="#EFF6FF" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)" />
+      <text x="472" y="438" font-size="9" font-weight="700" fill="#1E40AF">✈ FUKUOKA AIRPORT</text>
+      <text x="472" y="449" font-size="8" font-weight="600" fill="#2563EB">Super close! Only 5-minute subway</text>
+      <text x="472" y="458" font-size="8" font-weight="600" fill="#2563EB">ride (2 stops) on Kuko Line (B2F).</text>
+    </g>
+  </g>
+
+  <!-- Layer 6: Legend -->
+  <g id="legend" font-family="Inter, system-ui, -apple-system, sans-serif">
+    <text x="40" y="540" font-size="11" font-weight="700" fill="currentColor" letter-spacing="0.8">LEGEND</text>
+
+    <circle cx="48" cy="558" r="6" fill="#E60012" />
+    <text x="62" y="561" font-size="10" font-weight="600" fill="currentColor">JR Shinkansen / Kagoshima</text>
+
+    <circle cx="230" cy="558" r="6" fill="#ECE51B" stroke="#d4cb00" stroke-width="1" />
+    <text x="244" y="561" font-size="10" font-weight="600" fill="currentColor">Fukuhoku Yutaka</text>
+
+    <circle cx="360" cy="558" r="6" fill="#FFA500" />
+    <text x="374" y="561" font-size="10" font-weight="600" fill="currentColor">Kuko Subway (B2F)</text>
+
+    <circle cx="490" cy="558" r="6" fill="#00A0E9" />
+    <text x="504" y="561" font-size="10" font-weight="600" fill="currentColor">Nanakuma Subway (B3F)</text>
+
+    <circle cx="630" cy="558" r="6" fill="#f5ebd6" stroke="#e8dcc0" stroke-width="1.5" />
+    <text x="644" y="561" font-size="10" font-weight="600" fill="currentColor">Passage</text>
+  </g>
+</svg>
