@@ -9,6 +9,7 @@
     startDate = $bindable(),
     endDate = $bindable(),
     defaultCurrency = $bindable(),
+    city = $bindable(),
     currencyFallbackLabel,
     allowInheritCurrency = false,
     iconType = "trip",
@@ -23,6 +24,7 @@
     startDate?: string;
     endDate?: string;
     defaultCurrency: string | undefined;
+    city?: string;
     currencyFallbackLabel?: string;
     allowInheritCurrency?: boolean;
     iconType?: "trip" | "place";
@@ -140,6 +142,21 @@
           {#if durationLabel}
             <span class="opacity-70 mx-1">·</span>
             <span class="text-teren-text-main font-medium">{durationLabel}</span>
+          {/if}
+
+          {#if iconType === "place"}
+            <span class="opacity-70 mx-1">·</span>
+            <div class="relative flex items-center group px-2 py-0.5 rounded-md bg-teren-primary-subtle hover:bg-teren-primary/15 border border-teren-primary/20 transition-all gap-1">
+              <span class="select-none text-[11px] opacity-80">🏙️</span>
+              <input
+                type="text"
+                bind:value={city}
+                onblur={onSave}
+                onkeydown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+                placeholder={$t("place_form.city_placeholder" as any) || "City"}
+                class="bg-transparent border-none p-0 focus:ring-0 text-[11px] font-bold text-teren-text-main outline-none w-20 group-hover:text-teren-primary transition"
+              />
+            </div>
           {/if}
 
           <div class="relative">

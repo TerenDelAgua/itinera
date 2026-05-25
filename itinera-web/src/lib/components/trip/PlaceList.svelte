@@ -23,26 +23,29 @@
     name: "",
     start_date: "",
     end_date: "",
+    city: "",
   });
 
   async function createPlace() {
     if (!newPlaceDraft.name) return;
     isSaving = true;
     try {
-      const payload: { name: string; start_date?: string; end_date?: string } = {
+      const payload: { name: string; start_date?: string; end_date?: string; city?: string } = {
         name: newPlaceDraft.name,
       };
       if (newPlaceDraft.start_date)
         payload.start_date = new Date(newPlaceDraft.start_date).toISOString();
       if (newPlaceDraft.end_date)
         payload.end_date = new Date(newPlaceDraft.end_date).toISOString();
+      if (newPlaceDraft.city.trim())
+        payload.city = newPlaceDraft.city.trim();
 
       const created = await apiFetch<Place>(`/trips/${tripId}/places`, {
         method: "POST",
         body: JSON.stringify(payload),
       });
       Events.placeCreated(tripId, created.id, created.name);
-      newPlaceDraft = { name: "", start_date: "", end_date: "" };
+      newPlaceDraft = { name: "", start_date: "", end_date: "", city: "" };
       onRefresh();
     } catch (err) {
       console.error("Error creating place:", err);
@@ -131,6 +134,21 @@
           </div>
         </div>
 
+        <!-- ROW 3: City (optional but highly emphasized) -->
+        <div class="relative flex items-center border-b border-teren-border/50 group">
+          <span class="absolute left-3.5 text-teren-text-muted group-focus-within:text-teren-primary transition-colors pointer-events-none text-sm select-none">
+            🏙️
+          </span>
+          <input
+            id="new-place-city"
+            type="text"
+            bind:value={newPlaceDraft.city}
+            placeholder={$t("place_form.city_placeholder" as any) || "City (e.g. Tokyo, Kyoto, Fukuoka)"}
+            onkeydown={(e) => e.key === "Enter" && createPlace()}
+            class="w-full h-11 pl-10 pr-3 bg-transparent text-sm text-teren-text-main focus:outline-none placeholder:text-teren-text-muted/30"
+          />
+        </div>
+
         <!-- ROW 3: Submit -->
         <div class="flex justify-end px-3 py-2">
           <button
@@ -171,18 +189,25 @@
     </div>
   {:else}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {#each places as place (place.id)}
-        <a
-          href={resolve(`/trips/${tripId}/places/${place.id}`)}
-          class="group block bg-teren-surface p-5 rounded-xl border border-teren-border hover:border-teren-primary/30 hover:shadow-md transition-all cursor-pointer relative"
+      {#each places as place, idx (place.id)}
+        <div
+          class="group bg-teren-surface p-5 rounded-xl border border-teren-border hover:border-teren-primary/30 hover:shadow-md transition-all relative flex flex-col gap-3.5"
         >
-          <div class="flex flex-col gap-1">
-            <div class="flex items-center gap-2 pr-8">
+          <a
+            href={resolve(`/trips/${tripId}/places/${place.id}`)}
+            class="flex flex-col gap-1 focus:outline-none"
+          >
+            <div class="flex items-center gap-2 pr-8 flex-wrap">
               <h3
                 class="text-lg font-semibold text-teren-text-main group-hover:text-teren-primary-hover transition-colors"
               >
                 {place.name}
               </h3>
+              {#if place.city}
+                <span class="text-xs text-teren-text-muted font-bold bg-teren-background px-1.5 py-0.5 rounded">
+                  {place.city}
+                </span>
+              {/if}
               {#if place.default_expense_currency}
                 <span
                   class="inline-flex items-center px-2 py-0.5 rounded-full bg-teren-primary-subtle text-teren-primary text-[11px] font-bold border border-teren-primary/15"
@@ -229,15 +254,16 @@
                 </div>
               {/if}
             </div>
-          </div>
+          </a>
 
+          <!-- Delete Button (absolute positioned relative to container div) -->
           <button
             onclick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               onRequestDelete(place.id);
             }}
-            class="absolute top-3 right-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-error-base/70 hover:text-error-base p-2 rounded-lg hover:bg-error-subtle transition active:scale-95"
+            class="absolute top-3 right-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-error-base/70 hover:text-error-base p-2 rounded-lg hover:bg-error-subtle transition active:scale-95 cursor-pointer z-10"
             aria-label="Delete place"
           >
             <svg
@@ -255,7 +281,7 @@
               />
             </svg>
           </button>
-        </a>
+        </div>
       {/each}
     </div>
   {/if}
