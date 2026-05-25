@@ -1,11 +1,10 @@
 <!-- StationGuide.svelte -->
 <script lang="ts">
-  import { fly, slide } from 'svelte/transition';
+  import { fade, slide } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
   import {
     findStationGuide,
     getTipsByPriority,
-    getComplexityColor,
     type StationGuide
   } from '$lib/services/stationGuide';
   import { t } from '$lib/i18n/store';
@@ -35,6 +34,14 @@
     if (!guide) return '';
     return $t(`station_guide.complexity_${guide.complexity}` as any);
   });
+
+  // Complexity visual styling tokens aligned to design system 3.12 (WCAG AA/AAA compliant)
+  const complexityStyles: Record<StationGuide['complexity'], string> = {
+    low: 'bg-[#D1FAE5] text-[#065F46] border-[#065F46]/20',
+    medium: 'bg-[#DBEAFE] text-[#1E40AF] border-[#1E40AF]/20',
+    high: 'bg-[#FEF3C7] text-[#92400E] border-[#92400E]/20',
+    extreme: 'bg-[#FEE2E2] text-[#991B1B] border-[#991B1B]/20'
+  };
 </script>
 
 {#if guide}
@@ -90,8 +97,7 @@
 
           <!-- Complexity tag -->
           <span
-            class="text-[9px] font-black tracking-widest uppercase px-2.5 py-1 rounded-full border shadow-sm select-none"
-            style="background-color: {getComplexityColor(guide.complexity)}10; border-color: {getComplexityColor(guide.complexity)}40; color: {getComplexityColor(guide.complexity)};"
+            class="text-[11px] font-bold tracking-[0.05em] uppercase px-[10px] py-[4px] rounded-full border shadow-sm select-none {complexityStyles[guide.complexity]}"
           >
             {guide.complexity}
           </span>
@@ -124,14 +130,15 @@
         {/if}
 
         <!-- Tab switches -->
-        <div class="flex border-b border-teren-border/75 pt-1" role="tablist">
+        <div class="flex gap-1 border-b border-teren-border/75 pt-1" role="tablist">
           <button
             type="button"
             role="tab"
             aria-selected={activeTab === 'tips'}
-            class="flex-1 text-center py-2.5 border-b-2 font-bold text-xs tracking-wider uppercase transition-all duration-300 focus:outline-none cursor-pointer"
+            class="flex-1 text-center min-h-[40px] flex items-center justify-center border-b-2 font-bold text-xs tracking-wider uppercase transition-all duration-200 ease-out focus:outline-none cursor-pointer hover:bg-teren-interactive-hover hover:text-teren-text-main"
             class:border-teren-primary={activeTab === 'tips'}
             class:text-teren-primary={activeTab === 'tips'}
+            class:bg-transparent={activeTab === 'tips'}
             class:border-transparent={activeTab !== 'tips'}
             class:text-teren-text-muted={activeTab !== 'tips'}
             onclick={(e) => { e.preventDefault(); e.stopPropagation(); activeTab = 'tips'; }}
@@ -142,9 +149,10 @@
             type="button"
             role="tab"
             aria-selected={activeTab === 'exits'}
-            class="flex-1 text-center py-2.5 border-b-2 font-bold text-xs tracking-wider uppercase transition-all duration-300 focus:outline-none cursor-pointer"
+            class="flex-1 text-center min-h-[40px] flex items-center justify-center border-b-2 font-bold text-xs tracking-wider uppercase transition-all duration-200 ease-out focus:outline-none cursor-pointer hover:bg-teren-interactive-hover hover:text-teren-text-main"
             class:border-teren-primary={activeTab === 'exits'}
             class:text-teren-primary={activeTab === 'exits'}
+            class:bg-transparent={activeTab === 'exits'}
             class:border-transparent={activeTab !== 'exits'}
             class:text-teren-text-muted={activeTab !== 'exits'}
             onclick={(e) => { e.preventDefault(); e.stopPropagation(); activeTab = 'exits'; }}
@@ -155,9 +163,10 @@
             type="button"
             role="tab"
             aria-selected={activeTab === 'map'}
-            class="flex-1 text-center py-2.5 border-b-2 font-bold text-xs tracking-wider uppercase transition-all duration-300 focus:outline-none cursor-pointer"
+            class="flex-1 text-center min-h-[40px] flex items-center justify-center border-b-2 font-bold text-xs tracking-wider uppercase transition-all duration-200 ease-out focus:outline-none cursor-pointer hover:bg-teren-interactive-hover hover:text-teren-text-main"
             class:border-teren-primary={activeTab === 'map'}
             class:text-teren-primary={activeTab === 'map'}
+            class:bg-transparent={activeTab === 'map'}
             class:border-transparent={activeTab !== 'map'}
             class:text-teren-text-muted={activeTab !== 'map'}
             onclick={(e) => { e.preventDefault(); e.stopPropagation(); activeTab = 'map'; }}
@@ -169,19 +178,19 @@
         <!-- Rendered Tab Panels -->
         <div class="mt-2 min-h-[140px] flex flex-col gap-3">
           {#if activeTab === 'tips'}
-            <div class="flex flex-col gap-3" role="tabpanel" in:fly={{ y: 8, duration: 200, delay: 100 }}>
+            <div class="flex flex-col gap-3" role="tabpanel" in:fade={{ duration: 150 }}>
               {#each tips as tip}
                 <TipItem {tip} {locale} />
               {/each}
             </div>
           {:else if activeTab === 'exits'}
-            <div class="grid grid-cols-1 gap-3" role="tabpanel" in:fly={{ y: 8, duration: 200, delay: 100 }}>
+            <div class="grid grid-cols-1 gap-3" role="tabpanel" in:fade={{ duration: 150 }}>
               {#each Object.entries(guide.exits) as [key, exit]}
                 <ExitCard {exit} exitKey={key} {locale} />
               {/each}
             </div>
           {:else if activeTab === 'map'}
-            <div role="tabpanel" in:fly={{ y: 8, duration: 200, delay: 100 }}>
+            <div role="tabpanel" in:fade={{ duration: 150 }}>
               <StationMap stationId={guide.id} stationName={guide.name} />
             </div>
           {/if}
