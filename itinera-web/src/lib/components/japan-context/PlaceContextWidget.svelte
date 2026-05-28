@@ -26,9 +26,9 @@
     >
       <span class="text-sm font-semibold flex items-center gap-2.5">
         {#if rules.length === 1}
-          {$t("japan_context.ui.cultural_tip" as any, { count: "1" })}
+          {$t("japan_context.ui.cultural_tip_singular" as any)}
         {:else}
-          {$t("japan_context.ui.cultural_tip" as any, {
+          {$t("japan_context.ui.cultural_tips_plural" as any, {
             count: rules.length.toString(),
           })}
         {/if}

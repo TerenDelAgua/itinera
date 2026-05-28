@@ -215,7 +215,11 @@
     "ui": {
       "useful_phrases": "🗣️ 便利なフレーズ",
       "tips_count": "🎌 {count} ヒント",
+      "tip_singular": "🎌 1つのヒント",
+      "tips_plural": "🎌 {count}つのヒント",
       "cultural_tip": "🎌 1 文化的なヒント",
+      "cultural_tip_singular": "🎌 1つの文化的なヒント",
+      "cultural_tips_plural": "🎌 {count}つの文化的なヒント",
       "more_tips": "他 {count}",
       "category_restaurant": "🍜 レストラン",
       "category_transport": "🚆 交通機関",

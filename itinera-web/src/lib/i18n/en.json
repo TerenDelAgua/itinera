@@ -215,7 +215,11 @@
     "ui": {
       "useful_phrases": "🗣️ Useful Phrases",
       "tips_count": "🎌 {count} tips",
+      "tip_singular": "🎌 1 tip",
+      "tips_plural": "🎌 {count} tips",
       "cultural_tip": "🎌 {count} cultural tip",
+      "cultural_tip_singular": "🎌 1 cultural tip",
+      "cultural_tips_plural": "🎌 {count} cultural tips",
       "more_tips": "+{count} more",
       "category_restaurant": "🍜 Restaurant",
       "category_transport": "🚆 Transport",

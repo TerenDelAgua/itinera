@@ -38,9 +38,13 @@
         class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors bg-teren-primary-subtle border border-teren-primary/30 text-teren-primary-hover self-start cursor-pointer hover:bg-teren-primary/10 active:scale-95"
       >
         <span class="text-xs">
-          {$t("japan_context.ui.tips_count" as any, {
-            count: rules.length.toString(),
-          })}
+          {#if rules.length === 1}
+            {$t("japan_context.ui.tip_singular" as any)}
+          {:else}
+            {$t("japan_context.ui.tips_plural" as any, {
+              count: rules.length.toString(),
+            })}
+          {/if}
         </span>
         <svg
           class="w-3.5 h-3.5 transition-transform duration-200 {isExpanded
