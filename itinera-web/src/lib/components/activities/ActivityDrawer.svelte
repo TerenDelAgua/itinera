@@ -8,12 +8,19 @@
   import { SvelteMap, SvelteSet, SvelteDate } from "svelte/reactivity";
   import ConfirmModal from "$lib/components/utils/ConfirmModal.svelte";
   import { activityApi } from "$lib/api/activity";
-  import { t } from "$lib/i18n/store";
+  import { t, locale } from "$lib/i18n/store";
 
-  let { isOpen, tripId, placeId, tripStart, tripEnd, activities = [], defaultDate, onRefresh, onClose } = $props<{
+  // Japan Context imports
+  import ClimateBadge from "$lib/components/japan-context/ClimateBadge.svelte";
+  import TipBadge from "$lib/components/japan-context/TipBadge.svelte";
+  import { getClimate, shouldShowClimate, getRulesForActivity, type ClimateDisplay } from "$lib/services/japanContext";
+
+  let { isOpen, tripId, placeId, city, places, tripStart, tripEnd, activities = [], defaultDate, onRefresh, onClose } = $props<{
     isOpen: boolean;
     tripId: string;
     placeId?: string;
+    city?: string;
+    places?: any[];
     tripStart?: string;
     tripEnd?: string;
     activities: Activity[];
@@ -28,6 +35,8 @@
 
   let activityToDelete = $state<Activity | null>(null);
   let editingActivityId = $state<string | null>(null);
+
+  let currentLocale = $derived($locale);
 
   async function handleDeleteConfirm() {
     if (!activityToDelete) return;
@@ -66,6 +75,29 @@
       collapsedSections.add(date);
     }
   }
+
+  let dailyClimates = $state<Record<string, ClimateDisplay>>({});
+
+  $effect(() => {
+    if (isOpen && (city || places?.length) && tripStart && tripEnd) {
+      for (const date of grouped.keys()) {
+        if (shouldShowClimate(date, tripStart, tripEnd) && !dailyClimates[date]) {
+          let resolvedCity = city;
+          if (!resolvedCity && places) {
+            const matchedPlace = places.find((p: any) => p.start_date && p.end_date && date >= p.start_date.split('T')[0] && date <= p.end_date.split('T')[0]);
+            if (matchedPlace) {
+              resolvedCity = matchedPlace.city;
+            }
+          }
+          if (resolvedCity) {
+            getClimate(resolvedCity, date).then(c => {
+              if (c) dailyClimates[date] = c;
+            });
+          }
+        }
+      }
+    }
+  });
 
   let wasOpen = false;
   $effect(() => {
@@ -157,6 +189,9 @@
               </span>
 
               <div class="flex items-center gap-2">
+                {#if dailyClimates[date]}
+                  <ClimateBadge climate={dailyClimates[date]} />
+                {/if}
                 {#if isCollapsed(date)}
                   <span
                     class="text-xs text-teren-text-muted group-hover:text-teren-primary transition-colors"
@@ -191,6 +226,7 @@
                 transition:slide={{ duration: 200, easing: cubicOut }}
               >
                 {#each acts as activity (activity.id)}
+                  {@const rules = getRulesForActivity(activity.title, activity.notes, currentLocale)}
                   {#if editingActivityId === activity.id}
                     <div class="py-3" transition:slide>
                       <ActivityQuickAdd
@@ -209,67 +245,75 @@
                   {:else}
                     <div
                       onclick={() => (editingActivityId = activity.id)}
-                      class="flex items-start gap-4 py-3 hover:bg-teren-background/50 transition-colors cursor-pointer group"
+                      class="py-3 hover:bg-teren-background/50 transition-colors cursor-pointer group flex flex-col gap-2 rounded-lg px-2 -mx-2"
                     >
-                      <div class="w-14 text-right shrink-0 pt-0.5">
-                        {#if activity.time}
-                          <span
-                            class="text-xs font-mono font-medium text-teren-text-muted tabular-nums"
-                            >{activity.time}</span
+                      <div class="flex items-start gap-4 w-full">
+                        <div class="w-14 text-right shrink-0 pt-0.5">
+                          {#if activity.time}
+                            <span
+                              class="text-xs font-mono font-medium text-teren-text-muted tabular-nums"
+                              >{activity.time}</span
+                            >
+                          {:else}
+                            <span
+                              class="text-[10px] text-teren-text-muted/50 uppercase tracking-wider"
+                              >All day</span
+                            >
+                          {/if}
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                          <h4
+                            class="text-sm font-semibold text-teren-text-main leading-snug truncate"
                           >
-                        {:else}
-                          <span
-                            class="text-[10px] text-teren-text-muted/50 uppercase tracking-wider"
-                            >All day</span
+                            {activity.title}
+                          </h4>
+                          {#if activity.notes}
+                            <p
+                              class="text-xs text-teren-text-muted mt-0.5 italic line-clamp-2"
+                            >
+                              {activity.notes}
+                            </p>
+                          {/if}
+                          {#if activity.place_id}
+                            <span
+                              class="inline-block mt-1.5 text-[10px] font-medium text-teren-primary bg-teren-primary-subtle px-2 py-0.5 rounded-full"
+                            >
+                              Local Activity
+                            </span>
+                          {/if}
+                        </div>
+
+                        <!-- Delete Action -->
+                        <button
+                          onclick={(e) => {
+                            e.stopPropagation();
+                            activityToDelete = activity;
+                          }}
+                          class="p-2 text-error-base/70 hover:text-error-base hover:bg-error-subtle rounded-lg transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                          aria-label="Delete activity"
+                        >
+                          <svg
+                            class="w-4 h-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
                           >
-                        {/if}
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </button>
                       </div>
 
-                      <div class="flex-1 min-w-0">
-                        <h4
-                          class="text-sm font-semibold text-teren-text-main leading-snug truncate"
-                        >
-                          {activity.title}
-                        </h4>
-                        {#if activity.notes}
-                          <p
-                            class="text-xs text-teren-text-muted mt-0.5 italic line-clamp-2"
-                          >
-                            {activity.notes}
-                          </p>
-                        {/if}
-                        {#if activity.place_id}
-                          <span
-                            class="inline-block mt-1.5 text-[10px] font-medium text-teren-primary bg-teren-primary-subtle px-2 py-0.5 rounded-full"
-                          >
-                            Local Activity
-                          </span>
-                        {/if}
-                      </div>
-
-                      <!-- Delete Action -->
-                      <button
-                        onclick={(e) => {
-                          e.stopPropagation();
-                          activityToDelete = activity;
-                        }}
-                        class="p-2 text-error-base/70 hover:text-error-base hover:bg-error-subtle rounded-lg transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-                        aria-label="Delete activity"
-                      >
-                        <svg
-                          class="w-4 h-4"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
-                      </button>
+                      {#if rules.length > 0}
+                        <div class="w-full">
+                          <TipBadge {rules} />
+                        </div>
+                      {/if}
                     </div>
                   {/if}
                 {/each}
