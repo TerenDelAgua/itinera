@@ -16,6 +16,7 @@ interface OpenMeteoResponse {
         weather_code: number;
     };
     daily: {
+        time: string[];
         temperature_2m_max: number[];
         temperature_2m_min: number[];
         weather_code: number[];
@@ -84,10 +85,12 @@ export async function getClimate(city: string, date: string, placeLat?: number, 
             if (response.ok) {
                 const data: OpenMeteoResponse = await response.json();
                 
-                // Find index for the requested date
-                let dayIndex = 0;
-                // For simplicity, we just use the first day (current forecast) or if it's up to 3 days.
-                // A better approach would parse the dates array in daily.time
+                // Find index for the requested date by matching date string
+                const requestedDate = date.includes('T') ? date.split('T')[0] : date;
+                let dayIndex = data.daily.time ? data.daily.time.indexOf(requestedDate) : 0;
+                if (dayIndex === -1) {
+                    dayIndex = 0;
+                }
                 
                 const display: ClimateDisplay = {
                     temp_current: Math.round(data.current.temperature_2m),
