@@ -28,12 +28,27 @@ func TestEventLogging_Integration(t *testing.T) {
 			EndDate:      "2026-05-14",
 		})
 		require.NoError(t, err)
+
+		// Clean up the created trips and events at the end of the test
+		defer func() {
+			if demoTrip != nil {
+				_, _ = pool.Exec(ctx, "DELETE FROM events WHERE trip_id = $1", demoTrip.ID)
+				_, _ = pool.Exec(ctx, "DELETE FROM trips WHERE id = $1", demoTrip.ID)
+			}
+		}()
 		
 		// 2. Fork the trip
 		forkedTrip, err := repo.ForkTrip(ctx, demoTrip.ID.String(), nil, &sessionID)
 		require.NoError(t, err)
 		require.NotNil(t, forkedTrip)
 
+		defer func() {
+			if forkedTrip != nil {
+				_, _ = pool.Exec(ctx, "DELETE FROM events WHERE trip_id = $1", forkedTrip.ID)
+				_, _ = pool.Exec(ctx, "DELETE FROM trips WHERE id = $1", forkedTrip.ID)
+			}
+		}()
+ 
 		// 3. Verify event exists in the unified 'events' table
 		var count int
 		err = pool.QueryRow(ctx, 

@@ -1,0 +1,1573 @@
+{
+  "version": "2026-05-28-v1.3.1",
+  "metadata": {
+    "total_rules": 15,
+    "total_phrases": 20,
+    "total_cities": 30,
+    "regions": [
+      "kanto",
+      "kansai",
+      "kyushu",
+      "hokkaido",
+      "chubu",
+      "chugoku",
+      "tohoku",
+      "okinawa"
+    ]
+  },
+  "city_metadata": {
+    "tokyo": {
+      "lat": 35.6762,
+      "lon": 139.6503,
+      "region": "kanto",
+      "priority": 1
+    },
+    "yokohama": {
+      "lat": 35.4437,
+      "lon": 139.6380,
+      "region": "kanto",
+      "priority": 2
+    },
+    "kamakura": {
+      "lat": 35.3192,
+      "lon": 139.5467,
+      "region": "kanto",
+      "priority": 3
+    },
+    "kyoto": {
+      "lat": 35.0116,
+      "lon": 135.7681,
+      "region": "kansai",
+      "priority": 1
+    },
+    "osaka": {
+      "lat": 34.6937,
+      "lon": 135.5023,
+      "region": "kansai",
+      "priority": 1
+    },
+    "nara": {
+      "lat": 34.6851,
+      "lon": 135.8048,
+      "region": "kansai",
+      "priority": 2
+    },
+    "kobe": {
+      "lat": 34.6901,
+      "lon": 135.1955,
+      "region": "kansai",
+      "priority": 3
+    },
+    "fukuoka": {
+      "lat": 33.5902,
+      "lon": 130.4017,
+      "region": "kyushu",
+      "priority": 1
+    },
+    "kumamoto": {
+      "lat": 32.7893,
+      "lon": 130.7419,
+      "region": "kyushu",
+      "priority": 2
+    },
+    "beppu": {
+      "lat": 33.2846,
+      "lon": 131.4910,
+      "region": "kyushu",
+      "priority": 3
+    },
+    "nagasaki": {
+      "lat": 32.7503,
+      "lon": 129.8779,
+      "region": "kyushu",
+      "priority": 3
+    },
+    "sapporo": {
+      "lat": 43.0618,
+      "lon": 141.3545,
+      "region": "hokkaido",
+      "priority": 1
+    },
+    "hakodate": {
+      "lat": 41.7687,
+      "lon": 140.7288,
+      "region": "hokkaido",
+      "priority": 2
+    },
+    "hiroshima": {
+      "lat": 34.3853,
+      "lon": 132.4553,
+      "region": "chugoku",
+      "priority": 1
+    },
+    "miyajima": {
+      "lat": 34.2746,
+      "lon": 132.3054,
+      "region": "chugoku",
+      "priority": 2
+    },
+    "nagano": {
+      "lat": 36.6485,
+      "lon": 138.1942,
+      "region": "chubu",
+      "priority": 1
+    },
+    "matsumoto": {
+      "lat": 36.2380,
+      "lon": 137.9720,
+      "region": "chubu",
+      "priority": 2
+    },
+    "kanazawa": {
+      "lat": 36.5611,
+      "lon": 136.6566,
+      "region": "chubu",
+      "priority": 2
+    },
+    "takayama": {
+      "lat": 36.1461,
+      "lon": 137.2522,
+      "region": "chubu",
+      "priority": 3
+    },
+    "sendai": {
+      "lat": 38.2682,
+      "lon": 140.8694,
+      "region": "tohoku",
+      "priority": 1
+    },
+    "yamagata": {
+      "lat": 38.2404,
+      "lon": 140.3636,
+      "region": "tohoku",
+      "priority": 2
+    },
+    "nikko": {
+      "lat": 36.7196,
+      "lon": 139.6982,
+      "region": "kanto",
+      "priority": 2
+    },
+    "hakone": {
+      "lat": 35.2324,
+      "lon": 139.0269,
+      "region": "kanto",
+      "priority": 2
+    },
+    "izu": {
+      "lat": 34.9749,
+      "lon": 138.9460,
+      "region": "kanto",
+      "priority": 3
+    },
+    "shizuoka": {
+      "lat": 34.9756,
+      "lon": 138.3828,
+      "region": "chubu",
+      "priority": 3
+    },
+    "nagoya": {
+      "lat": 35.1815,
+      "lon": 136.9066,
+      "region": "chubu",
+      "priority": 2
+    },
+    "toyama": {
+      "lat": 36.6959,
+      "lon": 137.2137,
+      "region": "chubu",
+      "priority": 3
+    },
+    "kagoshima": {
+      "lat": 31.5966,
+      "lon": 130.5571,
+      "region": "kyushu",
+      "priority": 2
+    },
+    "yakushima": {
+      "lat": 30.3600,
+      "lon": 130.5270,
+      "region": "kyushu",
+      "priority": 3
+    },
+    "okinawa": {
+      "lat": 26.2123,
+      "lon": 127.6792,
+      "region": "okinawa",
+      "priority": 1
+    }
+  },
+  "keyword_rules": [
+    {
+      "keywords": {
+        "es": [
+          "templo",
+          "temple",
+          "寺"
+        ],
+        "en": [
+          "temple"
+        ],
+        "ja": [
+          "寺",
+          "お寺"
+        ]
+      },
+      "canonical_term": "temple",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "santuario",
+          "shrine",
+          "神社"
+        ],
+        "en": [
+          "shrine"
+        ],
+        "ja": [
+          "神社"
+        ]
+      },
+      "canonical_term": "shrine",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "onsen",
+          "温泉",
+          "baño termal"
+        ],
+        "en": [
+          "onsen",
+          "hot spring"
+        ],
+        "ja": [
+          "温泉"
+        ]
+      },
+      "canonical_term": "onsen",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "sento",
+          "銭湯",
+          "baño público"
+        ],
+        "en": [
+          "sento",
+          "public bath"
+        ],
+        "ja": [
+          "銭湯"
+        ]
+      },
+      "canonical_term": "sento",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "ryokan",
+          "旅館"
+        ],
+        "en": [
+          "ryokan"
+        ],
+        "ja": [
+          "旅館"
+        ]
+      },
+      "canonical_term": "ryokan",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "ramen",
+          "ラーメン"
+        ],
+        "en": [
+          "ramen"
+        ],
+        "ja": [
+          "ラーメン"
+        ]
+      },
+      "canonical_term": "ramen",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "ticket machine",
+          "máquina de tickets",
+          "券売機"
+        ],
+        "en": [
+          "ticket machine",
+          "vending machine"
+        ],
+        "ja": [
+          "券売機",
+          "自動販売機"
+        ]
+      },
+      "canonical_term": "ticket_machine_restaurant",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "tren",
+          "train",
+          "電車",
+          "shinkansen",
+          "新幹線",
+          "metro",
+          "subway"
+        ],
+        "en": [
+          "train",
+          "shinkansen",
+          "subway",
+          "metro"
+        ],
+        "ja": [
+          "電車",
+          "新幹線",
+          "地下鉄"
+        ]
+      },
+      "canonical_term": "transport_train",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "autobús",
+          "bus",
+          "バス"
+        ],
+        "en": [
+          "bus"
+        ],
+        "ja": [
+          "バス"
+        ]
+      },
+      "canonical_term": "transport_bus",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "gion",
+          "祇園",
+          "geisha",
+          "芸者",
+          "maiko",
+          "舞妓"
+        ],
+        "en": [
+          "gion",
+          "geisha",
+          "maiko"
+        ],
+        "ja": [
+          "祇園",
+          "芸者",
+          "舞妓"
+        ]
+      },
+      "canonical_term": "geisha_district",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "pontocho",
+          "先斗町"
+        ],
+        "en": [
+          "pontocho"
+        ],
+        "ja": [
+          "先斗町"
+        ]
+      },
+      "canonical_term": "pontocho",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "restaurante",
+          "restaurant",
+          "レストラン",
+          "izakaya",
+          "居酒屋"
+        ],
+        "en": [
+          "restaurant",
+          "izakaya"
+        ],
+        "ja": [
+          "レストラン",
+          "居酒屋"
+        ]
+      },
+      "canonical_term": "restaurant",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "monos",
+          "mono",
+          "monkey",
+          "猿",
+          "jigokudani"
+        ],
+        "en": [
+          "monkey",
+          "wildlife",
+          "jigokudani"
+        ],
+        "ja": [
+          "猿",
+          "地獄谷"
+        ]
+      },
+      "canonical_term": "wildlife",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "castillo",
+          "castle",
+          "城"
+        ],
+        "en": [
+          "castle"
+        ],
+        "ja": [
+          "城"
+        ]
+      },
+      "canonical_term": "castle",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "museo",
+          "museum",
+          "博物館"
+        ],
+        "en": [
+          "museum"
+        ],
+        "ja": [
+          "博物館"
+        ]
+      },
+      "canonical_term": "museum",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "mercado",
+          "market",
+          "市場",
+          "tsukiji",
+          "築地",
+          "toyosu",
+          "豊洲"
+        ],
+        "en": [
+          "market",
+          "tsukiji",
+          "toyosu"
+        ],
+        "ja": [
+          "市場",
+          "築地",
+          "豊洲"
+        ]
+      },
+      "canonical_term": "market",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "tienda tradicional",
+          "traditional shop",
+          "和雑貨"
+        ],
+        "en": [
+          "traditional shop"
+        ],
+        "ja": [
+          "和雑貨"
+        ]
+      },
+      "canonical_term": "traditional_shop",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "taxi",
+          "タクシー"
+        ],
+        "en": [
+          "taxi"
+        ],
+        "ja": [
+          "タクシー"
+        ]
+      },
+      "canonical_term": "taxi",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "hotel",
+          "ホテル"
+        ],
+        "en": [
+          "hotel"
+        ],
+        "ja": [
+          "ホテル"
+        ]
+      },
+      "canonical_term": "hotel",
+      "priority": 1
+    },
+    {
+      "keywords": {
+        "es": [
+          "casa privada",
+          "private home",
+          "民泊",
+          "airbnb"
+        ],
+        "en": [
+          "private home",
+          "airbnb"
+        ],
+        "ja": [
+          "民泊"
+        ]
+      },
+      "canonical_term": "private_home",
+      "priority": 1
+    }
+  ],
+  "etiquette_rules": [
+    {
+      "id": "no_phone_transport",
+      "canonical_term": "transport_train",
+      "priority": "high",
+      "icon": "🟡",
+      "contexts": [
+        "transport_train",
+        "transport_bus"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "no_eat_walk",
+      "canonical_term": "street",
+      "priority": "high",
+      "icon": "🟡",
+      "contexts": [
+        "street",
+        "transport_train"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "shoes_genkan",
+      "canonical_term": "temple",
+      "priority": "critical",
+      "icon": "🔴",
+      "contexts": [
+        "temple",
+        "shrine",
+        "ryokan",
+        "private_home"
+      ],
+      "severity": "critical"
+    },
+    {
+      "id": "no_tattoos_onsen",
+      "canonical_term": "onsen",
+      "priority": "critical",
+      "icon": "🔴",
+      "contexts": [
+        "onsen",
+        "sento"
+      ],
+      "severity": "critical"
+    },
+    {
+      "id": "no_touch_geisha",
+      "canonical_term": "geisha_district",
+      "priority": "critical",
+      "icon": "🔴",
+      "contexts": [
+        "gion",
+        "pontocho",
+        "geisha_district"
+      ],
+      "severity": "critical"
+    },
+    {
+      "id": "no_tipping",
+      "canonical_term": "restaurant",
+      "priority": "high",
+      "icon": "🟡",
+      "contexts": [
+        "restaurant",
+        "taxi",
+        "hotel"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "ticket_machine_order",
+      "canonical_term": "ramen",
+      "priority": "high",
+      "icon": "🟡",
+      "contexts": [
+        "ramen",
+        "ticket_machine_restaurant"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "hashi_etiquette",
+      "canonical_term": "restaurant",
+      "priority": "medium",
+      "icon": "🟢",
+      "contexts": [
+        "restaurant",
+        "funeral"
+      ],
+      "severity": "medium"
+    },
+    {
+      "id": "no_blow_nose",
+      "canonical_term": "any_public",
+      "priority": "medium",
+      "icon": "🟢",
+      "contexts": [
+        "any_public"
+      ],
+      "severity": "medium"
+    },
+    {
+      "id": "kanpai_wait",
+      "canonical_term": "restaurant",
+      "priority": "medium",
+      "icon": "🟢",
+      "contexts": [
+        "izakaya",
+        "restaurant"
+      ],
+      "severity": "medium"
+    },
+    {
+      "id": "no_touch_products",
+      "canonical_term": "traditional_shop",
+      "priority": "medium",
+      "icon": "🟢",
+      "contexts": [
+        "traditional_shop",
+        "market"
+      ],
+      "severity": "medium"
+    },
+    {
+      "id": "no_photos_restricted",
+      "canonical_term": "temple",
+      "priority": "critical",
+      "icon": "🔴",
+      "contexts": [
+        "temple",
+        "shrine",
+        "museum"
+      ],
+      "severity": "critical"
+    },
+    {
+      "id": "trash_separation",
+      "canonical_term": "any",
+      "priority": "high",
+      "icon": "🟡",
+      "contexts": [
+        "any"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "no_smoking_street",
+      "canonical_term": "street",
+      "priority": "high",
+      "icon": "🟡",
+      "contexts": [
+        "street",
+        "park"
+      ],
+      "severity": "high"
+    },
+    {
+      "id": "bow_formal",
+      "canonical_term": "ryokan",
+      "priority": "medium",
+      "icon": "🟢",
+      "contexts": [
+        "ryokan",
+        "temple",
+        "business"
+      ],
+      "severity": "medium"
+    },
+    {
+      "id": "wildlife_monkeys",
+      "canonical_term": "wildlife",
+      "priority": "critical",
+      "icon": "🔴",
+      "contexts": [
+        "wildlife"
+      ],
+      "severity": "critical"
+    }
+  ],
+  "phrases": [
+    {
+      "id": "sumimasen",
+      "romaji": "Sumimasen",
+      "ja": "すみません",
+      "contexts": [
+        "any"
+      ],
+      "priority": "critical"
+    },
+    {
+      "id": "arigatou",
+      "romaji": "Arigatou gozaimasu",
+      "ja": "ありがとうございます",
+      "contexts": [
+        "general"
+      ],
+      "priority": "critical"
+    },
+    {
+      "id": "wakarimasen",
+      "romaji": "Wakarimasen",
+      "ja": "分かりません",
+      "contexts": [
+        "any"
+      ],
+      "priority": "critical"
+    },
+    {
+      "id": "eigo",
+      "romaji": "Eigo wa dekimasu ka?",
+      "ja": "英語はできますか",
+      "contexts": [
+        "general"
+      ],
+      "priority": "high"
+    },
+    {
+      "id": "ikura",
+      "romaji": "Kore wa ikura desu ka?",
+      "ja": "これはいくらですか",
+      "contexts": [
+        "shop"
+      ],
+      "priority": "high"
+    },
+    {
+      "id": "okaikei",
+      "romaji": "Okaikei onegaishimasu",
+      "ja": "お会計お願いします",
+      "contexts": [
+        "restaurant"
+      ],
+      "priority": "critical"
+    },
+    {
+      "id": "hitori",
+      "romaji": "Hitori desu / Futari desu",
+      "ja": "一人です / 二人です",
+      "contexts": [
+        "restaurant"
+      ],
+      "priority": "high"
+    },
+    {
+      "id": "bejitarian",
+      "romaji": "Bejitarian desu",
+      "ja": "ベジタリアンです",
+      "contexts": [
+        "restaurant"
+      ],
+      "priority": "medium"
+    },
+    {
+      "id": "niku_nashi",
+      "romaji": "Niku wa tabemasen / Sakana wa tabemasen",
+      "ja": "肉は食べません / 魚は食べません",
+      "contexts": [
+        "restaurant"
+      ],
+      "priority": "medium"
+    },
+    {
+      "id": "toire",
+      "romaji": "Toire wa doko desu ka?",
+      "ja": "トイレはどこですか",
+      "contexts": [
+        "emergency",
+        "general"
+      ],
+      "priority": "critical"
+    },
+    {
+      "id": "arerugii",
+      "romaji": "... arerugii desu",
+      "ja": "...アレルギーです",
+      "contexts": [
+        "restaurant"
+      ],
+      "priority": "high"
+    },
+    {
+      "id": "tasukete",
+      "romaji": "Tasukete!",
+      "ja": "助けて！",
+      "contexts": [
+        "emergency"
+      ],
+      "priority": "critical"
+    },
+    {
+      "id": "oishii",
+      "romaji": "Oishii!",
+      "ja": "美味しい！",
+      "contexts": [
+        "restaurant"
+      ],
+      "priority": "medium"
+    },
+    {
+      "id": "kanpai",
+      "romaji": "Kanpai!",
+      "ja": "乾杯！",
+      "contexts": [
+        "restaurant"
+      ],
+      "priority": "medium"
+    },
+    {
+      "id": "ohayou",
+      "romaji": "Ohayou gozaimasu",
+      "ja": "おはようございます",
+      "contexts": [
+        "general"
+      ],
+      "priority": "medium"
+    },
+    {
+      "id": "konbanwa",
+      "romaji": "Konbanwa",
+      "ja": "こんばんは",
+      "contexts": [
+        "general"
+      ],
+      "priority": "medium"
+    },
+    {
+      "id": "arigatou_mashita",
+      "romaji": "Arigatou gozaimashita",
+      "ja": "ありがとうございました",
+      "contexts": [
+        "general"
+      ],
+      "priority": "medium"
+    },
+    {
+      "id": "densha",
+      "romaji": "... iki no densha desu ka?",
+      "ja": "...行きの電車ですか",
+      "contexts": [
+        "transport"
+      ],
+      "priority": "high"
+    },
+    {
+      "id": "deguchi",
+      "romaji": "Deguchi wa doko desu ka?",
+      "ja": "出口はどこですか",
+      "contexts": [
+        "transport"
+      ],
+      "priority": "high"
+    },
+    {
+      "id": "byouin",
+      "romaji": "Byouin wo onegaishimasu",
+      "ja": "病院をお願いします",
+      "contexts": [
+        "emergency"
+      ],
+      "priority": "critical"
+    }
+  ],
+  "climate": {
+    "kanto": {
+      "name": "Tokyo / Kanto",
+      "name_ja": "東京・関東",
+      "months": {
+        "1": {
+          "temp_c_min": 2,
+          "temp_c_max": 10,
+          "rain_mm": 52,
+          "icon": "clear",
+          "notes": "Dry, cold. New Year crowds."
+        },
+        "2": {
+          "temp_c_min": 2,
+          "temp_c_max": 11,
+          "rain_mm": 56,
+          "icon": "clear",
+          "notes": "Plum blossoms late Feb."
+        },
+        "3": {
+          "temp_c_min": 5,
+          "temp_c_max": 14,
+          "rain_mm": 118,
+          "icon": "partly-cloudy",
+          "notes": "Cherry blossoms late Mar."
+        },
+        "4": {
+          "temp_c_min": 10,
+          "temp_c_max": 19,
+          "rain_mm": 125,
+          "icon": "partly-cloudy",
+          "notes": "Sakura peak. Golden Week prep."
+        },
+        "5": {
+          "temp_c_min": 15,
+          "temp_c_max": 23,
+          "rain_mm": 138,
+          "icon": "partly-cloudy",
+          "notes": "Golden Week (Apr 29-May 5): everything crowded."
+        },
+        "6": {
+          "temp_c_min": 19,
+          "temp_c_max": 26,
+          "rain_mm": 168,
+          "icon": "rainy",
+          "notes": "Rainy season (tsuyu) starts mid-Jun."
+        },
+        "7": {
+          "temp_c_min": 23,
+          "temp_c_max": 30,
+          "rain_mm": 154,
+          "icon": "rainy",
+          "notes": "Humid, hot. Obon (mid-Aug) travel surge."
+        },
+        "8": {
+          "temp_c_min": 24,
+          "temp_c_max": 32,
+          "rain_mm": 168,
+          "icon": "rainy",
+          "notes": "Peak heat. Typhoon risk late Aug."
+        },
+        "9": {
+          "temp_c_min": 21,
+          "temp_c_max": 28,
+          "rain_mm": 210,
+          "icon": "rainy",
+          "notes": "Typhoon season. Risk of transport disruption."
+        },
+        "10": {
+          "temp_c_min": 15,
+          "temp_c_max": 22,
+          "rain_mm": 198,
+          "icon": "partly-cloudy",
+          "notes": "Autumn foliage starts late Oct."
+        },
+        "11": {
+          "temp_c_min": 9,
+          "temp_c_max": 17,
+          "rain_mm": 93,
+          "icon": "clear",
+          "notes": "Momiji (maple) peak. Best weather."
+        },
+        "12": {
+          "temp_c_min": 4,
+          "temp_c_max": 12,
+          "rain_mm": 51,
+          "icon": "clear",
+          "notes": "Dry, cold. Illuminations."
+        }
+      }
+    },
+    "kansai": {
+      "name": "Kyoto / Kansai",
+      "name_ja": "京都・関西",
+      "months": {
+        "1": {
+          "temp_c_min": 1,
+          "temp_c_max": 9,
+          "rain_mm": 48,
+          "icon": "clear",
+          "notes": "Cold, dry. Temples empty."
+        },
+        "2": {
+          "temp_c_min": 1,
+          "temp_c_max": 10,
+          "rain_mm": 55,
+          "icon": "clear",
+          "notes": "Plum blossoms."
+        },
+        "3": {
+          "temp_c_min": 4,
+          "temp_c_max": 13,
+          "rain_mm": 120,
+          "icon": "partly-cloudy",
+          "notes": "Sakura late Mar. Temples crowded."
+        },
+        "4": {
+          "temp_c_min": 9,
+          "temp_c_max": 19,
+          "rain_mm": 115,
+          "icon": "partly-cloudy",
+          "notes": "Sakura peak. Geisha sightings in Gion."
+        },
+        "5": {
+          "temp_c_min": 14,
+          "temp_c_max": 23,
+          "rain_mm": 145,
+          "icon": "partly-cloudy",
+          "notes": "Aoi Matsuri (May 15). Green maple."
+        },
+        "6": {
+          "temp_c_min": 19,
+          "temp_c_max": 27,
+          "rain_mm": 185,
+          "icon": "rainy",
+          "notes": "Rainy season. Moss gardens vibrant."
+        },
+        "7": {
+          "temp_c_min": 23,
+          "temp_c_max": 31,
+          "rain_mm": 160,
+          "icon": "rainy",
+          "notes": "Humid, hot. Gion Matsuri (Jul)."
+        },
+        "8": {
+          "temp_c_min": 24,
+          "temp_c_max": 33,
+          "rain_mm": 140,
+          "icon": "rainy",
+          "notes": "Peak heat. Obon ceremonies."
+        },
+        "9": {
+          "temp_c_min": 20,
+          "temp_c_max": 29,
+          "rain_mm": 195,
+          "icon": "rainy",
+          "notes": "Typhoon risk. Temple gardens lush."
+        },
+        "10": {
+          "temp_c_min": 14,
+          "temp_c_max": 23,
+          "rain_mm": 120,
+          "icon": "partly-cloudy",
+          "notes": "Autumn foliage starts."
+        },
+        "11": {
+          "temp_c_min": 8,
+          "temp_c_max": 16,
+          "rain_mm": 80,
+          "icon": "clear",
+          "notes": "Momiji peak. Kiyomizu-dera at sunset = magic."
+        },
+        "12": {
+          "temp_c_min": 3,
+          "temp_c_max": 10,
+          "rain_mm": 50,
+          "icon": "clear",
+          "notes": "Cold, clear. New Year temple visits."
+        }
+      }
+    },
+    "kyushu": {
+      "name": "Fukuoka / Kyushu",
+      "name_ja": "福岡・九州",
+      "months": {
+        "1": {
+          "temp_c_min": 4,
+          "temp_c_max": 11,
+          "rain_mm": 75,
+          "icon": "clear",
+          "notes": "Mild, dry. Onsen weather."
+        },
+        "2": {
+          "temp_c_min": 5,
+          "temp_c_max": 12,
+          "rain_mm": 85,
+          "icon": "clear",
+          "notes": "Plum blossoms early."
+        },
+        "3": {
+          "temp_c_min": 8,
+          "temp_c_max": 16,
+          "rain_mm": 110,
+          "icon": "partly-cloudy",
+          "notes": "Warmer than Tokyo. Cherry blossoms early."
+        },
+        "4": {
+          "temp_c_min": 13,
+          "temp_c_max": 21,
+          "rain_mm": 130,
+          "icon": "partly-cloudy",
+          "notes": "Sakura peak. Comfortable."
+        },
+        "5": {
+          "temp_c_min": 17,
+          "temp_c_max": 25,
+          "rain_mm": 160,
+          "icon": "partly-cloudy",
+          "notes": "Hakata Gion Yamakasa (Jul 1-15 prep)."
+        },
+        "6": {
+          "temp_c_min": 21,
+          "temp_c_max": 28,
+          "rain_mm": 250,
+          "icon": "rainy",
+          "notes": "Rainy season. Onsen weather."
+        },
+        "7": {
+          "temp_c_min": 25,
+          "temp_c_max": 33,
+          "rain_mm": 280,
+          "icon": "rainy",
+          "notes": "Humid, hot. Obon festivals."
+        },
+        "8": {
+          "temp_c_min": 25,
+          "temp_c_max": 33,
+          "rain_mm": 220,
+          "icon": "rainy",
+          "notes": "Peak heat. Nagasaki lantern festival."
+        },
+        "9": {
+          "temp_c_min": 22,
+          "temp_c_max": 30,
+          "rain_mm": 180,
+          "icon": "rainy",
+          "notes": "Typhoon risk. Onsen ideal."
+        },
+        "10": {
+          "temp_c_min": 17,
+          "temp_c_max": 24,
+          "rain_mm": 90,
+          "icon": "partly-cloudy",
+          "notes": "Yufuin autumn foliage."
+        },
+        "11": {
+          "temp_c_min": 11,
+          "temp_c_max": 19,
+          "rain_mm": 75,
+          "icon": "clear",
+          "notes": "Crisp, clear. Best onsen season."
+        },
+        "12": {
+          "temp_c_min": 6,
+          "temp_c_max": 13,
+          "rain_mm": 65,
+          "icon": "clear",
+          "notes": "Mild winter. Illuminations."
+        }
+      }
+    },
+    "hokkaido": {
+      "name": "Sapporo / Hokkaido",
+      "name_ja": "札幌・北海道",
+      "months": {
+        "1": {
+          "temp_c_min": -8,
+          "temp_c_max": -2,
+          "rain_mm": 100,
+          "icon": "snow",
+          "notes": "Sapporo Snow Festival (Feb). Ice sculptures."
+        },
+        "2": {
+          "temp_c_min": -7,
+          "temp_c_max": -1,
+          "rain_mm": 90,
+          "icon": "snow",
+          "notes": "Peak snow. Onsen in snow = magic."
+        },
+        "3": {
+          "temp_c_min": -3,
+          "temp_c_max": 4,
+          "rain_mm": 80,
+          "icon": "snow",
+          "notes": "Still snow. Ski season ends late."
+        },
+        "4": {
+          "temp_c_min": 2,
+          "temp_c_max": 11,
+          "rain_mm": 70,
+          "icon": "partly-cloudy",
+          "notes": "Deshielo. Cherry blossoms late."
+        },
+        "5": {
+          "temp_c_min": 7,
+          "temp_c_max": 17,
+          "rain_mm": 65,
+          "icon": "partly-cloudy",
+          "notes": "Green season. Fresh air."
+        },
+        "6": {
+          "temp_c_min": 11,
+          "temp_c_max": 21,
+          "rain_mm": 60,
+          "icon": "partly-cloudy",
+          "notes": "Pleasant. No rainy season here."
+        },
+        "7": {
+          "temp_c_min": 16,
+          "temp_c_max": 25,
+          "rain_mm": 80,
+          "icon": "partly-cloudy",
+          "notes": "Lavender fields (Furano). Pleasant summer."
+        },
+        "8": {
+          "temp_c_min": 17,
+          "temp_c_max": 26,
+          "rain_mm": 110,
+          "icon": "partly-cloudy",
+          "notes": "Peak summer. Obon dances."
+        },
+        "9": {
+          "temp_c_min": 12,
+          "temp_c_max": 21,
+          "rain_mm": 130,
+          "icon": "rainy",
+          "notes": "Autumn starts early. Harvest season."
+        },
+        "10": {
+          "temp_c_min": 6,
+          "temp_c_max": 15,
+          "rain_mm": 110,
+          "icon": "partly-cloudy",
+          "notes": "Autumn foliage. First snow possible late Oct."
+        },
+        "11": {
+          "temp_c_min": 0,
+          "temp_c_max": 7,
+          "rain_mm": 100,
+          "icon": "snow",
+          "notes": "First snow. Ski prep."
+        },
+        "12": {
+          "temp_c_min": -5,
+          "temp_c_max": 1,
+          "rain_mm": 95,
+          "icon": "snow",
+          "notes": "Snow season. Christmas markets."
+        }
+      }
+    },
+    "chubu": {
+      "name": "Nagano / Chubu",
+      "name_ja": "長野・中部",
+      "months": {
+        "1": {
+          "temp_c_min": -5,
+          "temp_c_max": 3,
+          "rain_mm": 55,
+          "icon": "snow",
+          "notes": "Snow monkeys at Jigokudani."
+        },
+        "2": {
+          "temp_c_min": -4,
+          "temp_c_max": 4,
+          "rain_mm": 60,
+          "icon": "snow",
+          "notes": "Best onsen snow views."
+        },
+        "3": {
+          "temp_c_min": 0,
+          "temp_c_max": 9,
+          "rain_mm": 95,
+          "icon": "partly-cloudy",
+          "notes": "Late snow. Cherry blossoms in valleys."
+        },
+        "4": {
+          "temp_c_min": 5,
+          "temp_c_max": 15,
+          "rain_mm": 105,
+          "icon": "partly-cloudy",
+          "notes": "Sakura in Matsumoto."
+        },
+        "5": {
+          "temp_c_min": 10,
+          "temp_c_max": 20,
+          "rain_mm": 120,
+          "icon": "partly-cloudy",
+          "notes": "Green season. Alpine routes open."
+        },
+        "6": {
+          "temp_c_min": 15,
+          "temp_c_max": 24,
+          "rain_mm": 160,
+          "icon": "rainy",
+          "notes": "Rainy season. Onsen ideal."
+        },
+        "7": {
+          "temp_c_min": 19,
+          "temp_c_max": 28,
+          "rain_mm": 180,
+          "icon": "rainy",
+          "notes": "Humid. Fuji climbing season."
+        },
+        "8": {
+          "temp_c_min": 20,
+          "temp_c_max": 29,
+          "rain_mm": 150,
+          "icon": "rainy",
+          "notes": "Peak heat. Obon in mountains."
+        },
+        "9": {
+          "temp_c_min": 16,
+          "temp_c_max": 24,
+          "rain_mm": 170,
+          "icon": "rainy",
+          "notes": "Typhoon risk. Autumn colors start in Alps."
+        },
+        "10": {
+          "temp_c_min": 9,
+          "temp_c_max": 18,
+          "rain_mm": 130,
+          "icon": "partly-cloudy",
+          "notes": "Momiji in Kamikochi."
+        },
+        "11": {
+          "temp_c_min": 3,
+          "temp_c_max": 11,
+          "rain_mm": 75,
+          "icon": "clear",
+          "notes": "First snow in mountains."
+        },
+        "12": {
+          "temp_c_min": -2,
+          "temp_c_max": 5,
+          "rain_mm": 60,
+          "icon": "snow",
+          "notes": "Ski season. Snow monkeys."
+        }
+      }
+    },
+    "chugoku": {
+      "name": "Hiroshima / Chugoku",
+      "name_ja": "広島・中国",
+      "months": {
+        "1": {
+          "temp_c_min": 2,
+          "temp_c_max": 9,
+          "rain_mm": 45,
+          "icon": "clear",
+          "notes": "Cold, dry. Peace Memorial quiet."
+        },
+        "2": {
+          "temp_c_min": 2,
+          "temp_c_max": 10,
+          "rain_mm": 55,
+          "icon": "clear",
+          "notes": "Plum blossoms."
+        },
+        "3": {
+          "temp_c_min": 5,
+          "temp_c_max": 13,
+          "rain_mm": 100,
+          "icon": "partly-cloudy",
+          "notes": "Sakura in Hiroshima Peace Park."
+        },
+        "4": {
+          "temp_c_min": 10,
+          "temp_c_max": 19,
+          "rain_mm": 120,
+          "icon": "partly-cloudy",
+          "notes": "Miyajima cherry blossoms."
+        },
+        "5": {
+          "temp_c_min": 15,
+          "temp_c_max": 23,
+          "rain_mm": 140,
+          "icon": "partly-cloudy",
+          "notes": "Green season. Comfortable."
+        },
+        "6": {
+          "temp_c_min": 19,
+          "temp_c_max": 26,
+          "rain_mm": 220,
+          "icon": "rainy",
+          "notes": "Rainy season. Miyajima tide changes dramatic."
+        },
+        "7": {
+          "temp_c_min": 23,
+          "temp_c_max": 31,
+          "rain_mm": 240,
+          "icon": "rainy",
+          "notes": "Humid, hot. Obon floating lanterns."
+        },
+        "8": {
+          "temp_c_min": 24,
+          "temp_c_max": 32,
+          "rain_mm": 160,
+          "icon": "rainy",
+          "notes": "Peak heat."
+        },
+        "9": {
+          "temp_c_min": 20,
+          "temp_c_max": 28,
+          "rain_mm": 180,
+          "icon": "rainy",
+          "notes": "Typhoon risk."
+        },
+        "10": {
+          "temp_c_min": 14,
+          "temp_c_max": 23,
+          "rain_mm": 100,
+          "icon": "partly-cloudy",
+          "notes": "Autumn foliage. Miyajima maple."
+        },
+        "11": {
+          "temp_c_min": 8,
+          "temp_c_max": 16,
+          "rain_mm": 70,
+          "icon": "clear",
+          "notes": "Crisp, clear. Oyster season."
+        },
+        "12": {
+          "temp_c_min": 3,
+          "temp_c_max": 11,
+          "rain_mm": 50,
+          "icon": "clear",
+          "notes": "Cold, dry. Year-end reflections."
+        }
+      }
+    },
+    "tohoku": {
+      "name": "Sendai / Tohoku",
+      "name_ja": "仙台・東北",
+      "months": {
+        "1": {
+          "temp_c_min": -3,
+          "temp_c_max": 4,
+          "rain_mm": 60,
+          "icon": "snow",
+          "notes": "Snow festivals. Yamadera snow views."
+        },
+        "2": {
+          "temp_c_min": -3,
+          "temp_c_max": 5,
+          "rain_mm": 55,
+          "icon": "snow",
+          "notes": "Peak snow. Onsen in snow."
+        },
+        "3": {
+          "temp_c_min": 0,
+          "temp_c_max": 8,
+          "rain_mm": 80,
+          "icon": "partly-cloudy",
+          "notes": "Late snow. Cherry blossoms late."
+        },
+        "4": {
+          "temp_c_min": 5,
+          "temp_c_max": 14,
+          "rain_mm": 95,
+          "icon": "partly-cloudy",
+          "notes": "Sakura peak. Hanami in parks."
+        },
+        "5": {
+          "temp_c_min": 10,
+          "temp_c_max": 19,
+          "rain_mm": 100,
+          "icon": "partly-cloudy",
+          "notes": "Green season. Matsuri season starts."
+        },
+        "6": {
+          "temp_c_min": 15,
+          "temp_c_max": 22,
+          "rain_mm": 130,
+          "icon": "rainy",
+          "notes": "Rainy season. Tanabata (Sendai, Aug 6-8)."
+        },
+        "7": {
+          "temp_c_min": 19,
+          "temp_c_max": 26,
+          "rain_mm": 150,
+          "icon": "rainy",
+          "notes": "Humid. Tanabata decorations."
+        },
+        "8": {
+          "temp_c_min": 20,
+          "temp_c_max": 28,
+          "rain_mm": 140,
+          "icon": "rainy",
+          "notes": "Peak heat. Nebuta (Aomori, Aug 2-7)."
+        },
+        "9": {
+          "temp_c_min": 16,
+          "temp_c_max": 24,
+          "rain_mm": 160,
+          "icon": "rainy",
+          "notes": "Typhoon risk. Autumn colors start in mountains."
+        },
+        "10": {
+          "temp_c_min": 9,
+          "temp_c_max": 18,
+          "rain_mm": 110,
+          "icon": "partly-cloudy",
+          "notes": "Autumn foliage. Zao ropeway."
+        },
+        "11": {
+          "temp_c_min": 3,
+          "temp_c_max": 11,
+          "rain_mm": 80,
+          "icon": "clear",
+          "notes": "First snow. Onsen season."
+        },
+        "12": {
+          "temp_c_min": -1,
+          "temp_c_max": 6,
+          "rain_mm": 70,
+          "icon": "snow",
+          "notes": "Snow season. Year-end soba."
+        }
+      }
+    }
+  }
+}

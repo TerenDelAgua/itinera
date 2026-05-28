@@ -119,13 +119,18 @@ func (h *Handlers) CreateActivity(w http.ResponseWriter, r *http.Request) {
 		notesPtr = &input.Notes
 	}
 
+	var timePtr *string
+	if input.Time != nil && *input.Time != "" {
+		timePtr = input.Time
+	}
+
 	newActivity := models.Activity{
 		Id:      uuid.New(),
 		TripId:  tripId,
 		PlaceId: placeIdPtr,
 		Title:   input.Title,
 		Date:    input.Date,
-		Time:    input.Time,
+		Time:    timePtr,
 		Notes:   notesPtr,
 	}
 

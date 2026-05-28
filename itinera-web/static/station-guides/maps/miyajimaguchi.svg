@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <!--
+    ========================================================================
+    MIYAJIMAGUCHI STATION SCHEMATIC MAP
+    Minimalist 2D transit map design
+    Philosophy: Clean, flat UI, high-contrast, optimized for mobile reading
+    ========================================================================
+  -->
+  <defs>
+    <!-- Crisp drop shadow for UI elements -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#1c1917" flood-opacity="0.12" filter-units="userSpaceOnUse" />
+    </filter>
+  </defs>
+
+  <!-- Layer 1: Background (transparent for dark/light mode compatibility) -->
+  <g id="background">
+    <rect width="800" height="600" fill="transparent" />
+  </g>
+
+  <!-- Layer 2: Connecting Concourse & Pedestrian Paths -->
+  <g id="connecting-paths">
+    <!-- Main Central Corridor (Connecting North and South exits) -->
+    <rect x="180" y="240" width="440" height="80" rx="10" fill="#f5ebd6" stroke="#e8dcc0" stroke-width="2" opacity="0.95" />
+
+    <!-- Connecting passage to the JR Platforms Gates -->
+    <rect x="360" y="140" width="80" height="110" rx="8" fill="#f5ebd6" stroke="#e8dcc0" stroke-width="2" opacity="0.9" />
+
+    <!-- Pedestrian path outside South exit to the Ferry Port -->
+    <line x1="120" y1="300" x2="120" y2="400" stroke="#e8dcc0" stroke-width="12" stroke-linecap="round" opacity="0.8" />
+  </g>
+
+  <!-- Layer 3: Operator Zones & Platforms -->
+  <!-- 1. JR West - Sanyo Main Line (Gold - Platforms 1-2) -->
+  <g id="line-sanyo">
+    <rect x="250" y="100" width="300" height="26" rx="13" fill="#FFD700" stroke="#ffffff" stroke-width="2" filter="url(#shadow)" />
+    <text x="400" y="116" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" fill="#1c1917" text-anchor="middle" letter-spacing="0.3">JR SANYO MAIN LINE (P1-2 - TO HIROSHIMA/IWAKUNI)</text>
+  </g>
+
+  <!-- 2. Hiroden - Miyajima Line (Green - Platform 1) -->
+  <g id="line-hiroden">
+    <rect x="250" y="160" width="300" height="26" rx="13" fill="#008000" stroke="#ffffff" stroke-width="2" filter="url(#shadow)" />
+    <text x="400" y="176" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.3">HIRODEN TRAM - MIYAJIMA LINE (P1 - TO HIROSHIMA)</text>
+  </g>
+
+  <!-- 3. Ferry Terminal (Blue - South Exit path) -->
+  <g id="ferry-terminal" filter="url(#shadow)">
+    <rect x="50" y="400" width="160" height="50" rx="8" fill="#0284c7" stroke="#ffffff" stroke-width="2" />
+    <text x="130" y="429" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="10" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">🚢 FERRY TO MIYAJIMA</text>
+  </g>
+
+  <!-- Layer 4: Exit Pins -->
+  <g id="exits">
+    <!-- North Exit (Kita-guchi - Tram connection) -->
+    <g id="exit-north" filter="url(#shadow)">
+      <circle cx="680" cy="280" r="22" fill="#e25c3d" stroke="#ffffff" stroke-width="3" />
+      <text x="680" y="287" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle">N</text>
+    </g>
+
+    <!-- South Exit (Minami-guchi - Main Tourist Exit / Ferry Port) -->
+    <g id="exit-south" filter="url(#shadow)">
+      <circle cx="120" cy="280" r="22" fill="#e25c3d" stroke="#ffffff" stroke-width="3" />
+      <text x="120" y="287" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle">S</text>
+    </g>
+  </g>
+
+  <!-- Layer 5: Labels & Warnings -->
+  <g id="labels" font-family="Inter, system-ui, -apple-system, sans-serif">
+    <!-- Title -->
+    <text x="40" y="48" font-size="22" font-weight="800" fill="currentColor" letter-spacing="-0.5">Miyajimaguchi Station</text>
+    <text x="40" y="68" font-size="11" font-weight="600" fill="currentColor" opacity="0.6" letter-spacing="1.2">SCHEMATIC MAP • MAIN &amp; FERRY PORT LEVELS</text>
+
+    <!-- Orientations -->
+    <text x="120" y="240" font-size="10" font-weight="700" fill="currentColor" opacity="0.6" letter-spacing="0.5" text-anchor="middle">SOUTH EXIT (FERRY PORT / ITSUKUSHIMA)</text>
+    <text x="680" y="240" font-size="10" font-weight="700" fill="currentColor" opacity="0.6" letter-spacing="0.5" text-anchor="middle">NORTH EXIT (TRAM STOP)</text>
+
+    <!-- Sightseeing Card -->
+    <g id="sightseeing-card">
+      <rect x="230" y="460" width="370" height="70" rx="8" fill="#F0F9FF" stroke="#0284c7" stroke-width="1.5" filter="url(#shadow)" />
+      <text x="245" y="482" font-size="10" font-weight="700" fill="#0369a1">⛩️ ITSUKUSHIMA SHRINE (MIYAJIMA) ADVICE</text>
+      <text x="245" y="498" font-size="9" font-weight="600" fill="#0284c7">Walk straight out the South Exit directly to the Ferry Port (2 mins walk).</text>
+      <text x="245" y="510" font-size="9" font-weight="600" fill="#0284c7">Ferries run every 10-15 mins. Note: JR Pass fully covers the JR Ferry!</text>
+    </g>
+  </g>
+
+  <!-- Layer 6: Legend -->
+  <g id="legend" font-family="Inter, system-ui, -apple-system, sans-serif">
+    <text x="40" y="530" font-size="11" font-weight="700" fill="currentColor" letter-spacing="0.8">LEGEND</text>
+
+    <circle cx="48" cy="548" r="6" fill="#FFD700" />
+    <text x="62" y="551" font-size="10" font-weight="600" fill="currentColor">JR West Sanyo Main Line</text>
+
+    <circle cx="280" cy="548" r="6" fill="#008000" />
+    <text x="294" y="551" font-size="10" font-weight="600" fill="currentColor">Hiroden Tram Miyajima Line</text>
+
+    <circle cx="480" cy="548" r="6" fill="#f5ebd6" stroke="#e8dcc0" stroke-width="1.5" />
+    <text x="494" y="551" font-size="10" font-weight="600" fill="currentColor">Central Concourse</text>
+  </g>
+</svg>
