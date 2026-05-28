@@ -795,7 +795,8 @@
       "name_ja_romaji": "Hiroshima-eki",
       "city": "Hiroshima",
       "region": "chugoku",
-      "complexity": "medium",
+      "complexity": "high",
+      "daily_passengers_millions": 0.25,
       "operators": [
         {
           "name": "JR West",
@@ -972,6 +973,957 @@
       ],
       "svg_map": "kobe_sannomiya.svg",
       "svg_map_simplified": "kobe_sannomiya_simple.svg"
+    },
+    {
+      "id": "nagano",
+      "name": "Nagano Station",
+      "name_ja": "長野駅",
+      "name_ja_romaji": "Nagano-eki",
+      "city": "Nagano",
+      "region": "chubu",
+      "complexity": "medium",
+      "daily_passengers_millions": 0.12,
+      "operators": [
+        {
+          "name": "JR East",
+          "name_ja": "JR東日本",
+          "lines": [
+            { "name": "Hokuriku Shinkansen", "name_ja": "北陸新幹線", "color": "#0055A5", "platforms": ["11-14"], "directions": ["Tokyo", "Kanazawa"] },
+            { "name": "Shinano Railway", "name_ja": "しなの鉄道", "color": "#FFD400", "platforms": ["5-6"], "directions": ["Karuizawa", "Myoko-Kogen"] }
+          ]
+        }
+      ],
+      "exits": {
+        "east": {
+          "name": "East Exit (Higashi-guchi)",
+          "name_es": "Salida Este (Higashi-guchi)",
+          "name_ja": "東口",
+          "landmarks": ["Zenkoji Temple", "Zenkoji-dori", "Bus Terminal"],
+          "best_for": ["sightseeing", "buses"],
+          "time_to_surface": "3 min",
+          "tips": [
+            "Take the 'Shiritai Nagano' bus to Zenkoji from here.",
+            "Zenkoji-dori has souvenir shops."
+          ],
+          "tips_es": [
+            "Toma el autobús 'Shiritai Nagano' hacia Zenkoji desde aquí.",
+            "Zenkoji-dori tiene tiendas de souvenirs."
+          ],
+          "tips_ja": [
+            "ここから善光寺行きの「しりたい長野」バスに乗車できます。",
+            "善光寺通りにはお土産店があります。"
+          ]
+        },
+        "west": {
+          "name": "West Exit (Nishi-guchi)",
+          "name_es": "Salida Oeste (Nishi-guchi)",
+          "name_ja": "西口",
+          "landmarks": ["City Center", "Togura-Kamiyamada Onsen"],
+          "best_for": ["business", "hotels"],
+          "time_to_surface": "2 min",
+          "tips": [
+            "Quiet area with local shops."
+          ],
+          "tips_es": [
+            "Zona tranquila con tiendas locales."
+          ],
+          "tips_ja": [
+            "地元の商店が並ぶ静かなエリアです。"
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "JR Shinkansen and Shinano Railway are on different platforms. Allow 10 min transfer.",
+          "text_es": "El Shinkansen de JR y la línea Shinano Railway están en andenes distintos. Reserva 10 minutos para el transbordo.",
+          "text_ja": "JR新幹線としなの鉄道は異なるホームにあります。乗り換えに10分ほど余裕を見てください。"
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "East Exit is the main gateway for tourists. West Exit is quieter.",
+          "text_es": "La Salida Este es la puerta de entrada principal para turistas. La Salida Oeste es más tranquila.",
+          "text_ja": "東口は観光客の主な玄関口です。西口 es relativamente silenciosa."
+        }
+      ],
+      "svg_map": "nagano.svg",
+      "svg_map_simplified": "nagano_simple.svg"
+    },
+    {
+      "id": "yokohama",
+      "name": "Yokohama Station",
+      "name_ja": "横浜駅",
+      "name_ja_romaji": "Yokohama-eki",
+      "city": "Yokohama",
+      "region": "kanto",
+      "complexity": "extreme",
+      "daily_passengers_millions": 2.2,
+      "operators": [
+        {
+          "name": "JR East",
+          "name_ja": "JR東日本",
+          "lines": [
+            { "name": "Tokaido Line", "name_ja": "東海道線", "color": "#FFD400", "platforms": ["3-4"], "directions": ["Tokyo", "Odawara"] },
+            { "name": "Yokosuka Line", "name_ja": "横須賀線", "color": "#008000", "platforms": ["7-10"], "directions": ["Kamakura", "Kurihama"] }
+          ]
+        },
+        {
+          "name": "Keikyu",
+          "name_ja": "京急",
+          "lines": [
+            { "name": "Keikyu Main Line", "name_ja": "京急本線", "color": "#CC0000", "platforms": ["1-2"], "directions": ["Haneda Airport", "Shinagawa"] }
+          ]
+        },
+        {
+          "name": "Yokohama Municipal Subway",
+          "name_ja": "横浜市営地下鉄",
+          "lines": [
+            { "name": "Blue Line", "name_ja": "ブルーライン", "color": "#0096FF", "platforms": ["B1"], "directions": ["Shonandai", "Azamino"] }
+          ]
+        }
+      ],
+      "exits": {
+        "east": {
+          "name": "East Exit (Higashi-guchi)",
+          "name_es": "Salida Este (Higashi-guchi)",
+          "name_ja": "東口",
+          "landmarks": ["Minato Mirai 21", "Cosmo Clock 21", "Landmark Tower"],
+          "best_for": ["sightseeing", "nightlife", "shopping"],
+          "time_to_surface": "10 min walk",
+          "tips": [
+            "Minato Mirai is a 10-15 min walk. Follow signs for 'Minato Mirai Line'."
+          ],
+          "tips_es": [
+            "Minato Mirai está a 10-15 minutos a pie. Sigue las indicaciones para la línea 'Minato Mirai Line'."
+          ],
+          "tips_ja": [
+            "みなとみらいまでは徒歩10〜15分です。「みなとみらい線」の案内表示に従ってください。"
+          ]
+        },
+        "west": {
+          "name": "West Exit (Nishi-guchi)",
+          "name_es": "Salida Oeste (Nishi-guchi)",
+          "name_ja": "西口",
+          "landmarks": ["Yodobashi Camera", "Chinatown Bus Terminal"],
+          "best_for": ["shopping", "buses"],
+          "time_to_surface": "5 min",
+          "tips": [
+            "Yodobashi is huge electronics store. Chinatown bus departs from here."
+          ],
+          "tips_es": [
+            "Yodobashi Camera es una tienda de electrónica enorme. El autobús a Chinatown sale desde aquí."
+          ],
+          "tips_ja": [
+            "ヨドバシカメラは巨大な家電量販店 es. 中華街行きのバスはここから出発します。"
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "Yokohama Station is a labyrinth. Use landmarks (Landmark Tower vs. Yodobashi) to orient.",
+          "text_es": "La estación de Yokohama es un laberinto. Utiliza puntos de referencia (Landmark Tower frente a Yodobashi) para orientarte.",
+          "text_ja": "横浜駅は迷宮です。目印（ランドマークタワーやヨドバシカメラ）を使って方向を確認してください。"
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "To go to Kamakura, use Yokosuka Line (Green). To go to Minato Mirai, walk East.",
+          "text_es": "Para ir a Kamakura, usa la línea Yokosuka (Verde). Para ir a Minato Mirai, camina hacia el Este.",
+          "text_ja": "鎌倉へ行くには横須賀線（緑）を使用してください。みなとみらいへ行くには東口へ歩いてください。"
+        }
+      ],
+      "svg_map": "yokohama.svg",
+      "svg_map_simplified": "yokohama_simple.svg"
+    },
+    {
+      "id": "kumamoto",
+      "name": "Kumamoto Station",
+      "name_ja": "熊本駅",
+      "name_ja_romaji": "Kumamoto-eki",
+      "city": "Kumamoto",
+      "region": "kyushu",
+      "complexity": "medium",
+      "daily_passengers_millions": 0.1,
+      "operators": [
+        {
+          "name": "JR Kyushu",
+          "name_ja": "JR九州",
+          "lines": [
+            { "name": "Kyushu Shinkansen", "name_ja": "九州新幹線", "color": "#E60012", "platforms": ["1-2"], "directions": ["Hakata", "Kagoshima-Chuo"] },
+            { "name": "Hohi Main Line", "name_ja": "豊肥本线", "color": "#008000", "platforms": ["3-4"], "directions": ["Aso", "Oita"] }
+          ]
+        }
+      ],
+      "exits": {
+        "west": {
+          "name": "West Exit (Nishi-guchi)",
+          "name_es": "Salida Oeste (Nishi-guchi)",
+          "name_ja": "西口",
+          "landmarks": ["Kumamoto Castle", "City Center", "Tram Stop"],
+          "best_for": ["sightseeing", "tram"],
+          "time_to_surface": "5 min",
+          "tips": [
+            "Tram stop is right outside. Take Tram A to Kumamotojo-mae (Castle).",
+            "Kumamon (mascot) statue is at West Exit."
+          ],
+          "tips_es": [
+            "La parada del tranvía está justo afuera. Toma el tranvía A hacia Kumamotojo-mae (Castillo).",
+            "La estatua de Kumamon (la mascota oficial) está en la salida Oeste."
+          ],
+          "tips_ja": [
+            "路面電車の停留所はすぐ外にあります。熊本城前（お城）までは市電A系統に乗車してください。",
+            "西口にはくまモン（公式キャラクター）の像があります。"
+          ]
+        },
+        "east": {
+          "name": "East Exit (Higashi-guchi)",
+          "name_es": "Salida Este (Higashi-guchi)",
+          "name_ja": "東口",
+          "landmarks": ["Shopping Street"],
+          "best_for": ["shopping"],
+          "time_to_surface": "3 min",
+          "tips": [
+            "Less used by tourists."
+          ],
+          "tips_es": [
+            "Menos utilizada por los turistas."
+          ],
+          "tips_ja": [
+            "観光客の利用は比較的少ない出口です。"
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "Use the Tram (Route A) to get to the Castle or Downtown (Kami-Kumamoto).",
+          "text_es": "Usa el tranvía (Ruta A) para llegar al Castillo o al centro de la ciudad (Kami-Kumamoto).",
+          "text_ja": "お城や中心街（上熊本）へ行くには、路面電車（A系統）を利用してください。"
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "Kumamon Station is on the 2nd floor. Free photo op.",
+          "text_es": "La estación de Kumamon está en el segundo piso. ¡Sesión de fotos gratuita!",
+          "text_ja": "2階にはくまモンの撮影スポットがあります。無料で写真が撮れます。"
+        }
+      ],
+      "svg_map": "kumamoto.svg",
+      "svg_map_simplified": "kumamoto_simple.svg"
+    },
+    {
+      "id": "nara",
+      "name": "JR Nara Station",
+      "name_ja": "JR奈良駅",
+      "name_ja_romaji": "JR Nara-eki",
+      "city": "Nara",
+      "region": "kansai",
+      "complexity": "low",
+      "daily_passengers_millions": 0.05,
+      "operators": [
+        {
+          "name": "JR West",
+          "name_ja": "JR西日本",
+          "lines": [
+            { "name": "Yamatoji Line", "name_ja": "大和路線", "color": "#FFD700", "platforms": ["1-2"], "directions": ["Kyoto", "Osaka"] },
+            { "name": "Kansai Main Line", "name_ja": "関西本線", "color": "#008000", "platforms": ["3-4"], "directions": ["Nagoya"] }
+          ]
+        }
+      ],
+      "exits": {
+        "east": {
+          "name": "East Exit (Higashi-guchi)",
+          "name_es": "Salida Este (Higashi-guchi)",
+          "name_ja": "東口",
+          "landmarks": ["Nara Park", "Deer", "Todai-ji Temple"],
+          "best_for": ["sightseeing", "deer-park"],
+          "time_to_surface": "1 min",
+          "tips": [
+            "Walk straight 15-20 min to reach Nara Park and Deer.",
+            "Feed deer with special crackers (buy at stands)."
+          ],
+          "tips_es": [
+            "Camina recto 15-20 minutos para llegar al Parque de Nara y los ciervos.",
+            "Alimenta a los ciervos con galletas especiales (cómpralas en los puestos)."
+          ],
+          "tips_ja": [
+            "奈良公園と鹿のいるエリアまでは直進して徒歩15〜20分です。",
+            "鹿せんべい（売店で購入）で鹿に餌をあげることができます。"
+          ]
+        },
+        "west": {
+          "name": "West Exit (Nishi-guchi)",
+          "name_es": "Salida Oeste (Nishi-guchi)",
+          "name_ja": "西口",
+          "landmarks": ["Local shops"],
+          "best_for": ["business"],
+          "time_to_surface": "2 min",
+          "tips": [
+            "Quiet area."
+          ],
+          "tips_es": [
+            "Zona tranquila."
+          ],
+          "tips_ja": [
+            "静かなエリアです。"
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "Kintetsu Nara Station is closer to the park (5 min walk). JR Nara is 15-20 min.",
+          "text_es": "La estación Kintetsu Nara está más cerca del parque (a 5 minutos a pie). La estación JR Nara está a 15-20 minutos.",
+          "text_ja": "近鉄奈良駅の方が公園に近いです（徒歩5分）。JR奈良駅からは徒歩15〜20分かかります。"
+        },
+        {
+          "category": "safety",
+          "priority": "medium",
+          "text": "Deer can be aggressive if they think you have food. Keep crackers sealed until ready.",
+          "text_es": "Los ciervos pueden ser agresivos si creen que tienes comida. Mantén las galletas guardadas hasta que estés listo.",
+          "text_ja": "鹿は食べ物を持っていると思うと攻撃的になることがあります。準備ができるまで鹿せんべいはしまっておいてください。"
+        }
+      ],
+      "svg_map": "nara.svg",
+      "svg_map_simplified": "nara_simple.svg"
+    },
+    {
+      "id": "kanazawa",
+      "name": "Kanazawa Station",
+      "name_ja": "金沢駅",
+      "name_ja_romaji": "Kanazawa-eki",
+      "city": "Kanazawa",
+      "region": "chubu",
+      "complexity": "medium",
+      "daily_passengers_millions": 0.1,
+      "operators": [
+        {
+          "name": "JR West",
+          "name_ja": "JR西日本",
+          "lines": [
+            { "name": "Hokuriku Shinkansen", "name_ja": "北陸新幹線", "color": "#0055A5", "platforms": ["11-14"], "directions": ["Tokyo", "Toyama"] }
+          ]
+        }
+      ],
+      "exits": {
+        "east": {
+          "name": "East Exit (Higashi-guchi)",
+          "name_es": "Salida Este (Higashi-guchi)",
+          "name_ja": "東口",
+          "landmarks": ["Tsuzumi Gate", "Kenrokuen Bus Terminal", "Gold Leaf Museum"],
+          "best_for": ["sightseeing", "buses", "gold-leaf"],
+          "time_to_surface": "2 min",
+          "tips": [
+            "Iconic 'Tsuzumi Gate' (drum) is here. Best photo spot.",
+            "Take bus to Kenrokuen (10 min)."
+          ],
+          "tips_es": [
+            "La icónica puerta 'Tsuzumi Gate' (tambor) está aquí. El mejor lugar para hacer fotos.",
+            "Toma el autobús hacia Kenrokuen (10 min)."
+          ],
+          "tips_ja": [
+            "象徴的な「鼓門」がここにあります。最高の写真撮影スポットです。",
+            "兼六園行きのバス（所要時間10分）に乗車できます。"
+          ]
+        },
+        "west": {
+          "name": "West Exit (Nishi-guchi)",
+          "name_es": "Salida Oeste (Nishi-guchi)",
+          "name_ja": "西口",
+          "landmarks": ["Local shops"],
+          "best_for": ["shopping"],
+          "time_to_surface": "3 min",
+          "tips": [
+            "Smaller exit."
+          ],
+          "tips_es": [
+            "Salida más pequeña."
+          ],
+          "tips_ja": [
+            "比較的小さな出口です。"
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "East Exit is the main tourist entrance. West Exit is local.",
+          "text_es": "La Salida Este es la entrada turística principal. La Salida Oeste es local.",
+          "text_ja": "東口 es la entrada principal para turistas. 西口 es local."
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "Buy Gold Leaf soft serve near East Exit. Try the 'Gold Leaf' shop.",
+          "text_es": "Compra helado con hoja de oro cerca de la Salida Este. Prueba la tienda 'Gold Leaf'.",
+          "text_ja": "東口の近くで金箔ソフトクリームを購入できます。「金箔」ショップを試してみてください。"
+        }
+      ],
+      "svg_map": "kanazawa.svg",
+      "svg_map_simplified": "kanazawa_simple.svg"
+    },
+    {
+      "id": "nagasaki",
+      "name": "Nagasaki Station",
+      "name_ja": "長崎駅",
+      "name_ja_romaji": "Nagasaki-eki",
+      "city": "Nagasaki",
+      "region": "kyushu",
+      "complexity": "medium",
+      "daily_passengers_millions": 0.08,
+      "operators": [
+        {
+          "name": "JR Kyushu",
+          "name_ja": "JR九州",
+          "lines": [
+            { "name": "Nishi Kyushu Shinkansen", "name_ja": "西九州新幹線", "color": "#E60012", "platforms": ["1-2"], "directions": ["Hakata"] }
+          ]
+        },
+        {
+          "name": "Nagasaki Electric Tramway",
+          "name_ja": "長崎電気軌道",
+          "lines": [
+            { "name": "Tram", "name_ja": "路面電車", "color": "#008000", "platforms": ["1-3"], "directions": ["Peace Park", "Glover Garden"] }
+          ]
+        }
+      ],
+      "exits": {
+        "west": {
+          "name": "West Exit (Nishi-guchi)",
+          "name_es": "Salida Oeste (Nishi-guchi)",
+          "name_ja": "西口",
+          "landmarks": ["Tram Stop", "Harbor", "Peace Park Bus"],
+          "best_for": ["trams", "sightseeing"],
+          "time_to_surface": "3 min",
+          "tips": [
+            "Tram stops are right outside. Take Line 1 or 3 to Peace Park.",
+            "Chinatown is a 5 min walk south."
+          ],
+          "tips_es": [
+            "La parada de tranvía está justo afuera. Toma la línea 1 o 3 hacia el Parque de la Paz.",
+            "Chinatown está a 5 minutos a pie hacia el sur."
+          ],
+          "tips_ja": [
+            "路面電車の停留所はすぐ外にあります。平和公園へは1号系統または3号系統に乗車してください。",
+            "中華街までは南へ徒歩5分です。"
+          ]
+        },
+        "east": {
+          "name": "East Exit (Higashi-guchi)",
+          "name_es": "Salida Este (Higashi-guchi)",
+          "name_ja": "東口",
+          "landmarks": ["Bus Terminal"],
+          "best_for": ["buses"],
+          "time_to_surface": "5 min",
+          "tips": [
+            "Bus terminal for longer trips."
+          ],
+          "tips_es": [
+            "Terminal de autobuses para viajes más largos."
+          ],
+          "tips_ja": [
+            "中長距離旅行向けのバスターミナルがあります。"
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "Nagasaki is hilly. Trams are the best way to move around.",
+          "text_es": "Nagasaki es montañosa. Los tranvías son la mejor manera de desplazarse.",
+          "text_ja": "長崎は坂が多い街です。移動には路面電車が最適です。"
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "Try Champon noodles at 'Shikairou' near the station.",
+          "text_es": "Prueba los fideos Champon en 'Shikairou' cerca de la estación.",
+          "text_ja": "駅の近くにある「四海樓」でちゃんぽん麺を試してみてください。"
+        }
+      ],
+      "svg_map": "nagasaki.svg",
+      "svg_map_simplified": "nagasaki_simple.svg"
+    },
+    {
+      "id": "hakodate",
+      "name": "Hakodate Station",
+      "name_ja": "函館駅",
+      "name_ja_romaji": "Hakodate-eki",
+      "city": "Hakodate",
+      "region": "hokkaido",
+      "complexity": "low",
+      "daily_passengers_millions": 0.04,
+      "operators": [
+        {
+          "name": "JR Hokkaido",
+          "name_ja": "JR北海道",
+          "lines": [
+            { "name": "Hakodate Main Line", "name_ja": "函館本線", "color": "#008000", "platforms": ["1-3"], "directions": ["Sapporo", "New Hakodate-Hokuto"] }
+          ]
+        }
+      ],
+      "exits": {
+        "north": {
+          "name": "North Exit (Kita-guchi)",
+          "name_es": "Salida Norte (Kita-guchi)",
+          "name_ja": "北口",
+          "landmarks": ["Tram Stop", "Morning Market", "Bay Area"],
+          "best_for": ["trams", "market", "sightseeing"],
+          "time_to_surface": "3 min",
+          "tips": [
+            "Tram stop is outside. Take Line 2 or 5 to Goryokaku or Motomachi.",
+            "Morning Market is 5 min walk east."
+          ],
+          "tips_es": [
+            "La parada de tranvía está afuera. Toma la línea 2 o 5 hacia Goryokaku o Motomachi.",
+            "El mercado matutino (Morning Market) está a 5 minutos a pie hacia el este."
+          ],
+          "tips_ja": [
+            "路面電車の停留所は外にあります。五稜郭や元町へは2号系統または5号系統に乗車してください。",
+            "朝市までは東へ徒歩5分です。"
+          ]
+        },
+        "south": {
+          "name": "South Exit (Minami-guchi)",
+          "name_es": "Salida Sur (Minami-guchi)",
+          "name_ja": "南口",
+          "landmarks": ["Taxi Stand"],
+          "best_for": ["taxis"],
+          "time_to_surface": "2 min",
+          "tips": [
+            "Mostly for taxis."
+          ],
+          "tips_es": [
+            "Principalmente para taxis."
+          ],
+          "tips_ja": [
+            "主にタクシー乗り場として利用されます。"
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "Hakodate is compact. Trams connect most sights.",
+          "text_es": "Hakodate es compacta. Los tranvías conectan la mayoría de los lugares de interés.",
+          "text_ja": "函館はコンパクトな街です。主要な観光スポットへは路面電車が便利です。"
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "Buy 'Ganso Yaki' (squid) at the market.",
+          "text_es": "Compra 'Ganso Yaki' (calamar) en el mercado.",
+          "text_ja": "朝市で名物の「イカ焼き」を試してみてください。"
+        }
+      ],
+      "svg_map": "hakodate.svg",
+      "svg_map_simplified": "hakodate_simple.svg"
+    },
+    {
+      "id": "matsumoto",
+      "name": "Matsumoto Station",
+      "name_ja": "松本駅",
+      "name_ja_romaji": "Matsumoto-eki",
+      "city": "Matsumoto",
+      "region": "chubu",
+      "complexity": "low",
+      "daily_passengers_millions": 0.03,
+      "operators": [
+        {
+          "name": "JR East",
+          "name_ja": "JR東日本",
+          "lines": [
+            { "name": "Shinano Railway", "name_ja": "しなの鉄道", "color": "#FFD700", "platforms": ["3-4"], "directions": ["Nagano", "Karuizawa"] },
+            { "name": "Oito Line", "name_ja": "大糸線", "color": "#008000", "platforms": ["5-6"], "directions": ["Azumino", "Takayama"] }
+          ]
+        }
+      ],
+      "exits": {
+        "west": {
+          "name": "West Exit (Nishi-guchi)",
+          "name_es": "Salida Oeste (Nishi-guchi)",
+          "name_ja": "西口",
+          "landmarks": ["Matsumoto Castle", "City Center", "Nakamachi"],
+          "best_for": ["sightseeing", "castle", "shopping"],
+          "time_to_surface": "15 min walk",
+          "tips": [
+            "Walk straight west to reach Castle (15 min).",
+            "Nakamachi street has old merchant houses."
+          ],
+          "tips_es": [
+            "Camina recto hacia el oeste para llegar al castillo (15 min).",
+            "La calle Nakamachi tiene antiguas casas de comerciantes."
+          ],
+          "tips_ja": [
+            "城（徒歩15分）までは西へ直進してください。",
+            "中町通りには古い商家が並んでいます。"
+          ]
+        },
+        "east": {
+          "name": "East Exit (Higashi-guchi)",
+          "name_es": "Salida Este (Higashi-guchi)",
+          "name_ja": "東口",
+          "landmarks": ["Hotels"],
+          "best_for": ["hotels"],
+          "time_to_surface": "2 min",
+          "tips": [
+            "Quiet area with hotels."
+          ],
+          "tips_es": [
+            "Zona tranquila con hoteles."
+          ],
+          "tips_ja": [
+            "ホテルが並ぶ静かなエリアです。"
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "Matsumoto Castle is walkable but allow 15 min.",
+          "text_es": "Se puede ir caminando al Castillo de Matsumoto, pero reserva 15 minutos.",
+          "text_ja": "松本城までは徒歩圏内ですが、15分ほど見てください。"
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "Castle has steep stairs inside. Wear comfortable shoes.",
+          "text_es": "El castillo tiene escaleras empinadas en su interior. Usa zapatos cómodos.",
+          "text_ja": "天守閣内は階段が非常に急です。歩きやすい靴を着用してください。"
+        }
+      ],
+      "svg_map": "matsumoto.svg",
+      "svg_map_simplified": "matsumoto_simple.svg"
+    },
+    {
+      "id": "miyajimaguchi",
+      "name": "Miyajimaguchi Station (Ferry)",
+      "name_ja": "宮島口駅",
+      "name_ja_romaji": "Miyajimaguchi-eki",
+      "city": "Hatsukaichi",
+      "region": "chugoku",
+      "complexity": "low",
+      "daily_passengers_millions": 0.02,
+      "operators": [
+        {
+          "name": "JR West",
+          "name_ja": "JR西日本",
+          "lines": [
+            { "name": "Sanyo Main Line", "name_ja": "山陽本線", "color": "#FFD700", "platforms": ["1-2"], "directions": ["Hiroshima", "Iwakuni"] }
+          ]
+        },
+        {
+          "name": "Hiroshima Electric Railway",
+          "name_ja": "広島電鉄",
+          "lines": [
+            { "name": "Miyajima Line", "name_ja": "宮島線", "color": "#008000", "platforms": ["1"], "directions": ["Hiroshima"] }
+          ]
+        }
+      ],
+      "exits": {
+        "south": {
+          "name": "South Exit (Minami-guchi)",
+          "name_es": "Salida Sur (Minami-guchi)",
+          "name_ja": "南口",
+          "landmarks": ["Ferry Port to Miyajima", "Itsukushima Shrine"],
+          "best_for": ["ferry", "sightseeing"],
+          "time_to_surface": "2 min",
+          "tips": [
+            "Ferry to Miyajima is right outside (10 min ride).",
+            "Buy ferry tickets at booth."
+          ],
+          "tips_es": [
+            "El ferry a Miyajima está justo afuera (viaje de 10 min).",
+            "Compra los boletos del ferry en la taquilla."
+          ],
+          "tips_ja": [
+            "宮島行きのフェリー乗り場はすぐ外にあります（乗船時間約10分）。",
+            "切符売り場でフェリーの乗船券を購入してください。"
+          ]
+        },
+        "north": {
+          "name": "North Exit (Kita-guchi)",
+          "name_es": "Salida Norte (Kita-guchi)",
+          "name_ja": "北口",
+          "landmarks": ["Tram Stop"],
+          "best_for": ["tram"],
+          "time_to_surface": "3 min",
+          "tips": [
+            "Tram goes back to Hiroshima (30 min)."
+          ],
+          "tips_es": [
+            "El tranvía regresa a Hiroshima (30 min)."
+          ],
+          "tips_ja": [
+            "路面電車で広島駅まで戻ることができます（所要時間約30分）。"
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "This is the gateway to Miyajima. The station itself is just a transfer point.",
+          "text_es": "Esta es la puerta de entrada a Miyajima. La estación en sí es solo un punto de transbordo.",
+          "text_ja": "宮島への玄関口です。駅自体は単なる乗り換え地点に過ぎません。"
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "Ferry runs every 10-15 min. JR Pass covers the ferry.",
+          "text_es": "El ferry sale cada 10-15 minutos. El JR Pass cubre el ferry.",
+          "text_ja": "フェリーは10〜15分間隔で運行しています。JRパスでフェリーに乗船可能です。"
+        }
+      ],
+      "svg_map": "miyajimaguchi.svg",
+      "svg_map_simplified": "miyajimaguchi_simple.svg"
+    },
+    {
+      "id": "himeji",
+      "name": "Himeji Station",
+      "name_ja": "姫路駅",
+      "name_ja_romaji": "Himeji-eki",
+      "city": "Himeji",
+      "region": "kansai",
+      "complexity": "medium",
+      "daily_passengers_millions": 0.12,
+      "operators": [
+        {
+          "name": "JR West",
+          "name_ja": "JR西日本",
+          "lines": [
+            { "name": "Sanyo Shinkansen", "name_ja": "山陽新幹線", "color": "#0055A5", "platforms": ["21-24"], "directions": ["Osaka", "Hiroshima"] },
+            { "name": "JR Kobe Line", "name_ja": "JR神戸線", "color": "#008000", "platforms": ["1-4"], "directions": ["Osaka", "Kobe"] }
+          ]
+        }
+      ],
+      "exits": {
+        "south": {
+          "name": "South Exit (Minami-guchi)",
+          "name_es": "Salida Sur (Minami-guchi)",
+          "name_ja": "南口",
+          "landmarks": ["Himeji Castle", "Koko-en Garden", "Otemae-dori"],
+          "best_for": ["sightseeing", "castle", "shopping"],
+          "time_to_surface": "15 min walk",
+          "tips": [
+            "Walk straight south to Himeji Castle (15 min).",
+            "Otemae-dori is main shopping street."
+          ],
+          "tips_es": [
+            "Camina recto hacia el sur para llegar al Castillo de Himeji (15 min).",
+            "Otemae-dori es la calle comercial principal."
+          ],
+          "tips_ja": [
+            "姫路城（徒歩15分）までは南へ直進してください。",
+            "大手前通りは主要なショッピング街です。"
+          ]
+        },
+        "north": {
+          "name": "North Exit (Kita-guchi)",
+          "name_es": "Salida Norte (Kita-guchi)",
+          "name_ja": "北口",
+          "landmarks": ["Bus Terminal"],
+          "best_for": ["buses"],
+          "time_to_surface": "5 min",
+          "tips": [
+            "Buses for further trips depart here."
+          ],
+          "tips_es": [
+            "Los autobuses para viajes más largos salen desde aquí."
+          ],
+          "tips_ja": [
+            "中長距離向けのバスはここから出発します。"
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "Himeji Castle is the main attraction. Allow 2-3 hours.",
+          "text_es": "El Castillo de Himeji es la atracción principal. Reserva de 2 a 3 horas.",
+          "text_ja": "姫路城が主な観光スポットです。見学には2〜3時間を見てください。"
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "Castle renovation finished. It looks pristine white.",
+          "text_es": "La renovación del castillo ha terminado. Luce de un blanco inmaculado.",
+          "text_ja": "お城의 改修工事は完了しました。真っ白で美しい姿を見ることができます。"
+        }
+      ],
+      "svg_map": "himeji.svg",
+      "svg_map_simplified": "himeji_simple.svg"
+    },
+    {
+      "id": "sendai",
+      "name": "Sendai Station",
+      "name_ja": "仙台駅",
+      "name_ja_romaji": "Sendai-eki",
+      "city": "Sendai",
+      "region": "tohoku",
+      "complexity": "high",
+      "daily_passengers_millions": 0.25,
+      "operators": [
+        {
+          "name": "JR East",
+          "name_ja": "JR東日本",
+          "lines": [
+            { "name": "Tohoku Shinkansen", "name_ja": "東北新幹線", "color": "#0055A5", "platforms": ["11-14"], "directions": ["Tokyo", "Morioka"] },
+            { "name": "Senseki Line", "name_ja": "仙石線", "color": "#008000", "platforms": ["5-6"], "directions": ["Matsushima", "Ishinomaki"] }
+          ]
+        },
+        {
+          "name": "Sendai Subway",
+          "name_ja": "仙台市営地下鉄",
+          "lines": [
+            { "name": "Namboku Line", "name_ja": "南北線", "color": "#008000", "platforms": ["B1"], "directions": ["Izumi-Chuo", "Tomizawa"] }
+          ]
+        }
+      ],
+      "exits": {
+        "east": {
+          "name": "East Exit (Higashi-guchi)",
+          "name_es": "Salida Este (Higashi-guchi)",
+          "name_ja": "東口",
+          "landmarks": ["Aoba Castle Ruins", "Zuihoden", "City Center"],
+          "best_for": ["sightseeing", "castle", "shopping"],
+          "time_to_surface": "5 min",
+          "tips": [
+            "East Exit connects to Aoba-dori (shopping).",
+            "Bus to Zuihoden (mausoleum) departs from here."
+          ],
+          "tips_es": [
+            "La salida Este conecta con Aoba-dori (zona de compras).",
+            "El autobús hacia Zuihoden (mausoleo) sale desde aquí."
+          ],
+          "tips_ja": [
+            "東口は青葉通り（ショッピング街）に接続しています。",
+            "瑞鳳殿（霊屋）行きのバスはここから出発します。"
+          ]
+        },
+        "west": {
+          "name": "West Exit (Nishi-guchi)",
+          "name_es": "Salida Oeste (Nishi-guchi)",
+          "name_ja": "西口",
+          "landmarks": ["Hotels", "Local shops"],
+          "best_for": ["hotels"],
+          "time_to_surface": "2 min",
+          "tips": [
+            "Quieter area."
+          ],
+          "tips_es": [
+            "Zona más tranquila."
+          ],
+          "tips_ja": [
+            "比較的静かなエリアです。"
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "Sendai is a hub for Tohoku. Transfer to Senseki Line for Matsushima.",
+          "text_es": "Sendai es el centro neurálgico de Tohoku. Haz transbordo a la línea Senseki para ir a Matsushima.",
+          "text_ja": "仙台は東北の交通の要所です。松島方面へは仙石線に乗り換えてください。"
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "Try Gyutan (Beef Tongue) at 'Rikyu' or 'Yakitei' near the station.",
+          "text_es": "Prueba el Gyutan (lengua de ternera) en 'Rikyu' o 'Yakitei' cerca de la estación.",
+          "text_ja": "駅の近くにある「利久」や「伊達の牛タン」で牛タンを試してみてください。"
+        }
+      ],
+      "svg_map": "sendai.svg",
+      "svg_map_simplified": "sendai_simple.svg"
+    },
+    {
+      "id": "nikko",
+      "name": "Tobu Nikko Station",
+      "name_ja": "東武日光駅",
+      "name_ja_romaji": "Tobu-Nikko-eki",
+      "city": "Nikko",
+      "region": "kanto",
+      "complexity": "low",
+      "daily_passengers_millions": 0.02,
+      "operators": [
+        {
+          "name": "Tobu Railway",
+          "name_ja": "東武鉄道",
+          "lines": [
+            { "name": "Tobu Nikko Line", "name_ja": "東武日光線", "color": "#CC0000", "platforms": ["1-2"], "directions": ["Asakusa (Tokyo)", "Shimo-Imaichi"] }
+          ]
+        }
+      ],
+      "exits": {
+        "east": {
+          "name": "East Exit (Higashi-guchi)",
+          "name_es": "Salida Este (Higashi-guchi)",
+          "name_ja": "東口",
+          "landmarks": ["World Heritage Shrines", "Nikko Toshogu", "Rinnai-ji"],
+          "best_for": ["sightseeing", "shrines"],
+          "time_to_surface": "1 min",
+          "tips": [
+            "Shrines are 30 min walk or take World Heritage Bus.",
+            "Buy bus pass at station."
+          ],
+          "tips_es": [
+            "Los santuarios están a 30 minutos a pie o puedes tomar el autobús World Heritage Bus.",
+            "Compra el pase de autobús en la estación."
+          ],
+          "tips_ja": [
+            "社寺までは徒歩30分、または世界遺産めぐりバスに乗車してください。",
+            "駅でフリーパスを購入できます。"
+          ]
+        },
+        "west": {
+          "name": "West Exit (Nishi-guchi)",
+          "name_es": "Salida Oeste (Nishi-guchi)",
+          "name_ja": "西口",
+          "landmarks": ["Local shops"],
+          "best_for": ["shopping"],
+          "time_to_surface": "2 min",
+          "tips": [
+            "Local area."
+          ],
+          "tips_es": [
+            "Zona local."
+          ],
+          "tips_ja": [
+            "地元の人向けのエリアです。"
+          ]
+        }
+      },
+      "key_tips": [
+        {
+          "category": "navigation",
+          "priority": "critical",
+          "text": "Tobu Nikko is much closer to the Shrines than JR Nikko Station (15 min vs 30 min walk).",
+          "text_es": "La estación Tobu Nikko está mucho más cerca de los santuarios que la estación JR Nikko (15 min frente a 30 min a pie).",
+          "text_ja": "東武日光駅の方が、JR日光駅よりも社寺に近いです（徒歩15分 vs 30分）。"
+        },
+        {
+          "category": "practical",
+          "priority": "high",
+          "text": "Buy 'Nikko Pass' for unlimited bus rides to shrines.",
+          "text_es": "Compra el 'Nikko Pass' para viajes en autobús ilimitados a los santuarios.",
+          "text_ja": "社寺へのバスが乗り放題になる「日光パス」を購入してください。"
+        }
+      ],
+      "svg_map": "nikko.svg",
+      "svg_map_simplified": "nikko_simple.svg"
     }
   ]
 }

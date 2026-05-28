@@ -119,13 +119,18 @@ func (h *Handlers) CreateActivity(w http.ResponseWriter, r *http.Request) {
 		notesPtr = &input.Notes
 	}
 
+	var timePtr *string
+	if input.Time != nil && *input.Time != "" {
+		timePtr = input.Time
+	}
+
 	newActivity := models.Activity{
 		Id:      uuid.New(),
 		TripId:  tripId,
 		PlaceId: placeIdPtr,
 		Title:   input.Title,
 		Date:    input.Date,
-		Time:    input.Time,
+		Time:    timePtr,
 		Notes:   notesPtr,
 	}
 
@@ -149,6 +154,7 @@ func (h *Handlers) UpdateActivity(w http.ResponseWriter, r *http.Request) {
 
 	var input struct {
 		Title   *string `json:"title"`
+		Date    *string `json:"date"`
 		Time    *string `json:"time"`
 		Notes   *string `json:"notes"`
 		PlaceID *string `json:"place_id"`
@@ -167,11 +173,37 @@ func (h *Handlers) UpdateActivity(w http.ResponseWriter, r *http.Request) {
 	if input.Title != nil {
 		current.Title = *input.Title
 	}
+	if input.Date != nil {
+		trip, err := h.TripsRepo.GetTripById(r.Context(), current.TripId)
+		if err == nil {
+			tripStart := trip.StartDate
+			if len(tripStart) > 10 {
+				tripStart = tripStart[:10]
+			}
+			tripEnd := trip.EndDate
+			if len(tripEnd) > 10 {
+				tripEnd = tripEnd[:10]
+			}
+			if *input.Date < tripStart || *input.Date > tripEnd {
+				http.Error(w, "Activity date must be within trip dates", http.StatusBadRequest)
+				return
+			}
+		}
+		current.Date = *input.Date
+	}
 	if input.Time != nil {
-		current.Time = input.Time
+		if *input.Time == "" {
+			current.Time = nil
+		} else {
+			current.Time = input.Time
+		}
 	}
 	if input.Notes != nil {
-		current.Notes = input.Notes
+		if *input.Notes == "" {
+			current.Notes = nil
+		} else {
+			current.Notes = input.Notes
+		}
 	}
 	if input.PlaceID != nil {
 		uid, _ := uuid.Parse(*input.PlaceID)

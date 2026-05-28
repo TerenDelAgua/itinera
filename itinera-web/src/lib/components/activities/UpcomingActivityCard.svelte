@@ -13,6 +13,8 @@
     tripEnd,
     defaultDate,
     placeId,
+    city,
+    places,
     onRefresh,
     onOpenDrawer,
   } = $props<{
@@ -22,11 +24,17 @@
     tripEnd?: string;
     defaultDate?: string;
     placeId?: string;
+    city?: string;
+    places?: any[];
     onRefresh: () => void;
     onOpenDrawer: () => void;
   }>();
 
+  import ClimateBadge from "$lib/components/japan-context/ClimateBadge.svelte";
+  import { getClimate, shouldShowClimate, type ClimateDisplay } from "$lib/services/japanContext";
+
   let showQuickAdd = $state(false);
+  let upcomingClimate = $state<ClimateDisplay | null>(null);
 
   let upcoming = $derived.by(() => {
     const today = new Date().toISOString().split("T")[0];
@@ -37,6 +45,23 @@
         if (a.time && b.time) return a.time.localeCompare(b.time);
         return a.time ? -1 : 1; // All-day al final
       })[0];
+  });
+
+  $effect(() => {
+    let resolvedCity = city;
+    if (upcoming && !resolvedCity && places) {
+      const matchedPlace = places.find((p: any) => p.start_date && p.end_date && upcoming.date >= p.start_date.split('T')[0] && upcoming.date <= p.end_date.split('T')[0]);
+      if (matchedPlace) {
+        resolvedCity = matchedPlace.city;
+      }
+    }
+    if (upcoming && resolvedCity && shouldShowClimate(upcoming.date, tripStart, tripEnd)) {
+      getClimate(resolvedCity, upcoming.date).then(c => {
+        upcomingClimate = c;
+      });
+    } else {
+      upcomingClimate = null;
+    }
   });
 </script>
 
@@ -97,7 +122,7 @@
           </h4>
           {#if upcoming.time}
             <span
-              class="text-xs px-2 py-0.5 rounded-full bg-teren-background border border-teren-border text-teren-text-muted tabular-nums"
+              class="text-xs px-2 py-0.5 rounded-full bg-teren-background border border-teren-border text-teren-text-muted tabular-nums ml-auto shrink-0"
             >
               {upcoming.time}
             </span>
@@ -111,26 +136,32 @@
       </div>
     </div>
 
-    <!-- View All (Bottom-Left) -->
-    <button
-      onclick={onOpenDrawer}
-      class="text-sm text-teren-text-muted hover:text-teren-primary transition-colors self-start flex items-center gap-1 group"
-    >
-      {$t("itinerary.view_all")}
-      <svg
-        class="w-4 h-4 group-hover:translate-x-1 transition-transform"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
+    <!-- View All (Bottom-Left) & Climate (Bottom-Right) -->
+    <div class="flex justify-between items-end mt-1">
+      <button
+        onclick={onOpenDrawer}
+        class="text-sm text-teren-text-muted hover:text-teren-primary transition-colors self-start flex items-center gap-1 group"
       >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M17 8l4 4m0 0l-4 4m4-4H3"
-        />
-      </svg>
-    </button>
+        {$t("itinerary.view_all")}
+        <svg
+          class="w-4 h-4 group-hover:translate-x-1 transition-transform"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 8l4 4m0 0l-4 4m4-4H3"
+          />
+        </svg>
+      </button>
+
+      {#if upcomingClimate}
+        <ClimateBadge climate={upcomingClimate} />
+      {/if}
+    </div>
   {:else}
     <!-- Empty State -->
     <div class="text-center py-8 px-4 flex flex-col items-center justify-center border border-dashed border-teren-border rounded-xl bg-teren-background/30">

@@ -246,6 +246,7 @@
         <UpcomingActivityCard
           {tripId}
           {activities}
+          {places}
           tripStart={tripStartDate}
           tripEnd={tripEndDate}
           onOpenDrawer={() => (isAgendaOpen = true)}
@@ -290,6 +291,7 @@
   <ActivityDrawer
     isOpen={isAgendaOpen}
     {tripId}
+    {places}
     tripStart={tripStartDate}
     tripEnd={tripEndDate}
     {activities}

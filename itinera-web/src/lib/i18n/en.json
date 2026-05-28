@@ -1,214 +1,410 @@
 {
-    "dashboard": {
-        "title": "My trips",
-        "subtitle": "Plan and organize your journeys",
-        "button_new": "New trip",
-        "destination": "Destination",
-        "destinations": "Destinations",
-        "inspiration": "Inspiration",
-        "inspiration_badge": "INSPIRATION"
+  "dashboard": {
+    "title": "My trips",
+    "subtitle": "Plan and organize your journeys",
+    "button_new": "New trip",
+    "destination": "Destination",
+    "destinations": "Destinations",
+    "inspiration": "Inspiration",
+    "inspiration_badge": "INSPIRATION"
+  },
+  "empty_state": {
+    "title": "No trips yet",
+    "description": "Start planning your first journey",
+    "cta": "Create your first trip"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "try_again": "Try again",
+    "today": "Today",
+    "today_short": "TODAY",
+    "tomorrow": "Tomorrow",
+    "tomorrow_short": "TMRW",
+    "next": "Next",
+    "delete": "Delete",
+    "save": "Save",
+    "add": "Add",
+    "inherit": "Inherit",
+    "cancel": "Cancel",
+    "done": "Done"
+  },
+  "trip_form": {
+    "title": "Create a new trip",
+    "name": "Trip Name",
+    "name_placeholder": "Trip name (e.g. Japan)",
+    "description": "Description (Optional)",
+    "description_placeholder": "e.g. Exploring Tokyo, Kyoto, and Osaka",
+    "start_date": "Start Date",
+    "end_date": "End Date",
+    "currency": "Base Currency",
+    "expense_currency": "Expense Currency",
+    "cancel": "Cancel",
+    "submit": "Create Trip",
+    "creating": "Creating...",
+    "create_error": "Could not create trip. Please try again.",
+    "currency_help": "Currencies default to {currency}. You can change this inside your trip anytime.",
+    "dates": "Dates",
+    "error_name_required": "Trip name is required.",
+    "error_start_required": "Start date is required.",
+    "error_end_after_start": "End date must be after start date."
+  },
+  "currencies": {
+    "eur": "Euro (€)",
+    "usd": "Dollar ($)",
+    "jpy": "Yen (¥)",
+    "gbp": "Pound (£)"
+  },
+  "detail": {
+    "back": "Back",
+    "edit": "Edit",
+    "settings": "Trip Settings",
+    "currency": "Base Currency",
+    "summary_currency": "Summary currency",
+    "default_expense_currency": "Default expense currency",
+    "summary_currency_short": "Summary",
+    "expense_currency_short": "Spend",
+    "currency_settings_help": "Summary totals stay in {currency}. Quick add opens in the currency you use most.",
+    "description": "Description & Notes",
+    "no_description": "No description added yet.",
+    "save": "Save Changes",
+    "places": "Places",
+    "places_empty": "Tap to add destinations",
+    "expenses": "Expenses",
+    "expenses_empty": "Tap to track spending",
+    "notes_optional": "Note (optional)",
+    "view_all_expenses": "View All",
+    "destinations": "Destinations",
+    "add_destination": "Add Destination",
+    "destinations_empty": "No destinations added yet.",
+    "destinations_empty_sub": "Add places to organize your expenses by location.",
+    "add_place": "Add Place",
+    "places_empty_subtitle": "Add places to organize your itinerary and expenses by destination.",
+    "add_first_place": "Add your first place"
+  },
+  "place": {
+    "view_place_expenses": "View place expenses",
+    "local": "Local",
+    "default_expense_currency": "Default expense currency",
+    "currency_help": "This place uses {currency} for quick add. Leave it inherited to follow the trip default.",
+    "no_date": "No date",
+    "days": "days",
+    "day": "day",
+    "no_expenses": "No local expenses yet.",
+    "view_history": "View All"
+  },
+  "itinerary": {
+    "title": "Activities",
+    "agenda": "Agenda",
+    "view_all": "View All",
+    "next_activity": "Next",
+    "no_activities": "No upcoming activities planned.",
+    "add_activity": "Add Activity",
+    "title_placeholder": "Title (e.g., TeamLab)",
+    "notes_placeholder": "Notes (optional)",
+    "adding": "Adding...",
+    "add_to_agenda": "Add to Agenda",
+    "local_activity": "Local Activity",
+    "empty_state": "No activities added yet.",
+    "add": "Add",
+    "empty_state_subtitle": "Keep track of your flights, hotels, and sights in one place.",
+    "plan_first_activity": "Plan your first activity"
+  },
+  "confirm": {
+    "delete_place_title": "Delete Destination",
+    "delete_place_message": "Are you sure you want to delete this destination? All associated activities will be lost.",
+    "delete_expense_title": "Delete Expense",
+    "delete_expense_message": "Are you sure you want to delete this expense? This action cannot be undone.",
+    "delete_activity_title": "Delete Activity",
+    "delete_activity_message": "Are you sure you want to delete this activity?",
+    "delete_trip_title": "Delete Trip",
+    "delete_trip_message": "You are about to delete \"{tripName}\" and all associated data. This action cannot be undone."
+  },
+  "place_form": {
+    "name_placeholder": "Destination name (e.g. Kyoto)",
+    "start_date": "Start Date (Optional)",
+    "end_date": "End Date (Optional)",
+    "city_placeholder": "City (e.g. Tokyo, Kyoto, Fukuoka)"
+  },
+  "expenses": {
+    "notes_placeholder": "Notes (optional)...",
+    "add_expense": "Add Expense"
+  },
+  "landing": {
+    "travelers_planning": "travelers have planned their trips",
+    "hero_title_plan": "Plan your journeys",
+    "hero_title_frictionless": "without friction",
+    "hero_subtitle": "Itinera is your planning companion: guest-first, offline-ready, and specialized in Japan. Start in seconds.",
+    "cta_primary": "Start Planning — No Sign Up",
+    "cta_secondary": "See Inspiration",
+    "value_guest_title": "Guest-First",
+    "value_guest_desc": "No registration walls. No ads. Just elegant trip planning for thoughtful travelers.",
+    "value_offline_title": "Offline-Ready",
+    "value_offline_desc": "Airplanes, subways, mountains. Access your plans anywhere, even without internet.",
+    "value_japan_title": "Japan Edge",
+    "value_japan_desc": "Specialized tools for Japan: JR Pass optimization, station tagging, and etiquette guides.",
+    "inspiration_title": "Start from inspiration",
+    "inspiration_subtitle": "Curated itineraries you can make your own",
+    "customize": "Customize",
+    "how_title": "No account required",
+    "how_subtitle": "Three steps to your next adventure",
+    "how_step1_title": "Pick a template or start fresh",
+    "how_step1_desc": "Browse our curated itineraries or create your own. No signup needed.",
+    "how_step2_title": "Plan your trip",
+    "how_step2_desc": "Edit, add places, track expenses. All your data stays for 30 days.",
+    "how_step3_title": "Save when you're ready",
+    "how_step3_desc": "Register anytime to sync across devices and keep your plans forever.",
+    "give_feedback": "Give feedback"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "date_out_of_bounds": "The date must be between {tripStart} and {tripEnd}.",
+    "required_fields": "Please complete all required fields.",
+    "trip_not_found": "We couldn't find this trip.",
+    "invalid_place": "The selected destination is invalid."
+  },
+  "transport": {
+    "savings_estimated": "Estimated savings",
+    "jr_transport": "JR Transport",
+    "no_savings": "Transport: {total} (no JR Pass savings)",
+    "total_individual_tickets": "Total individual tickets",
+    "algorithm_note": "Estimated by place order. Add dates to destinations for accuracy.",
+    "no_routes": "No known JR routes in this itinerary.",
+    "significant_savings": "{passName} recommended. Significant savings.",
+    "modest_savings": "Modest savings. Evaluate convenience vs flexibility.",
+    "cheaper_individual": "For this itinerary, individual tickets are cheaper.",
+    "fallback_note": "Estimated by place order. Add dates for accuracy.",
+    "closest_note": "Origin: {origin} (approximate date)"
+  },
+  "station_guide": {
+    "section_title": "Station Guide",
+    "badge_label": "{station} — {complexity}",
+    "complexity_low": "Station guide",
+    "complexity_medium": "Station guide",
+    "complexity_high": "Complex station",
+    "complexity_extreme": "Complex station",
+    "tabs_tips": "Tips",
+    "tabs_exits": "Exits",
+    "tabs_map": "Map",
+    "tip_category_navigation": "Navigation",
+    "tip_category_practical": "Practical",
+    "tip_category_safety": "Safety",
+    "tip_category_cultural": "Cultural",
+    "priority_critical": "Critical",
+    "priority_high": "Important",
+    "priority_medium": "Good to know",
+    "priority_low": "Extra",
+    "exit_time_to_surface": "{time} to surface",
+    "exit_best_for": "Best for: {categories}",
+    "best_for_nightlife": "Nightlife & Bars",
+    "best_for_shopping": "Shopping & Department Stores",
+    "best_for_hotels": "Hotels & Stays",
+    "best_for_business": "Business & Skyscrapers",
+    "best_for_parks": "Parks & Gardens",
+    "best_for_buses": "Buses & Airport Transit",
+    "best_for_day_trips": "Day Trips & Excursions",
+    "best_for_sightseeing": "Sightseeing & Monuments",
+    "best_for_transit": "Rail Transit & Connections",
+    "best_for_dining": "Dining & Local Eats",
+    "map_placeholder": "Station Navigation Map — Coming Soon",
+    "map_placeholder_subtitle": "We are designing custom simplified maps to help you navigate {station_name} effortlessly. Check back soon!",
+    "map_insight_title": "Insight",
+    "map_insight_body": "This is not a confusing satellite map. It is a logical, rapid-orientation diagram for the critical 30 seconds after stepping off the train."
+  },
+  "japan_context": {
+    "ui": {
+      "useful_phrases": "🗣️ Useful Phrases",
+      "tips_count": "🎌 {count} tips",
+      "tip_singular": "🎌 1 tip",
+      "tips_plural": "🎌 {count} tips",
+      "cultural_tip": "🎌 {count} cultural tip",
+      "cultural_tip_singular": "🎌 1 cultural tip",
+      "cultural_tips_plural": "🎌 {count} cultural tips",
+      "more_tips": "+{count} more",
+      "category_restaurant": "🍜 Restaurant",
+      "category_transport": "🚆 Transport",
+      "category_emergency": "🚨 Emergency",
+      "category_general": "💬 General"
     },
-    "empty_state": {
-        "title": "No trips yet",
-        "description": "Start planning your first journey",
-        "cta": "Create your first trip"
+    "rules": {
+      "no_phone_transport": {
+        "title": "Silence on Public Transport",
+        "body": "Do not talk on the phone or make video calls on trains, buses, or subways. It is considered highly disrespectful.",
+        "consequence": "You may be scolded by other passengers or the conductor.",
+        "tip": "If you need to take a call, step off at the next stop."
+      },
+      "no_eat_walk": {
+        "title": "No Eating or Drinking While Walking",
+        "body": "Eating or drinking while walking down the street or on transport (except Shinkansen) is considered bad manners.",
+        "consequence": "Disapproving stares.",
+        "tip": "If you buy something from a vending machine or store, eat it nearby before continuing."
+      },
+      "shoes_genkan": {
+        "title": "Take Off Your Shoes at the Entrance",
+        "body": "You must leave your shoes in the genkan (sunken entrance area). Never step on tatami mats with shoes.",
+        "consequence": "Severely offending the host or being asked to leave.",
+        "tip": "Always carry clean, hole-free socks."
+      },
+      "no_tattoos_onsen": {
+        "title": "No Visible Tattoos in Onsen",
+        "body": "Tattoos are historically associated with the yakuza in Japan. Many onsen and pools strictly ban them.",
+        "consequence": "Being kicked out of the establishment without explanation.",
+        "tip": "Search for tattoo-friendly onsen or use tattoo-cover patches."
+      },
+      "no_touch_geisha": {
+        "title": "Do Not Touch Geisha or Maiko",
+        "body": "In areas like Gion, do not touch or block the path of geisha or maiko to take photos. They are professionals working.",
+        "consequence": "Local fines and being reprimanded by the police.",
+        "tip": "Take photos from afar without interrupting their path."
+      },
+      "no_tipping": {
+        "title": "No Tipping",
+        "body": "In Japan, you do not leave a tip in restaurants, taxis, or hotels. Good service is already included.",
+        "consequence": "Staff will run after you to return the money.",
+        "tip": "A simple gochisosama deshita (thank you for the meal) is enough."
+      },
+      "ticket_machine_order": {
+        "title": "Order from the Machine Before Sitting",
+        "body": "Many ramen or fast-food places require you to buy your ticket from the machine at the entrance before finding a seat.",
+        "consequence": "Hindering the fast flow of the restaurant.",
+        "tip": "Carry cash; many older machines do not accept cards."
+      },
+      "hashi_etiquette": {
+        "title": "Chopstick Etiquette",
+        "body": "Never stick chopsticks vertically into rice or pass food from your chopsticks to someone else's, as it resembles funeral rituals.",
+        "consequence": "It is a severe taboo.",
+        "tip": "Use the chopstick rest when you are not using them."
+      },
+      "no_blow_nose": {
+        "title": "Do Not Blow Your Nose in Public",
+        "body": "Blowing your nose loudly in public, especially in restaurants or on transport, is considered disgusting.",
+        "consequence": "Extreme discomfort around you.",
+        "tip": "Go to the bathroom to blow your nose or do it discreetly."
+      },
+      "kanpai_wait": {
+        "title": "Wait for Kanpai",
+        "body": "Do not start drinking until everyone has their drink and someone says Kanpai (Cheers!). Also, do not pour your own drink; pour for others and let them pour for you.",
+        "consequence": "Looking selfish in social situations.",
+        "tip": "Keep your companions' glasses full."
+      },
+      "no_touch_products": {
+        "title": "Do Not Touch Products Unnecessarily",
+        "body": "In traditional shops, craft stores, or food markets, avoid touching products if you are not going to buy them.",
+        "consequence": "Angering the shop owner.",
+        "tip": "If you want to examine something, ask for permission first (mite mo ii desu ka?)."
+      },
+      "no_photos_restricted": {
+        "title": "No Photography",
+        "body": "Strictly respect no-photo signs, common in temples, shrines, and museums for spiritual or conservation reasons.",
+        "consequence": "Confiscation of the camera or expulsion.",
+        "tip": "If you do not see a clear sign, assume you cannot take photos inside temples."
+      },
+      "trash_separation": {
+        "title": "Separate Your Trash",
+        "body": "Japan has a strict waste separation system (burnables, plastics, cans, PET bottles).",
+        "consequence": "Public bins are closely monitored.",
+        "tip": "It is often easier to take your trash to your accommodation and throw it away there."
+      },
+      "no_smoking_street": {
+        "title": "No Smoking on the Street",
+        "body": "In most cities, smoking while walking down the street is prohibited. It can only be done in designated areas.",
+        "consequence": "Direct fines.",
+        "tip": "Look for green Smoking Area signs."
+      },
+      "bow_formal": {
+        "title": "Bow Slightly",
+        "body": "The standard greeting is a bow. A simple nod is sufficient for foreigners.",
+        "consequence": "The lack of a bow is not serious for foreigners, but doing it scores many points.",
+        "tip": "Do not combine a bow with a handshake unless the local initiates it."
+      },
+      "wildlife_monkeys": {
+        "title": "Jigokudani Monkey Etiquette",
+        "body": "Do not touch or feed the wild macaques. Avoid direct eye contact as they perceive it as a threat.",
+        "consequence": "Monkeys may become aggressive, scratch or bite, and steal your belongings.",
+        "tip": "Keep a safe distance of at least 2 meters and keep all food sealed in your bag."
+      }
     },
-    "common": {
-        "loading": "Loading...",
-        "error": "Something went wrong",
-        "try_again": "Try again",
-        "today": "Today",
-        "today_short": "TODAY",
-        "tomorrow": "Tomorrow",
-        "tomorrow_short": "TMRW",
-        "next": "Next",
-        "delete": "Delete",
-        "save": "Save",
-        "add": "Add",
-        "inherit": "Inherit",
-        "cancel": "Cancel",
-        "done": "Done"
-    },
-    "trip_form": {
-        "title": "Create a new trip",
-        "name": "Trip Name",
-        "name_placeholder": "Trip name (e.g. Japan)",
-        "description": "Description (Optional)",
-        "description_placeholder": "e.g. Exploring Tokyo, Kyoto, and Osaka",
-        "start_date": "Start Date",
-        "end_date": "End Date",
-        "currency": "Base Currency",
-        "expense_currency": "Expense Currency",
-        "cancel": "Cancel",
-        "submit": "Create Trip",
-        "creating": "Creating...",
-        "create_error": "Could not create trip. Please try again.",
-        "currency_help": "Currencies default to {currency}. You can change this inside your trip anytime.",
-        "dates": "Dates",
-        "error_name_required": "Trip name is required.",
-        "error_start_required": "Start date is required.",
-        "error_end_after_start": "End date must be after start date."
-    },
-    "currencies": {
-        "eur": "Euro (€)",
-        "usd": "Dollar ($)",
-        "jpy": "Yen (¥)",
-        "gbp": "Pound (£)"
-    },
-    "detail": {
-        "back": "Back",
-        "edit": "Edit",
-        "settings": "Trip Settings",
-        "currency": "Base Currency",
-        "summary_currency": "Summary currency",
-        "default_expense_currency": "Default expense currency",
-        "summary_currency_short": "Summary",
-        "expense_currency_short": "Spend",
-        "currency_settings_help": "Summary totals stay in {currency}. Quick add opens in the currency you use most.",
-        "description": "Description & Notes",
-        "no_description": "No description added yet.",
-        "save": "Save Changes",
-        "places": "Places",
-        "places_empty": "Tap to add destinations",
-        "expenses": "Expenses",
-        "expenses_empty": "Tap to track spending",
-        "notes_optional": "Note (optional)",
-        "view_all_expenses": "View All",
-        "destinations": "Destinations",
-        "add_destination": "Add Destination",
-        "destinations_empty": "No destinations added yet.",
-        "destinations_empty_sub": "Add places to organize your expenses by location.",
-        "add_place": "Add Place",
-        "places_empty_subtitle": "Add places to organize your itinerary and expenses by destination.",
-        "add_first_place": "Add your first place"
-    },
-    "place": {
-        "view_place_expenses": "View place expenses",
-        "local": "Local",
-        "default_expense_currency": "Default expense currency",
-        "currency_help": "This place uses {currency} for quick add. Leave it inherited to follow the trip default.",
-        "no_date": "No date",
-        "days": "days",
-        "day": "day",
-        "no_expenses": "No local expenses yet.",
-        "view_history": "View All"
-    },
-    "itinerary": {
-        "title": "Activities",
-        "agenda": "Agenda",
-        "view_all": "View All",
-        "next_activity": "Next",
-        "no_activities": "No upcoming activities planned.",
-        "add_activity": "Add Activity",
-        "title_placeholder": "Title (e.g., TeamLab)",
-        "notes_placeholder": "Notes (optional)",
-        "adding": "Adding...",
-        "add_to_agenda": "Add to Agenda",
-        "local_activity": "Local Activity",
-        "empty_state": "No activities added yet.",
-        "add": "Add",
-        "empty_state_subtitle": "Keep track of your flights, hotels, and sights in one place.",
-        "plan_first_activity": "Plan your first activity"
-    },
-    "confirm": {
-        "delete_place_title": "Delete Destination",
-        "delete_place_message": "Are you sure you want to delete this destination? All associated activities will be lost.",
-        "delete_expense_title": "Delete Expense",
-        "delete_expense_message": "Are you sure you want to delete this expense? This action cannot be undone.",
-        "delete_activity_title": "Delete Activity",
-        "delete_activity_message": "Are you sure you want to delete this activity?",
-        "delete_trip_title": "Delete Trip",
-        "delete_trip_message": "You are about to delete \"{tripName}\" and all associated data. This action cannot be undone."
-    },
-    "place_form": {
-        "name_placeholder": "Destination name (e.g. Kyoto)",
-        "start_date": "Start Date (Optional)",
-        "end_date": "End Date (Optional)",
-        "city_placeholder": "City (e.g. Tokyo, Kyoto, Fukuoka)"
-    },
-    "expenses": {
-        "notes_placeholder": "Notes (optional)...",
-        "add_expense": "Add Expense"
-    },
-    "landing": {
-        "travelers_planning": "travelers have planned their trips",
-        "hero_title_plan": "Plan your journeys",
-        "hero_title_frictionless": "without friction",
-        "hero_subtitle": "Itinera is your planning companion: guest-first, offline-ready, and specialized in Japan. Start in seconds.",
-        "cta_primary": "Start Planning — No Sign Up",
-        "cta_secondary": "See Inspiration",
-        "value_guest_title": "Guest-First",
-        "value_guest_desc": "No registration walls. No ads. Just elegant trip planning for thoughtful travelers.",
-        "value_offline_title": "Offline-Ready",
-        "value_offline_desc": "Airplanes, subways, mountains. Access your plans anywhere, even without internet.",
-        "value_japan_title": "Japan Edge",
-        "value_japan_desc": "Specialized tools for Japan: JR Pass optimization, station tagging, and etiquette guides.",
-        "inspiration_title": "Start from inspiration",
-        "inspiration_subtitle": "Curated itineraries you can make your own",
-        "customize": "Customize",
-        "how_title": "No account required",
-        "how_subtitle": "Three steps to your next adventure",
-        "how_step1_title": "Pick a template or start fresh",
-        "how_step1_desc": "Browse our curated itineraries or create your own. No signup needed.",
-        "how_step2_title": "Plan your trip",
-        "how_step2_desc": "Edit, add places, track expenses. All your data stays for 30 days.",
-        "how_step3_title": "Save when you're ready",
-        "how_step3_desc": "Register anytime to sync across devices and keep your plans forever.",
-        "give_feedback": "Give feedback"
-    },
-    "errors": {
-        "generic": "Something went wrong. Please try again.",
-        "date_out_of_bounds": "The date must be between {tripStart} and {tripEnd}.",
-        "required_fields": "Please complete all required fields.",
-        "trip_not_found": "We couldn't find this trip.",
-        "invalid_place": "The selected destination is invalid."
-    },
-    "transport": {
-        "savings_estimated": "Estimated savings",
-        "jr_transport": "JR Transport",
-        "no_savings": "Transport: {total} (no JR Pass savings)",
-        "total_individual_tickets": "Total individual tickets",
-        "algorithm_note": "Estimated by place order. Add dates to destinations for accuracy.",
-        "no_routes": "No known JR routes in this itinerary.",
-        "significant_savings": "{passName} recommended. Significant savings.",
-        "modest_savings": "Modest savings. Evaluate convenience vs flexibility.",
-        "cheaper_individual": "For this itinerary, individual tickets are cheaper.",
-        "fallback_note": "Estimated by place order. Add dates for accuracy.",
-        "closest_note": "Origin: {origin} (approximate date)"
-    },
-    "station_guide": {
-        "section_title": "Station Guide",
-        "badge_label": "{station} — {complexity}",
-        "complexity_low": "Station guide",
-        "complexity_medium": "Station guide",
-        "complexity_high": "Complex station",
-        "complexity_extreme": "Complex station",
-        "tabs_tips": "Tips",
-        "tabs_exits": "Exits",
-        "tabs_map": "Map",
-        "tip_category_navigation": "Navigation",
-        "tip_category_practical": "Practical",
-        "tip_category_safety": "Safety",
-        "tip_category_cultural": "Cultural",
-        "priority_critical": "Critical",
-        "priority_high": "Important",
-        "priority_medium": "Good to know",
-        "priority_low": "Extra",
-        "exit_time_to_surface": "{time} to surface",
-        "exit_best_for": "Best for: {categories}",
-        "best_for_nightlife": "Nightlife & Bars",
-        "best_for_shopping": "Shopping & Department Stores",
-        "best_for_hotels": "Hotels & Stays",
-        "best_for_business": "Business & Skyscrapers",
-        "best_for_parks": "Parks & Gardens",
-        "best_for_buses": "Buses & Airport Transit",
-        "best_for_day_trips": "Day Trips & Excursions",
-        "best_for_sightseeing": "Sightseeing & Monuments",
-        "best_for_transit": "Rail Transit & Connections",
-        "best_for_dining": "Dining & Local Eats",
-        "map_placeholder": "Station Navigation Map — Coming Soon",
-        "map_placeholder_subtitle": "We are designing custom simplified maps to help you navigate {station_name} effortlessly. Check back soon!",
-        "map_insight_title": "Insight",
-        "map_insight_body": "This is not a confusing satellite map. It is a logical, rapid-orientation diagram for the critical 30 seconds after stepping off the train."
+    "phrases": {
+      "sumimasen": {
+        "translation": "Excuse me / Sorry / Thanks",
+        "usage": "The most useful word. Use it to call a waiter, apologize, or pass through."
+      },
+      "arigatou": {
+        "translation": "Thank you (formal)",
+        "usage": "To thank services, purchases, or favors politely."
+      },
+      "wakarimasen": {
+        "translation": "I do not understand",
+        "usage": "Useful when spoken to in Japanese and you do not understand."
+      },
+      "eigo": {
+        "translation": "Do you speak English?",
+        "usage": "Always ask this before speaking English."
+      },
+      "ikura": {
+        "translation": "How much is this?",
+        "usage": "Pointing at an object you want to buy."
+      },
+      "okaikei": {
+        "translation": "The check, please",
+        "usage": "To ask for the bill. Make an X sign with your index fingers."
+      },
+      "hitori": {
+        "translation": "For one/two person(s)",
+        "usage": "Hold up one or two fingers when entering a restaurant."
+      },
+      "bejitarian": {
+        "translation": "I am vegetarian",
+        "usage": "Caution: many Japanese do not consider fish broth (dashi) as meat."
+      },
+      "niku_nashi": {
+        "translation": "I do not eat meat/fish",
+        "usage": "More specific than saying vegetarian to ensure no derivatives."
+      },
+      "toire": {
+        "translation": "Where is the bathroom?",
+        "usage": "Essential in stations or large streets."
+      },
+      "arerugii": {
+        "translation": "I am allergic to...",
+        "usage": "Combine it with the ingredient, e.g., piinatsu arerugii desu (peanuts)."
+      },
+      "tasukete": {
+        "translation": "Help!",
+        "usage": "Only for emergencies."
+      },
+      "oishii": {
+        "translation": "Delicious!",
+        "usage": "Saying it out loud in a restaurant will make the chef very happy."
+      },
+      "kanpai": {
+        "translation": "Cheers!",
+        "usage": "The official Japanese toast."
+      },
+      "ohayou": {
+        "translation": "Good morning",
+        "usage": "Until 10:30-11:00 am."
+      },
+      "konbanwa": {
+        "translation": "Good evening",
+        "usage": "From sunset."
+      },
+      "arigatou_mashita": {
+        "translation": "Thank you (for what just happened)",
+        "usage": "Perfect to say when leaving a store or restaurant."
+      },
+      "densha": {
+        "translation": "Is this the train to...?",
+        "usage": "Pointing at a train on the platform to avoid taking the wrong one."
+      },
+      "deguchi": {
+        "translation": "Where is the exit?",
+        "usage": "Large stations can be mazes."
+      },
+      "byouin": {
+        "translation": "I need a doctor/hospital",
+        "usage": "To ask for urgent medical help."
+      }
     }
+  }
 }

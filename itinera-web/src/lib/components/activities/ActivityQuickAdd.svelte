@@ -46,8 +46,8 @@
       const data = {
         title,
         date,
-        time: time || undefined,
-        notes: notes || undefined,
+        time,
+        notes,
         place_id: placeId || activity?.place_id
       };
 

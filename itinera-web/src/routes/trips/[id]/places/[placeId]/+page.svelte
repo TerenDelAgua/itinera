@@ -28,11 +28,17 @@
   import StationGuide from "$lib/components/station-guide/StationGuide.svelte";
   import { matchStationGuide } from "$lib/services/stationGuide";
 
+  // Japan Context v1.3.1 imports
+  import PlaceContextWidget from "$lib/components/japan-context/PlaceContextWidget.svelte";
+  import PhraseDrawer from "$lib/components/japan-context/PhraseDrawer.svelte";
+  import { getPlaceLevelRules } from "$lib/services/japanContext";
+
   let tripId = $state("");
   let placeId = $state("");
 
   let place = $state<Place | null>(null);
   let matchedGuide = $derived(place ? matchStationGuide(place.name, place.city) : null);
+  let placeRules = $derived(place && place.city ? getPlaceLevelRules(place.name, place.city, $locale) : []);
   let expenses = $state<Expense[]>([]);
   let categorySummary = $state<CategorySummary[]>([]);
   let categories = $state<Expense_Category[]>([]);
@@ -222,6 +228,7 @@
       <UpcomingActivityCard
         {tripId}
         {placeId}
+        city={place.city}
         tripStart={tripStartDate}
         tripEnd={tripEndDate}
         activities={activities.filter((a) => a.place_id === placeId)}
@@ -229,19 +236,27 @@
         onRefresh={loadAllData}
       />
 
+      <PhraseDrawer />
+
       <!-- ============================================================ -->
       <!-- STATION GUIDE: Rendered fully expanded inside Place detail   -->
       <!-- ============================================================ -->
-      {#if matchedGuide}
+      {#if matchedGuide || placeRules.length > 0}
         <div class="space-y-4 pt-4 border-t border-dashed border-teren-border/60">
-          <h2 class="text-lg font-semibold text-teren-text-main tracking-tight flex items-center gap-2">
-            <span>🚉</span> {$t("station_guide.section_title" as any)}
-          </h2>
-          <StationGuide
-            cityName={matchedGuide.id}
-            compact={false}
-            locale={$locale}
-          />
+          {#if matchedGuide}
+            <h2 class="text-lg font-semibold text-teren-text-main tracking-tight flex items-center gap-2">
+              <span>🚉</span> {$t("station_guide.section_title" as any)}
+            </h2>
+            <StationGuide
+              cityName={matchedGuide.id}
+              compact={false}
+              locale={$locale}
+            />
+          {/if}
+          
+          {#if placeRules.length > 0}
+            <PlaceContextWidget rules={placeRules} />
+          {/if}
         </div>
       {/if}
     {/if}
@@ -260,6 +275,7 @@
     isOpen={isAgendaOpen}
     {tripId}
     {placeId}
+    city={place?.city}
     tripStart={tripStartDate}
     tripEnd={tripEndDate}
     {activities}
