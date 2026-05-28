@@ -123,6 +123,8 @@ jobs:
 
       - name: Install Playwright Browsers
         run: pnpm --filter itinera-web exec playwright install --with-deps chromium
+        env:
+          DEBIAN_FRONTEND: noninteractive
 
       - name: Build Backend
         working-directory: ./backend
