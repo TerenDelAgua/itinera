@@ -10,4 +10,5 @@ export interface Place {
     default_expense_currency?: string;
     total_expenses?: number;
     city?: string;
+    country_code?: string | null;
 }

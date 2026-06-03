@@ -37,8 +37,8 @@
   let placeId = $state("");
 
   let place = $state<Place | null>(null);
-  let matchedGuide = $derived(place ? matchStationGuide(place.name, place.city) : null);
-  let placeRules = $derived(place && place.city ? getPlaceLevelRules(place.name, place.city, $locale) : []);
+  let matchedGuide = $derived(place ? matchStationGuide(place) : null);
+  let placeRules = $derived(place ? getPlaceLevelRules(place, $locale) : []);
   let expenses = $state<Expense[]>([]);
   let categorySummary = $state<CategorySummary[]>([]);
   let categories = $state<Expense_Category[]>([]);
@@ -236,7 +236,7 @@
         onRefresh={loadAllData}
       />
 
-      <PhraseDrawer />
+      <PhraseDrawer {place} />
 
       <!-- ============================================================ -->
       <!-- STATION GUIDE: Rendered fully expanded inside Place detail   -->
@@ -275,6 +275,7 @@
     isOpen={isAgendaOpen}
     {tripId}
     {placeId}
+    places={place ? [place] : []}
     city={place?.city}
     tripStart={tripStartDate}
     tripEnd={tripEndDate}
