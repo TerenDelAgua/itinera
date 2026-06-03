@@ -32,6 +32,7 @@
 
   import ClimateBadge from "$lib/components/japan-context/ClimateBadge.svelte";
   import { getClimate, shouldShowClimate, type ClimateDisplay } from "$lib/services/japanContext";
+  import { isJapanPlace } from "$lib/utils/place";
 
   let showQuickAdd = $state(false);
   let upcomingClimate = $state<ClimateDisplay | null>(null);
@@ -49,13 +50,15 @@
 
   $effect(() => {
     let resolvedCity = city;
+    let matchedPlace = null;
     if (upcoming && !resolvedCity && places) {
-      const matchedPlace = places.find((p: any) => p.start_date && p.end_date && upcoming.date >= p.start_date.split('T')[0] && upcoming.date <= p.end_date.split('T')[0]);
+      matchedPlace = places.find((p: any) => p.start_date && p.end_date && upcoming.date >= p.start_date.split('T')[0] && upcoming.date <= p.end_date.split('T')[0]);
       if (matchedPlace) {
         resolvedCity = matchedPlace.city;
       }
     }
-    if (upcoming && resolvedCity && shouldShowClimate(upcoming.date, tripStart, tripEnd)) {
+    const checkPlace = matchedPlace || (placeId && places?.find((p: any) => p.id === placeId)) || { city: resolvedCity };
+    if (upcoming && resolvedCity && isJapanPlace(checkPlace) && shouldShowClimate(upcoming.date, tripStart, tripEnd)) {
       getClimate(resolvedCity, upcoming.date).then(c => {
         upcomingClimate = c;
       });

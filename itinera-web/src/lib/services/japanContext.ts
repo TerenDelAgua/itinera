@@ -1,6 +1,7 @@
 import dataset from '$lib/data/japan_context.json';
 import { matchContext } from './contextMatcher';
 import { getClimate, shouldShowClimate, type ClimateDisplay } from './climateService';
+import { isJapanPlace } from '$lib/utils/place';
 
 export interface RuleDisplay {
     id: string;
@@ -48,9 +49,13 @@ export function getRulesForActivity(name: string, notes: string | undefined, loc
     return results;
 }
 
-export function getPlaceLevelRules(placeName: string, placeCity: string, locale: string): RuleDisplay[] {
+export function getPlaceLevelRules(place: { name: string; city?: string; country_code?: string | null } | null | undefined, locale: string): RuleDisplay[] {
+    if (!place || !isJapanPlace(place)) {
+        return [];
+    }
+
     // Para Place header, pasamos el nombre del lugar y ciudad
-    const rules = getRulesForActivity(`${placeName} ${placeCity}`, '', locale);
+    const rules = getRulesForActivity(`${place.name} ${place.city || ''}`, '', locale);
     
     // Append general rules (any / any_public) so general etiquette tips show up here
     const addedIds = new Set(rules.map(r => r.id));
