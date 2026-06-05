@@ -97,8 +97,8 @@
     try {
       const tripData = await apiFetch<Trip>(`/trips/${tripId}`);
 
-      tripName = tripData.name;
-      tripDescription = tripData.description || "";
+      tripName = tripData.name?.startsWith("inspiration.") ? $t(tripData.name as any) : tripData.name;
+      tripDescription = tripData.description?.startsWith("inspiration.") ? $t(tripData.description as any) : (tripData.description || "");
       tripStartDate = tripData.start_date?.split("T")[0] || "";
       tripEndDate = tripData.end_date?.split("T")[0] || "";
       baseCurrency = tripData.base_currency || "EUR";
