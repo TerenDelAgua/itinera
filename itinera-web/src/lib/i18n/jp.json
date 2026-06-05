@@ -406,5 +406,22 @@
         "usage": "To ask for urgent medical help."
       }
     }
+  },
+  "budget": {
+    "on_track": "順調",
+    "halfway": "中間地点",
+    "over_by": "{{amount}}超過",
+    "under_budget": "予算内（{{amount}}お得）",
+    "over_budget": "予算超過（{{amount}}）",
+    "actual": "実績",
+    "estimated": "予測",
+    "remaining": "残り",
+    "over": "超過",
+    "excl_flights": "（航空券を除く）",
+    "aria_label": "経費の内訳を表示",
+    "days_left": "開始まであと{{count}}日",
+    "trip_starts_today": "旅行は今日から始まります",
+    "trip_starts_tomorrow": "旅行は明日から始まります",
+    "day_x_of_y": "旅行 {{day}} / {{total}}日目"
   }
 }

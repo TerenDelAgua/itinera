@@ -406,5 +406,22 @@
         "usage": "To ask for urgent medical help."
       }
     }
+  },
+  "budget": {
+    "on_track": "On track",
+    "halfway": "Halfway",
+    "over_by": "Over by {amount}",
+    "under_budget": "{amount} under budget",
+    "over_budget": "{amount} over budget",
+    "actual": "Actual",
+    "estimated": "Estimated",
+    "remaining": "Remaining",
+    "over": "Over",
+    "excl_flights": "(excl. flights)",
+    "aria_label": "View expense breakdown",
+    "days_left": "{count} days left",
+    "trip_starts_today": "Trip starts today",
+    "trip_starts_tomorrow": "Trip starts tomorrow",
+    "day_x_of_y": "Day {day}/{total}"
   }
 }

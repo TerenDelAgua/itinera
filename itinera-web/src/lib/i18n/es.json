@@ -406,5 +406,22 @@
         "usage": "Para pedir ayuda médica urgente."
       }
     }
+  },
+  "budget": {
+    "on_track": "En curso",
+    "halfway": "A mitad",
+    "over_by": "Excedido por {amount}",
+    "under_budget": "{amount} por debajo",
+    "over_budget": "{amount} por encima",
+    "actual": "Real",
+    "estimated": "Estimado",
+    "remaining": "Restante",
+    "over": "Excedido",
+    "excl_flights": "(excl. vuelos)",
+    "aria_label": "Ver desglose de presupuesto",
+    "days_left": "Faltan {count} días",
+    "trip_starts_today": "El viaje empieza hoy",
+    "trip_starts_tomorrow": "El viaje empieza mañana",
+    "day_x_of_y": "Día {day}/{total}"
   }
 }

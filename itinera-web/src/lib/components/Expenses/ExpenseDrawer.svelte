@@ -13,6 +13,8 @@
   } from "$lib/utils";
   import { t } from "$lib/i18n/store";
   import { COMMON_CURRENCIES } from "$lib/types/Currency";
+  import BudgetStatusCard from "./BudgetStatusCard.svelte";
+  import type { CostEstimate } from "$lib/services/costPredictor";
 
   let {
     tripId,
@@ -21,6 +23,7 @@
     onClose,
     onRefreshSummary,
     placeId,
+    estimate = null,
   }: {
     tripId: string;
     categories: Category[];
@@ -28,6 +31,7 @@
     onClose: () => void;
     onRefreshSummary: () => void;
     placeId?: string;
+    estimate?: CostEstimate | null;
   } = $props();
 
   let expenses = $state<Expense[]>([]);
@@ -166,6 +170,9 @@
       </header>
 
       <main class="flex-1 overflow-y-auto p-6 space-y-6">
+        {#if estimate}
+          <BudgetStatusCard {estimate} />
+        {/if}
         {#if loading}
           <div class="flex justify-center py-10">
             <div

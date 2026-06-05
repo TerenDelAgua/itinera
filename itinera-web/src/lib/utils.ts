@@ -41,3 +41,18 @@ export function getRelativeDateLabel(dateStr: string, locale = 'en-US'): string 
   if (diffDays === -1) return 'Yesterday';
   return target.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
 }
+
+export function formatCurrency(amount: number, currency: string): string {
+  try {
+    // If currency is JPY, we format it as integer usually, but let Intl handle details.
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: currency === 'JPY' ? 0 : 2,
+      maximumFractionDigits: currency === 'JPY' ? 0 : 2
+    }).format(amount);
+  } catch (e) {
+    const symbol = getCurrencySymbol(currency);
+    return `${symbol}${amount.toFixed(currency === 'JPY' ? 0 : 2)}`;
+  }
+}
