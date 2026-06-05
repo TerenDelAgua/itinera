@@ -128,7 +128,11 @@
   },
   "expenses": {
     "notes_placeholder": "Notes (optional)...",
-    "add_expense": "Add Expense"
+    "add_expense": "Add Expense",
+    "empty_title": "Start with your flight",
+    "empty_subtitle": "Add your flight cost to see your total trip budget",
+    "add_flight": "Add Flight Cost",
+    "add_other": "Add other expense"
   },
   "landing": {
     "travelers_planning": "travelers have planned their trips",
@@ -415,13 +419,18 @@
     "over_budget": "{amount} over budget",
     "actual": "Actual",
     "estimated": "Estimated",
-    "remaining": "Remaining",
-    "over": "Over",
+    "flight": "Flight",
+    "daily_spent": "Daily spent",
+    "daily_estimated": "Daily budget",
+    "daily_remaining": "Remaining",
+    "daily_over": "Over",
     "excl_flights": "(excl. flights)",
+    "daily_excl_flights": "(Daily: {amount})",
     "aria_label": "View expense breakdown",
     "days_left": "{count} days left",
     "trip_starts_today": "Trip starts today",
     "trip_starts_tomorrow": "Trip starts tomorrow",
+    "trip_completed": "Trip completed",
     "day_x_of_y": "Day {day}/{total}"
   }
 }

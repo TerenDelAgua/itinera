@@ -9,15 +9,16 @@
     estimate: CostEstimate;
   } = $props();
 
-  let remaining = $derived(estimate.total.estimated - estimate.total.actual);
-  let isOver = $derived(remaining < 0);
+  let hasFlight = $derived(estimate.flightCost && estimate.flightCost > 0);
+  let dailyRemaining = $derived(estimate.dailyBudget.remaining);
+  let isDailyOver = $derived(dailyRemaining < 0);
 
-  // Color según fase y estado
-  let statusColor = $derived(
-    isOver 
-      ? 'var(--color-teren-error-base)'
-      : estimate.context.phase === 'pre_trip'
-        ? 'var(--color-teren-text-muted)'
+  // Color del remaining (basado en dailyBudget)
+  let remainingColor = $derived(
+    estimate.context.phase === 'pre_trip' 
+      ? 'var(--color-teren-text-muted)'
+      : isDailyOver
+        ? 'var(--color-teren-error-base)'
         : estimate.status === 'halfway'
           ? '#D97706'
           : 'var(--color-teren-primary)'
@@ -25,35 +26,70 @@
 </script>
 
 <div class="budget-status-card">
-  <!-- Actual vs Estimated -->
+  <!-- Total (siempre incluye flight si existe) -->
   <div class="row">
     <span class="label">{$t('budget.actual')}</span>
-    <span class="value">{formatCurrency(estimate.total.actual, estimate.total.currency)}</span>
-  </div>
-  <div class="row">
-    <span class="label">{$t('budget.estimated')}</span>
-    <span class="value">{formatCurrency(estimate.total.estimated, estimate.total.currency)}</span>
+    <span class="value">{formatCurrency(estimate.dailyBudget.spent + (estimate.flightCost || 0), estimate.total.currency)}</span>
   </div>
 
-  <!-- Disclaimer siempre visible -->
-  <div class="disclaimer">{$t('budget.excl_flights')}</div>
+  {#if hasFlight && estimate.flightCost}
+    <div class="row sub-row">
+      <span class="label">✈️ {$t('budget.flight')}</span>
+      <span class="value">{formatCurrency(estimate.flightCost, estimate.total.currency)}</span>
+    </div>
+  {/if}
+
+  <!-- Estimated (siempre = daily + flight) -->
+  <div class="row">
+    <span class="label">{$t('budget.estimated')}</span>
+    <span class="value">{formatCurrency(estimate.dailyBudget.estimated + (estimate.flightCost || 0), estimate.total.currency)}</span>
+  </div>
+
+  <div class="disclaimer">
+    {#if hasFlight}
+      {$t('budget.daily_excl_flights', { amount: formatCurrency(estimate.dailyBudget.estimated, estimate.total.currency) })}
+    {:else}
+      {$t('budget.excl_flights')}
+    {/if}
+  </div>
 
   <div class="divider"></div>
 
-  <!-- Remaining / Over -->
+  <!-- Daily Budget breakdown -->
+  <div class="row">
+    <span class="label">{$t('budget.daily_spent')}</span>
+    <span class="value">{formatCurrency(estimate.dailyBudget.spent, estimate.total.currency)}</span>
+  </div>
+
+  <div class="row">
+    <span class="label">{$t('budget.daily_estimated')}</span>
+    <span class="value">{formatCurrency(estimate.dailyBudget.estimated, estimate.total.currency)}</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Remaining (daily) -->
   <div class="row remaining">
     <span class="label">
-      {isOver ? $t('budget.over') : $t('budget.remaining')}
+      {isDailyOver ? $t('budget.daily_over') : $t('budget.daily_remaining')}
     </span>
-    <span class="value" style="color: {statusColor}">
-      {formatCurrency(Math.abs(remaining), estimate.total.currency)}
+    <span class="value" style="color: {remainingColor}">
+      {formatCurrency(Math.abs(dailyRemaining), estimate.total.currency)}
     </span>
   </div>
 
-  <!-- Contexto temporal (opcional, solo en active) -->
-  {#if estimate.context.phase === 'active'}
+  <!-- Contexto temporal (siempre abajo) -->
+  {#if estimate.context.phase === 'pre_trip'}
     <div class="context-hint">
-      {$t('budget.day_x_of_y', { day: String(estimate.context.daysElapsedDisplay), total: String(estimate.context.totalDays) })}
+      {$t('budget.days_left', { count: String(estimate.context.daysUntilStart) })}
+    </div>
+  {:else if estimate.context.phase === 'active'}
+    <div class="context-hint">
+      {$t('budget.day_x_of_y', { day: String(estimate.context.daysElapsed), total: String(estimate.context.totalDays) })}
+    </div>
+  {:else}
+    <div class="context-hint">
+      {$t('budget.trip_completed')}
     </div>
   {/if}
 </div>
@@ -72,6 +108,15 @@
     justify-content: space-between;
     align-items: center;
     padding: 4px 0;
+  }
+
+  .sub-row {
+    padding-left: 20px;
+    font-size: 13px;
+  }
+
+  .sub-row .label {
+    color: var(--color-teren-text-muted);
   }
 
   .label {
@@ -109,7 +154,7 @@
     font-size: 12px;
     color: var(--color-teren-text-muted);
     text-align: right;
-    margin-top: 4px;
+    margin-top: 8px;
   }
 
   :global(.dark) .budget-status-card {

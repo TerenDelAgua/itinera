@@ -15,6 +15,8 @@
   import { COMMON_CURRENCIES } from "$lib/types/Currency";
   import BudgetStatusCard from "./BudgetStatusCard.svelte";
   import type { CostEstimate } from "$lib/services/costPredictor";
+  import ExpenseQuickAdd from "./ExpenseQuickAdd.svelte";
+  import ExpenseEmptyState from "./ExpenseEmptyState.svelte";
 
   let {
     tripId,
@@ -45,6 +47,8 @@
     category_id: "",
     currency: "",
   });
+  let showAddForm = $state(false);
+  let preselectedCategorySlug = $state<string | undefined>(undefined);
 
   $effect(() => {
     if (isOpen && tripId) loadExpenses();
@@ -179,12 +183,48 @@
               class="w-8 h-8 border-3 border-teren-primary/30 border-t-teren-primary rounded-full animate-spin"
             ></div>
           </div>
-        {:else if expenses.length === 0}
-          <div class="text-center py-12 text-teren-text-muted">
-            {$t("detail.expenses_empty")}
-          </div>
+        {:else if expenses.length === 0 && !showAddForm}
+          <ExpenseEmptyState
+            onAddFlight={() => {
+              preselectedCategorySlug = 'flight';
+              showAddForm = true;
+            }}
+            onAddOther={() => {
+              preselectedCategorySlug = undefined;
+              showAddForm = true;
+            }}
+          />
         {:else}
-          {#each grouped as [slug, items] (slug)}
+          {#if showAddForm}
+            <div class="p-4 bg-teren-surface border border-teren-border rounded-xl mb-6 shadow-sm">
+              <div class="flex justify-between items-center mb-3">
+                <h4 class="text-sm font-semibold text-teren-text-main">
+                  {preselectedCategorySlug === 'flight' ? $t('expenses.add_flight') : $t('expenses.add_expense')}
+                </h4>
+                <button 
+                  onclick={() => showAddForm = false}
+                  class="text-xs text-teren-text-muted hover:text-teren-text-main underline"
+                >
+                  {$t('common.cancel')}
+                </button>
+              </div>
+              <ExpenseQuickAdd
+                {tripId}
+                {categories}
+                {placeId}
+                baseCurrency={estimate?.total.currency || 'EUR'}
+                initialCategorySlug={preselectedCategorySlug}
+                onSuccess={(exp) => {
+                  showAddForm = false;
+                  loadExpenses();
+                  onRefreshSummary();
+                }}
+              />
+            </div>
+          {/if}
+
+          {#if expenses.length > 0}
+            {#each grouped as [slug, items] (slug)}
             <section class="border-b border-teren-border/50 last:border-0 pb-2">
               <button
                 onclick={() => toggleCategory(slug)}
@@ -408,6 +448,7 @@
               {/if}
             </section>
           {/each}
+          {/if}
         {/if}
       </main>
     </div>

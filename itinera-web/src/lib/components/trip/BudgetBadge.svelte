@@ -18,14 +18,40 @@
   let formattedEstimated = $derived(formatCurrency(estimate.total.estimated, estimate.total.currency).replace(/\.00$/, ''));
 
   let overAmount = $derived(Math.max(0, estimate.total.actual - estimate.total.estimated));
+  let underAmount = $derived(Math.max(0, estimate.total.estimated - estimate.total.actual));
   let formattedOver = $derived(formatCurrency(overAmount, estimate.total.currency).replace(/\.00$/, ''));
+  let formattedUnder = $derived(formatCurrency(underAmount, estimate.total.currency).replace(/\.00$/, ''));
 
-  let statusColor = $derived({
-    on_track: 'var(--color-teren-primary)',
-    halfway: '#D97706',
-    over_budget: 'var(--color-teren-error-base)'
-  }[estimate.status]);
+  let statusColor = $derived(
+    phase === 'pre_trip'
+      ? '#A8A29E'
+      : phase === 'active'
+        ? {
+            on_track: 'var(--color-teren-primary)',
+            halfway: '#D97706',
+            over_budget: 'var(--color-teren-error-base)'
+          }[estimate.status]
+        : estimate.total.actual <= estimate.total.estimated
+          ? 'var(--color-teren-primary)'
+          : 'var(--color-teren-error-base)'
+  );
 
+  let statusText = $derived.by(() => {
+    if (phase === 'pre_trip') {
+      if (daysUntilStart === 0) return $t('budget.trip_starts_today');
+      if (daysUntilStart === 1) return $t('budget.trip_starts_tomorrow');
+      return $t('budget.days_left', { count: String(daysUntilStart) });
+    } else if (phase === 'active') {
+      if (estimate.status === 'on_track') return $t('budget.on_track');
+      if (estimate.status === 'halfway') return $t('budget.halfway');
+      return $t('budget.over_by', { amount: formattedOver });
+    } else {
+      if (estimate.total.actual <= estimate.total.estimated) {
+        return $t('budget.under_budget', { amount: formattedUnder });
+      }
+      return $t('budget.over_budget', { amount: formattedOver });
+    }
+  });
 </script>
 
 <button 
@@ -33,32 +59,12 @@
   onclick={onClick}
   aria-label={$t('budget.aria_label')}
 >
-  {#if phase === 'pre_trip'}
-    <span class="status-text" style="color: var(--color-teren-text-main)">
-      ⚪ {#if daysUntilStart === 0}{$t('budget.trip_starts_today')}{:else if daysUntilStart === 1}{$t('budget.trip_starts_tomorrow')}{:else}{$t('budget.days_left', { count: String(daysUntilStart) })}{/if}
-    </span>
-  {:else if phase === 'active'}
-    <span class="status-text" style="color: {statusColor}">
-      {#if estimate.status === 'on_track'}
-        🟢 {$t('budget.on_track')}
-      {:else if estimate.status === 'halfway'}
-        🟡 {$t('budget.halfway')}
-      {:else}
-        🔴 +{formattedOver}
-      {/if}
-    </span>
-  {:else if phase === 'completed'}
-    <span class="status-text" style="color: {estimate.total.actual <= estimate.total.estimated ? 'var(--color-teren-primary)' : 'var(--color-teren-error-base)'}">
-      {#if estimate.total.actual <= estimate.total.estimated}
-        🟢 {$t('budget.on_track')}
-      {:else}
-        🔴 +{formattedOver}
-      {/if}
-    </span>
-  {/if}
-
+  <span class="status-dot" style="background: {statusColor}"></span>
+  <span class="status-text" style="color: {phase === 'pre_trip' ? 'var(--color-teren-text-main)' : statusColor}">
+    {statusText}
+  </span>
   <span class="separator">·</span>
-  <span class="amounts" style="color: var(--color-teren-text-main)">
+  <span class="amounts">
     {formattedActual} / {formattedEstimated}
   </span>
 </button>
@@ -74,7 +80,7 @@
     border-radius: 9999px;
     font-size: 13px;
     font-weight: 500;
-    color: var(--color-teren-text-main);
+    color: var(--color-teren-text-muted);
     cursor: pointer;
     transition: all 200ms ease-out;
     white-space: nowrap;
@@ -83,6 +89,13 @@
   .budget-badge:hover {
     border-color: var(--color-teren-primary);
     background: var(--color-teren-primary-subtle);
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 9999px;
+    flex-shrink: 0;
   }
 
   .status-text {
@@ -98,13 +111,13 @@
     font-variant-numeric: tabular-nums;
     flex-shrink: 0;
     font-weight: 600;
+    color: var(--color-teren-text-main);
   }
 
-  /* Clean up dark mode specific hardcoded colors to rely on DS variables */
   :global(.dark) .budget-badge {
     background: var(--color-teren-surface);
     border-color: var(--color-teren-border-subtle);
-    color: var(--color-teren-text-main);
+    color: var(--color-teren-text-muted);
   }
 
   :global(.dark) .budget-badge:hover {

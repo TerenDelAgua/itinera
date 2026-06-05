@@ -19,6 +19,7 @@
     insertionCurrency,
     tripStart,
     tripEnd,
+    initialCategorySlug,
   }: {
     tripId: string;
     categories: Category[];
@@ -28,6 +29,7 @@
     insertionCurrency?: string;
     tripStart?: string;
     tripEnd?: string;
+    initialCategorySlug?: string;
   } = $props();
 
   let amount = $state("");
@@ -65,6 +67,13 @@
   });
 
   $effect(() => {
+    if (initialCategorySlug) {
+      const match = categories.find(c => c.slug.toLowerCase() === initialCategorySlug.toLowerCase());
+      if (match) {
+        categoryId = match.id;
+        return;
+      }
+    }
     if (!categoryId && sortedCategories.length > 0) {
       categoryId = sortedCategories[0].id;
     }

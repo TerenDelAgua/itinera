@@ -15,6 +15,7 @@ export const categoryEmojiMap: Record<string, string> = {
   food: '\u{1F354}',
   leisure: '\u{1F39F}\uFE0F',
   shopping: '\u{1F6CD}\uFE0F',
+  flight: '\u{2708}\u{FE0F}',
   others: '\u{1F4E6}'
 };
 

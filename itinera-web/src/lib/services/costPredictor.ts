@@ -38,9 +38,23 @@ export const costModels = costModelsRaw as CostModels;
 
 export interface CostEstimate {
   total: {
-    estimated: number;      // En trip.currency, sin vuelo
-    actual: number;         // Suma de expenses en trip.currency (convertidos)
-    currency: string;       // trip.currency para display
+    estimated: number;
+    actual: number;
+    currency: string;
+  };
+  flightCost?: number;
+  dailyBudget: {
+    estimated: number;
+    spent: number;
+    remaining: number;
+  };
+  status: 'on_track' | 'halfway' | 'over_budget';
+  context: {
+    phase: 'pre_trip' | 'active' | 'completed';
+    daysUntilStart: number;
+    daysElapsed: number;
+    totalDays: number;
+    expectedRatio: number;
   };
   byCategory: {
     accommodation: { estimated: number; actual: number };
@@ -48,16 +62,7 @@ export interface CostEstimate {
     transport: { estimated: number; actual: number };
     activities: { estimated: number; actual: number };
     misc: { estimated: number; actual: number };
-  };
-  status: 'on_track' | 'halfway' | 'over_budget';
-  excludesFlights: true;    // Siempre true en v1
-
-  context: {
-    phase: 'pre_trip' | 'active' | 'completed';
-    daysUntilStart: number;   // días hasta inicio (0+ en pre_trip, 0 en active/completed)
-    daysElapsedDisplay: number;      // días desde inicio (1+ en active, totalDays en completed)
-    totalDays: number;
-    expectedRatio: number;    // daysElapsed / totalDays (0 en pre_trip)
+    flight?: { estimated: number; actual: number };
   };
 }
 
@@ -144,8 +149,7 @@ export class HeuristicPredictor implements CostPredictor {
     
     // Gasto temporal ratio
     const daysElapsedRaw = Math.max(0, Math.ceil((now - start) / (1000 * 60 * 60 * 24)));
-    const daysElapsedDisplay = Math.max(1, daysElapsedRaw);
-
+    
     // Fase temporal
     let phase: 'pre_trip' | 'active' | 'completed';
     if (now < start) {
@@ -162,7 +166,14 @@ export class HeuristicPredictor implements CostPredictor {
       if (daysSinceEnd > 30) return null;
     }
 
-    const expectedRatio = totalDays > 0 ? (phase === 'pre_trip' ? 0 : daysElapsedRaw / totalDays) : 0;
+    let daysElapsed = 0;
+    if (phase === 'active') {
+      daysElapsed = Math.max(1, daysElapsedRaw);
+    } else if (phase === 'completed') {
+      daysElapsed = totalDays;
+    }
+
+    const expectedRatio = totalDays > 0 ? (phase === 'pre_trip' ? 0 : daysElapsed / totalDays) : 0;
 
     const estimatedJPY = this.calculateEstimateJPY(trip, places, activities);
     
@@ -170,13 +181,43 @@ export class HeuristicPredictor implements CostPredictor {
     const rate = await this.getRate('JPY', targetCurrency);
     const estimatedDisplay = Math.round(estimatedJPY.total * rate);
 
-    const actualDisplayUnrounded = await this.sumExpensesInCurrency(expenses, targetCurrency);
-    const actualDisplay = Math.round(actualDisplayUnrounded);
+    // Split expenses into flight and daily (non-flight)
+    const flightExpenses: Expense[] = [];
+    const dailyExpenses: Expense[] = [];
+    for (const exp of expenses) {
+      const cat = categories.find(c => c.id === exp.category_id);
+      if (cat && cat.slug.toLowerCase() === 'flight') {
+        flightExpenses.push(exp);
+      } else {
+        dailyExpenses.push(exp);
+      }
+    }
 
-    // Status solo en fase active
+    const flightCostUnrounded = await this.sumExpensesInCurrency(flightExpenses, targetCurrency);
+    const flightCost = Math.round(flightCostUnrounded);
+
+    const dailySpentUnrounded = await this.sumExpensesInCurrency(dailyExpenses, targetCurrency);
+    const dailySpent = Math.round(dailySpentUnrounded);
+
+    // Badge values based on phase
+    let badgeActual: number;
+    let badgeEstimated: number;
+
+    if (phase === 'pre_trip') {
+      badgeActual = flightCost + dailySpent;
+      badgeEstimated = estimatedDisplay + flightCost;
+    } else if (phase === 'active') {
+      badgeActual = dailySpent;
+      badgeEstimated = estimatedDisplay;
+    } else {
+      badgeActual = flightCost + dailySpent;
+      badgeEstimated = estimatedDisplay + flightCost;
+    }
+
+    // Status solo en fase active, basado en dailyBudget
     let status: CostEstimate['status'] = 'on_track';
     if (phase === 'active') {
-      const actualRatio = actualDisplay / (estimatedDisplay || 1);
+      const actualRatio = dailySpent / (estimatedDisplay || 1);
       if (actualRatio <= expectedRatio * 1.2) {
         status = 'on_track';
       } else if (actualRatio <= expectedRatio * 1.5) {
@@ -189,11 +230,16 @@ export class HeuristicPredictor implements CostPredictor {
     const byCategory = await this.convertCategoriesToDisplay(estimatedJPY.byCategory, expenses, categories, rate, targetCurrency);
 
     return {
-      total: { estimated: estimatedDisplay, actual: actualDisplay, currency: trip.base_currency || 'EUR' },
-      byCategory,
+      total: { estimated: badgeEstimated, actual: badgeActual, currency: trip.base_currency || 'EUR' },
+      flightCost: flightCost > 0 ? flightCost : undefined,
+      dailyBudget: {
+        estimated: estimatedDisplay,
+        spent: dailySpent,
+        remaining: estimatedDisplay - dailySpent
+      },
       status,
-      excludesFlights: true,
-      context: { phase, daysUntilStart, daysElapsedDisplay, totalDays, expectedRatio }
+      context: { phase, daysUntilStart, daysElapsed, totalDays, expectedRatio },
+      byCategory
     };
   }
 
@@ -363,7 +409,8 @@ export class HeuristicPredictor implements CostPredictor {
       food: 0,
       transport: 0,
       activities: 0,
-      misc: 0
+      misc: 0,
+      flight: 0
     };
 
     for (const expense of expenses) {
@@ -382,6 +429,8 @@ export class HeuristicPredictor implements CostPredictor {
         actualTarget.transport += expenseTarget;
       } else if (slug === 'activities' || slug === 'leisure' || slug === 'sightseeing') {
         actualTarget.activities += expenseTarget;
+      } else if (slug === 'flight') {
+        actualTarget.flight += expenseTarget;
       } else {
         actualTarget.misc += expenseTarget;
       }
@@ -407,6 +456,10 @@ export class HeuristicPredictor implements CostPredictor {
       misc: {
         estimated: Math.round(estimatedJPY.misc * rate),
         actual: Math.round(actualTarget.misc)
+      },
+      flight: {
+        estimated: 0,
+        actual: Math.round(actualTarget.flight)
       }
     };
   }
