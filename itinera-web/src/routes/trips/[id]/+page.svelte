@@ -26,6 +26,9 @@
   import ExpensesSummaryCard from "$lib/components/trip/ExpensesSummaryCard.svelte";
   import PlaceList from "$lib/components/trip/PlaceList.svelte";
   import TransportBadge from "$lib/components/trip/TransportBadge.svelte";
+  import { HeuristicPredictor, costModels, BackendExchangeService } from "$lib/services/costPredictor";
+  import type { CostEstimate } from "$lib/services/costPredictor";
+  import type { Expense } from "$lib/types/Expense";
 
   let tripId = $state("");
 
@@ -52,6 +55,8 @@
   let summary = $state<TripExpenseSummary | null>(null);
   let categories = $state<Expense_Category[]>([]);
   let animatedGrandTotal = tweened(0, { duration: 600, easing: cubicOut });
+  let estimate = $state<CostEstimate | null>(null);
+  let expenses = $state<Expense[]>([]);
 
   let isDrawerOpen = $state(false);
   let isLoading = $state(true);
@@ -100,13 +105,14 @@
       tripDefaultCurrency =
         tripData.default_expense_currency || tripData.base_currency || "EUR";
 
-      const [placesData, summaryData, catsData, actsData] = await Promise.all([
+      const [placesData, summaryData, catsData, actsData, expensesData] = await Promise.all([
         apiFetch<Place[]>(`/trips/${tripId}/places`),
         apiFetch<TripExpenseSummary>(
           `/trips/${tripId}/expenses/summary?currency=${baseCurrency}`,
         ),
         apiFetch<Expense_Category[]>(`/trips/${tripId}/expenses/categories`),
         activityApi.list(tripId),
+        apiFetch<Expense[]>(`/trips/${tripId}/expenses`),
       ]);
 
       places = (placesData || []).map((p) => ({
@@ -117,10 +123,29 @@
       summary = summaryData;
       categories = catsData || [];
       activities = actsData || [];
+      expenses = expensesData || [];
 
       if (summary) {
         animatedGrandTotal.set(summary.grand_total || 0);
       }
+
+      // Recalcular budget estimate
+      const tripObj = {
+        id: tripId,
+        name: tripName,
+        description: tripDescription,
+        start_date: tripStartDate,
+        end_date: tripEndDate,
+        base_currency: baseCurrency,
+        default_expense_currency: tripDefaultCurrency,
+        is_public_demo: false,
+        created_at: tripData.created_at,
+        place_count: places.length,
+        total_spent: summaryData.grand_total || 0
+      };
+
+      const predictor = new HeuristicPredictor(costModels, new BackendExchangeService(tripId));
+      estimate = await predictor.estimate(tripObj, places, activities, expenses, categories);
 
       if (tripData.is_public_demo) {
         Events.demoViewed(tripId, tripName);
@@ -226,6 +251,8 @@
     bind:startDate={tripStartDate}
     bind:endDate={tripEndDate}
     bind:defaultCurrency={baseCurrency}
+    {estimate}
+    onBadgeClick={() => (isDrawerOpen = true)}
     onSave={saveTripInfo}
     onUpdateCurrency={updateTripCurrency}
     onBack={() => goto("/trips")}
@@ -284,6 +311,7 @@
     {tripId}
     {categories}
     isOpen={isDrawerOpen}
+    {estimate}
     onClose={() => (isDrawerOpen = false)}
     onRefreshSummary={loadAllData}
   />

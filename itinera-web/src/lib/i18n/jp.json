@@ -128,7 +128,11 @@
   },
   "expenses": {
     "notes_placeholder": "メモ（任意）...",
-    "add_expense": "支出を追加"
+    "add_expense": "支出を追加",
+    "empty_title": "フライトから始めましょう",
+    "empty_subtitle": "旅行全体の予算を表示するには、航空券の費用を追加してください",
+    "add_flight": "航空券の費用を追加",
+    "add_other": "その他の支出を追加"
   },
   "landing": {
     "travelers_planning": "人の旅行者が旅を計画しました",
@@ -406,5 +410,27 @@
         "usage": "To ask for urgent medical help."
       }
     }
+  },
+  "budget": {
+    "on_track": "順調",
+    "halfway": "中間地点",
+    "over_by": "{{amount}}超過",
+    "under_budget": "予算内（{{amount}}お得）",
+    "over_budget": "予算超過（{{amount}}）",
+    "actual": "実績",
+    "estimated": "予測",
+    "flight": "航空券",
+    "daily_spent": "日々の実績",
+    "daily_estimated": "日々の予算",
+    "daily_remaining": "残り",
+    "daily_over": "超過",
+    "excl_flights": "（航空券を除く）",
+    "daily_excl_flights": "（一日あたり: {{amount}}）",
+    "aria_label": "経費の内訳を表示",
+    "days_left": "開始まであと{{count}}日",
+    "trip_starts_today": "旅行は今日から始まります",
+    "trip_starts_tomorrow": "旅行は明日から始まります",
+    "trip_completed": "旅行終了",
+    "day_x_of_y": "旅行 {{day}} / {{total}}日目"
   }
 }

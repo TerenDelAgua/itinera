@@ -22,7 +22,8 @@ const JAPAN_CITIES = [
  */
 export function isJapanPlace(place: { 
   country_code?: string | null; 
-  city?: string 
+  city?: string;
+  name?: string;
 } | null | undefined): boolean {
   if (!place) return false;
 
@@ -32,7 +33,13 @@ export function isJapanPlace(place: {
   // 2. Si es otro país explícito, no es Japón
   if (place.country_code && place.country_code !== 'JP') return false;
 
-  // 3. Fallback: lista de ciudades conocidas (para datos antiguos o nulls)
+  // 3. Fallback: lista de ciudades conocidas en la prop "city"
   const city = place.city?.toLowerCase().trim() || '';
-  return JAPAN_CITIES.includes(city);
+  if (JAPAN_CITIES.includes(city)) return true;
+
+  // 4. Fallback extremo: buscar coincidencias en el nombre general
+  const name = place.name?.toLowerCase().trim() || '';
+  if (name && JAPAN_CITIES.some(c => name.includes(c))) return true;
+
+  return false;
 }

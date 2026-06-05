@@ -31,7 +31,13 @@ test.describe('Currency and Conversions', () => {
 
     // 3. Add an expense of 100.00 EUR (default currency)
     // Wait for page to load
-    await expect(page.getByTestId('grand-total')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('[data-testid="empty-add-other"], [data-testid="grand-total"]').first()).toBeVisible({ timeout: 10000 });
+    
+    // If empty state is present, click Add Other to reveal the form
+    const addOtherBtn = page.getByTestId('empty-add-other').first();
+    if (await addOtherBtn.isVisible()) {
+      await addOtherBtn.click();
+    }
     
     // Fill QuickAdd
     const amountInput = page.getByTestId('expense-amount-input').last();
@@ -99,6 +105,15 @@ test.describe('Currency and Conversions', () => {
     // Ensure the place page is fully loaded and ID is set in the DOM
     const main = page.locator('main[data-place-id]');
     await expect(main).toHaveAttribute('data-place-id', /[0-9a-f-]+/, { timeout: 10000 });
+
+    // Wait for the empty state or the category selector to be ready
+    await expect(main.locator('[data-testid="empty-add-other"], [data-testid="expense-category-selector"]').first()).toBeVisible({ timeout: 10000 });
+
+    // If empty state is present, click Add Other to reveal the form
+    const addOtherBtn = main.getByTestId('empty-add-other').first();
+    if (await addOtherBtn.isVisible()) {
+      await addOtherBtn.click();
+    }
 
     // Ensure categories are loaded and a default is selected
     const categorySelector = main.getByTestId('expense-category-selector');

@@ -60,4 +60,17 @@ describe('isJapanPlace', () => {
   it('handles city names with whitespace', () => {
     expect(isJapanPlace({ country_code: null, city: '  tokyo  ' })).toBe(true);
   });
+
+  // Fallback por name
+  it('returns true if name contains a known city (extreme fallback)', () => {
+    expect(isJapanPlace({ country_code: null, city: '', name: 'Tokyo Classic Trip' })).toBe(true);
+  });
+
+  it('returns true if name exactly matches a known city', () => {
+    expect(isJapanPlace({ country_code: null, name: 'Osaka' })).toBe(true);
+  });
+
+  it('does not match if name has no japan cities', () => {
+    expect(isJapanPlace({ country_code: null, name: 'Madrid' })).toBe(false);
+  });
 });

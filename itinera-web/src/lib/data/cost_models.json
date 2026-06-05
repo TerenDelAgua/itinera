@@ -1,0 +1,79 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-06-03",
+  "cost_models": {
+    "japan": {
+      "accommodation": {
+        "budget": 8000,
+        "mid": 15000,
+        "luxury": 30000,
+        "unit": "JPY_per_night"
+      },
+      "food": {
+        "budget": 3000,
+        "mid": 6000,
+        "luxury": 12000,
+        "unit": "JPY_per_day"
+      },
+      "transport": {
+        "intercity_base": 5000,
+        "shinkansen_per_km": 20,
+        "local_per_day": 1000,
+        "unit": "JPY"
+      },
+      "activities": {
+        "temple": 500,
+        "museum": 2000,
+        "onsen": 1500,
+        "theme_park": 8000,
+        "default": 2000,
+        "unit": "JPY"
+      },
+      "misc": {
+        "daily_buffer": 2000,
+        "unit": "JPY_per_day"
+      }
+    }
+  },
+  "city_multipliers": {
+    "tokyo": { "accommodation": 1.4, "food": 1.3, "transport": 1.2, "activities": 1.2 },
+    "kyoto": { "accommodation": 1.3, "food": 1.2, "transport": 1.0, "activities": 1.3 },
+    "osaka": { "accommodation": 1.2, "food": 1.2, "transport": 1.1, "activities": 1.1 },
+    "fukuoka": { "accommodation": 1.0, "food": 1.0, "transport": 1.0, "activities": 1.0 },
+    "nagano": { "accommodation": 0.9, "food": 0.9, "transport": 1.1, "activities": 1.0 },
+    "hiroshima": { "accommodation": 1.0, "food": 1.0, "transport": 1.1, "activities": 1.1 },
+    "sapporo": { "accommodation": 1.1, "food": 1.2, "transport": 1.0, "activities": 1.1 },
+    "yokohama": { "accommodation": 1.2, "food": 1.2, "transport": 1.1, "activities": 1.0 },
+    "kobe": { "accommodation": 1.1, "food": 1.3, "transport": 1.0, "activities": 1.0 },
+    "kumamoto": { "accommodation": 0.9, "food": 0.9, "transport": 0.9, "activities": 1.0 },
+    "nara": { "accommodation": 0.9, "food": 0.9, "transport": 1.0, "activities": 1.2 },
+    "kanazawa": { "accommodation": 1.0, "food": 1.1, "transport": 1.0, "activities": 1.1 },
+    "nagasaki": { "accommodation": 0.9, "food": 1.0, "transport": 0.9, "activities": 1.0 },
+    "hakodate": { "accommodation": 0.9, "food": 1.1, "transport": 0.9, "activities": 1.0 },
+    "matsumoto": { "accommodation": 0.8, "food": 0.8, "transport": 0.9, "activities": 1.0 },
+    "miyajima": { "accommodation": 1.0, "food": 1.1, "transport": 1.0, "activities": 1.2 },
+    "himeji": { "accommodation": 0.9, "food": 0.9, "transport": 1.0, "activities": 1.1 },
+    "sendai": { "accommodation": 1.0, "food": 1.0, "transport": 1.0, "activities": 1.0 },
+    "nikko": { "accommodation": 0.9, "food": 0.9, "transport": 0.9, "activities": 1.1 }
+  },
+  "intercity_distances_km": {
+    "tokyo_kyoto": 513,
+    "tokyo_osaka": 552,
+    "tokyo_fukuoka": 1175,
+    "kyoto_osaka": 56,
+    "kyoto_nara": 42,
+    "osaka_hiroshima": 345,
+    "osaka_kobe": 35,
+    "tokyo_nagano": 226,
+    "tokyo_yokohama": 35,
+    "tokyo_sendai": 325,
+    "tokyo_nikko": 140,
+    "kyoto_kanazawa": 225,
+    "osaka_kumamoto": 650,
+    "fukuoka_kumamoto": 120,
+    "fukuoka_nagasaki": 150,
+    "fukuoka_hiroshima": 290,
+    "sapporo_hakodate": 320,
+    "hiroshima_miyajima": 20
+  }
+}
