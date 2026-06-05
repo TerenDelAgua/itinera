@@ -15,11 +15,11 @@
   <h3>{$t('expenses.empty_title')}</h3>
   <p>{$t('expenses.empty_subtitle')}</p>
 
-  <button class="btn-primary" onclick={onAddFlight}>
+  <button class="btn-primary" onclick={onAddFlight} data-testid="empty-add-flight">
     + {$t('expenses.add_flight')}
   </button>
 
-  <button class="btn-link" onclick={onAddOther}>
+  <button class="btn-link" onclick={onAddOther} data-testid="empty-add-other">
     {$t('expenses.add_other')}
   </button>
 </div>
