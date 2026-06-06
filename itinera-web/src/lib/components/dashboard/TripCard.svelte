@@ -37,7 +37,7 @@
           href={resolve(`/trips/${trip.id}`)}
           class="before:absolute before:inset-0 before:z-10 focus:outline-none"
         >
-          {trip.name}
+          {trip.name?.startsWith('inspiration.') ? $t(trip.name as any) : trip.name}
         </a>
       </h2>
 
@@ -60,7 +60,7 @@
       <p
         class="text-sm text-teren-text-muted italic line-clamp-2 leading-relaxed flex-grow"
       >
-        {trip.description}
+        {trip.description?.startsWith('inspiration.') ? $t(trip.description as any) : trip.description}
       </p>
     {:else}
       <div class="flex-grow"></div>

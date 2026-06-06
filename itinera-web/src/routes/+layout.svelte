@@ -88,6 +88,9 @@
           <option value="ja" class="bg-teren-surface text-teren-text-main"
             >JP</option
           >
+          <option value="id" class="bg-teren-surface text-teren-text-main"
+            >ID</option
+          >
         </select>
 
         <!-- Theme Toggle -->

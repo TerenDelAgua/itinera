@@ -432,5 +432,19 @@
     "trip_starts_tomorrow": "Trip starts tomorrow",
     "trip_completed": "Trip completed",
     "day_x_of_y": "Day {day}/{total}"
+  },
+  "inspiration": {
+    "roma": {
+      "title": "Roma Express: 3 unmissable days",
+      "desc": "Optimized itinerary for a short city break. Colosseum, Vatican, Trastevere, and local gastronomy. Designed for travelers who value time."
+    },
+    "japan": {
+      "title": "Classic Japan: 15 days from Tokyo to Hiroshima",
+      "desc": "Optimized route with 7-day JR Pass. Balance between culture, nature, and gastronomy. Includes basic etiquette and useful phrases."
+    },
+    "asia": {
+      "title": "Deep Asia: 60 days from Bangkok to Bali",
+      "desc": "Route for digital nomads and experienced backpackers. Tight budget, coworkings, and local connections. Multi-currency active."
+    }
   }
 }

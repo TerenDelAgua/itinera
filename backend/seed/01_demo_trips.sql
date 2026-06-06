@@ -13,8 +13,8 @@ BEGIN
 INSERT INTO public.trips (id, name, description, start_date, end_date, base_currency, is_public_demo, session_id)
 VALUES (
     '550e8400-e29b-41d4-a716-446655440001'::UUID,
-    'Roma Express: 3 días imperdibles',
-    'Itinerario optimizado para un city break corto. Coliseo, Vaticano, Trastevere y gastronomía local. Diseñado para viajeros que valoran el tiempo.',
+    'inspiration.roma.title',
+    'inspiration.roma.desc',
     '2026-06-15',
     '2026-06-17',
     'EUR',
@@ -51,8 +51,8 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO public.trips (id, name, description, start_date, end_date, base_currency, is_public_demo, session_id)
 VALUES (
     '550e8400-e29b-41d4-a716-446655440002'::UUID,
-    'Japón Clásico: 15 días de Tokio a Hiroshima',
-    'Ruta optimizada con JR Pass 7-day. Equilibrio entre cultura, naturaleza y gastronomía. Incluye etiqueta básica y frases útiles.',
+    'inspiration.japan.title',
+    'inspiration.japan.desc',
     '2026-10-01',
     '2026-10-15',
     'JPY',
@@ -92,8 +92,8 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO public.trips (id, name, description, start_date, end_date, base_currency, is_public_demo, session_id)
 VALUES (
     '550e8400-e29b-41d4-a716-446655440003'::UUID,
-    'Asia Profunda: 60 días de Bangkok a Bali',
-    'Ruta para nómadas digitales y mochileros experimentados. Presupuesto ajustado, coworkings, y conexiones locales. Multi-moneda activa.',
+    'inspiration.asia.title',
+    'inspiration.asia.desc',
     '2026-11-01',
     '2026-12-30',
     'USD',
