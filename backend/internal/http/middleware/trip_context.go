@@ -28,6 +28,12 @@ func ResolveTripContext(store database.TripContextStore) func(next http.Handler)
 				return
 			}
 
+			// Validate UUID format to avoid database query syntax errors
+			if _, err := uuid.Parse(tripID); err != nil {
+				next.ServeHTTP(w, r)
+				return
+			}
+
 			var userID *uuid.UUID
 			if uid, ok := ctx.Value(ContextKeyUserId{}).(uuid.UUID); ok {
 				userID = &uid
