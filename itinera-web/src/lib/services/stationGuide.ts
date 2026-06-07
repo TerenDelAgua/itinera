@@ -1,8 +1,5 @@
-// src/lib/services/stationGuide.ts
-// Station Guide Service — v1.2 TEREN
-// Cliente 100%, offline-first, zero dependencias externas
-
 import stationData from '$lib/data/station_guides.json';
+import { isJapanPlace } from '$lib/utils/place';
 
 // ============================================================
 // INTERFACES
@@ -61,6 +58,7 @@ export interface Place {
   visitDate?: string;
   endDate?: string;
   notes?: string;
+  country_code?: string | null;
 }
 
 export interface GuideDecision {
@@ -112,7 +110,13 @@ export function findStationGuide(cityName: string): StationGuide | null {
  * y luego en el nombre de la ciudad como fallback.
  * Esto permite dar cobertura a múltiples estaciones dentro de la misma ciudad (ej. Tokyo Station, Shinjuku Station, Shibuya Station en Tokyo).
  */
-export function matchStationGuide(placeName: string, cityName?: string): StationGuide | null {
+export function matchStationGuide(place: { name: string; city?: string; country_code?: string | null } | null | undefined): StationGuide | null {
+  if (!place || !isJapanPlace(place)) {
+    return null;
+  }
+
+  const placeName = place.name;
+  const cityName = place.city;
   const normalizedName = placeName ? placeName.toLowerCase().trim() : "";
   const normalizedCity = cityName ? cityName.toLowerCase().trim() : "";
 
@@ -237,7 +241,7 @@ export function computeGuideDecisions(places: Place[]): GuideDecision[] {
   const seenCities = new Set<string>();
 
   return places.map(place => {
-    if (!place.city) {
+    if (!place.city || !isJapanPlace(place)) {
       return { show: false, city: null };
     }
 

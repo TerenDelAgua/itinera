@@ -2,6 +2,8 @@
   import { t, locale } from "$lib/i18n/store";
   import { formatDate } from "$lib/utils/date";
   import CurrencySelector from "$lib/components/currency/CurrencySelector.svelte";
+  import BudgetBadge from "./BudgetBadge.svelte";
+  import type { CostEstimate } from "$lib/services/costPredictor";
 
   let {
     name = $bindable(),
@@ -15,6 +17,8 @@
     iconType = "trip",
     durationLabel,
     hideDescription = false,
+    estimate = null,
+    onBadgeClick,
     onSave,
     onUpdateCurrency,
     onBack,
@@ -30,6 +34,8 @@
     iconType?: "trip" | "place";
     durationLabel?: string;
     hideDescription?: boolean;
+    estimate?: CostEstimate | null;
+    onBadgeClick?: () => void;
     onSave: () => void;
     onUpdateCurrency: (code?: string) => void;
     onBack: () => void;
@@ -40,7 +46,7 @@
   class="bg-teren-background border-b border-teren-border py-4"
   data-testid={iconType === "place" ? "place-header" : "trip-header"}
 >
-  <div class="max-w-3xl mx-auto px-4 flex items-start justify-between">
+  <div class="max-w-3xl mx-auto px-4 flex flex-col w-full">
     <div class="flex items-start gap-3 w-full">
       <button
         onclick={onBack}
@@ -93,97 +99,106 @@
             class="bg-transparent border-none p-0 focus:ring-0 text-xl font-bold text-teren-text-main leading-tight outline-none w-full truncate"
           />
         </div>
-        <div
-          class="flex flex-wrap items-center gap-2 text-xs text-teren-text-muted font-medium mt-1"
+      </div>
+    </div>
+
+    <!-- Info Section aligned under the back button -->
+    <div class="flex flex-col gap-1 mt-3 w-full">
+      <div class="flex flex-wrap items-center gap-2 text-xs text-teren-text-muted font-medium">
+        <svg
+          class="w-3.5 h-3.5 opacity-70 flex-shrink-0"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          ><path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+          /></svg
         >
-          <svg
-            class="w-3.5 h-3.5 opacity-70 flex-shrink-0"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            ><path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            /></svg
+
+        <div class="relative flex items-center cursor-pointer group px-2 py-0.5 rounded-md bg-teren-primary-subtle hover:bg-teren-primary/15 border border-teren-primary/20 transition-all">
+          <span
+            class="text-teren-text-main group-hover:text-teren-primary transition"
+            >{formatDate(startDate, $locale)}</span
           >
-
-          <div class="relative flex items-center cursor-pointer group px-2 py-0.5 rounded-md bg-teren-primary-subtle hover:bg-teren-primary/15 border border-teren-primary/20 transition-all">
-            <span
-              class="text-teren-text-main group-hover:text-teren-primary transition"
-              >{formatDate(startDate, $locale)}</span
-            >
-            <input
-              type="date"
-              bind:value={startDate}
-              onchange={onSave}
-              onclick={(e) => e.currentTarget.showPicker()}
-              class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-            />
-          </div>
-
-          <span class="opacity-70 mx-0.5">—</span>
-
-          <div class="relative flex items-center cursor-pointer group px-2 py-0.5 rounded-md bg-teren-primary-subtle hover:bg-teren-primary/15 border border-teren-primary/20 transition-all">
-            <span
-              class="text-teren-text-main group-hover:text-teren-primary transition"
-              >{formatDate(endDate, $locale)}</span
-            >
-            <input
-              type="date"
-              bind:value={endDate}
-              onchange={onSave}
-              onclick={(e) => e.currentTarget.showPicker()}
-              class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-            />
-          </div>
-
-          {#if durationLabel}
-            <span class="opacity-70 mx-1">·</span>
-            <span class="text-teren-text-main font-medium">{durationLabel}</span>
-          {/if}
-
-          {#if iconType === "place"}
-            <span class="opacity-70 mx-1">·</span>
-            <div class="relative flex items-center group px-2 py-0.5 rounded-md bg-teren-primary-subtle hover:bg-teren-primary/15 border border-teren-primary/20 transition-all gap-1">
-              <span class="select-none text-[11px] opacity-80">🏙️</span>
-              <input
-                type="text"
-                bind:value={city}
-                onblur={onSave}
-                onkeydown={(e) => e.key === "Enter" && e.currentTarget.blur()}
-                placeholder={$t("place_form.city_placeholder" as any) || "City"}
-                class="bg-transparent border-none p-0 focus:ring-0 text-[11px] font-bold text-teren-text-main outline-none w-20 group-hover:text-teren-primary transition"
-              />
-            </div>
-          {/if}
-
-          <div class="relative">
-            <CurrencySelector
-              bind:value={defaultCurrency}
-              fallbackLabel={currencyFallbackLabel}
-              allowInherit={allowInheritCurrency}
-              onSave={onUpdateCurrency}
-            />
-          </div>
+          <input
+            type="date"
+            bind:value={startDate}
+            onchange={onSave}
+            onclick={(e) => e.currentTarget.showPicker()}
+            class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+          />
         </div>
 
-        {#if !hideDescription}
-          <textarea
-            bind:value={description}
-            onblur={onSave}
-            oninput={(e) => {
-              const target = e.currentTarget;
-              target.style.height = "auto";
-              target.style.height = target.scrollHeight + "px";
-            }}
-            placeholder={$t("detail.description")}
-            class="bg-transparent border-none p-0 focus:ring-0 text-sm text-teren-text-muted outline-none w-full mt-0.5 italic resize-none overflow-hidden"
-            rows="1"
-          ></textarea>
+        <span class="opacity-70 mx-0.5">—</span>
+
+        <div class="relative flex items-center cursor-pointer group px-2 py-0.5 rounded-md bg-teren-primary-subtle hover:bg-teren-primary/15 border border-teren-primary/20 transition-all">
+          <span
+            class="text-teren-text-main group-hover:text-teren-primary transition"
+            >{formatDate(endDate, $locale)}</span
+          >
+          <input
+            type="date"
+            bind:value={endDate}
+            onchange={onSave}
+            onclick={(e) => e.currentTarget.showPicker()}
+            class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+          />
+        </div>
+
+        {#if durationLabel}
+          <span class="opacity-70 mx-1">·</span>
+          <span class="text-teren-text-main font-medium">{durationLabel}</span>
         {/if}
+
+        {#if iconType === "place"}
+          <span class="opacity-70 mx-1">·</span>
+          <div class="relative flex items-center group px-2 py-0.5 rounded-md bg-teren-primary-subtle hover:bg-teren-primary/15 border border-teren-primary/20 transition-all gap-1">
+            <span class="select-none text-[11px] opacity-80">🏙️</span>
+            <input
+              type="text"
+              bind:value={city}
+              onblur={onSave}
+              onkeydown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+              placeholder={$t("place_form.city_placeholder" as any) || "City"}
+              class="bg-transparent border-none p-0 focus:ring-0 text-[11px] font-bold text-teren-text-main outline-none w-20 group-hover:text-teren-primary transition"
+            />
+          </div>
+        {/if}
+
+        <div class="relative">
+          <CurrencySelector
+            bind:value={defaultCurrency}
+            fallbackLabel={currencyFallbackLabel}
+            allowInherit={allowInheritCurrency}
+            onSave={onUpdateCurrency}
+          />
+        </div>
       </div>
+
+      {#if estimate}
+        <div class="mt-2 flex">
+          <BudgetBadge {estimate} onClick={() => onBadgeClick?.()} />
+        </div>
+      {/if}
+
+      {#if !hideDescription}
+        <textarea
+          bind:value={description}
+          onblur={onSave}
+          oninput={(e) => {
+            const target = e.currentTarget;
+            target.style.height = "auto";
+            target.style.height = target.scrollHeight + "px";
+          }}
+          placeholder={$t("detail.description")}
+          class="bg-transparent border-none p-0 focus:ring-0 text-sm text-teren-text-muted outline-none w-full mt-2 italic resize-none overflow-hidden"
+          rows="1"
+        ></textarea>
+      {/if}
     </div>
   </div>
 </header>
+

@@ -14,6 +14,7 @@
   import ClimateBadge from "$lib/components/japan-context/ClimateBadge.svelte";
   import TipBadge from "$lib/components/japan-context/TipBadge.svelte";
   import { getClimate, shouldShowClimate, getRulesForActivity, type ClimateDisplay } from "$lib/services/japanContext";
+  import { isJapanPlace } from "$lib/utils/place";
 
   let { isOpen, tripId, placeId, city, places, tripStart, tripEnd, activities = [], defaultDate, onRefresh, onClose } = $props<{
     isOpen: boolean;
@@ -30,7 +31,7 @@
   }>();
 
   let showQuickAdd = $state(false);
-  let collapsedSections = $state<Set<string>>(new SvelteSet());
+  let collapsedSections = $state<Set<string>>(new SvelteSet<string>());
   let todaySection = $state<Element | null>(null);
 
   let activityToDelete = $state<Activity | null>(null);
@@ -76,6 +77,18 @@
     }
   }
 
+  function isActivityInJapan(activity: Activity): boolean {
+    if (placeId) {
+      const currentPlace = places?.find((p) => p.id === placeId) || (places && places[0]) || { city, country_code: null };
+      return isJapanPlace(currentPlace);
+    }
+    if (activity.place_id && places) {
+      const actPlace = places.find((p) => p.id === activity.place_id);
+      return isJapanPlace(actPlace);
+    }
+    return false;
+  }
+
   let dailyClimates = $state<Record<string, ClimateDisplay>>({});
 
   $effect(() => {
@@ -83,13 +96,15 @@
       for (const date of grouped.keys()) {
         if (shouldShowClimate(date, tripStart, tripEnd) && !dailyClimates[date]) {
           let resolvedCity = city;
-          if (!resolvedCity && places) {
-            const matchedPlace = places.find((p: any) => p.start_date && p.end_date && date >= p.start_date.split('T')[0] && date <= p.end_date.split('T')[0]);
+          let matchedPlace = null;
+          if (places) {
+            matchedPlace = places.find((p: any) => p.start_date && p.end_date && date >= p.start_date.split('T')[0] && date <= p.end_date.split('T')[0]);
             if (matchedPlace) {
               resolvedCity = matchedPlace.city;
             }
           }
-          if (resolvedCity) {
+          const checkPlace = matchedPlace || (placeId && places?.find((p) => p.id === placeId)) || { city: resolvedCity };
+          if (resolvedCity && isJapanPlace(checkPlace)) {
             getClimate(resolvedCity, date).then(c => {
               if (c) dailyClimates[date] = c;
             });
@@ -108,7 +123,7 @@
         const pastDates = new Set(
           activities.filter((a) => a.date < todayStr).map((a) => a.date),
         );
-        collapsedSections = new SvelteSet(pastDates);
+        collapsedSections = new SvelteSet<string>(pastDates);
 
         // 2. Scroll a "Today" o la primera sección futura disponible
         tick().then(() => {
@@ -131,11 +146,15 @@
 </script>
 
 {#if isOpen}
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm"
     transition:fade={{ duration: 200 }}
     onclick={(e) => e.target === e.currentTarget && onClose()}
   >
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
       class="bg-teren-surface w-full sm:max-w-lg h-[85vh] sm:h-[80vh] rounded-t-2xl sm:rounded-2xl flex flex-col overflow-hidden shadow-2xl"
       transition:fly={{ y: 30, duration: 250, easing: cubicOut }}
@@ -226,7 +245,7 @@
                 transition:slide={{ duration: 200, easing: cubicOut }}
               >
                 {#each acts as activity (activity.id)}
-                  {@const rules = getRulesForActivity(activity.title, activity.notes, currentLocale)}
+                  {@const rules = isActivityInJapan(activity) ? getRulesForActivity(activity.title, activity.notes, currentLocale) : []}
                   {#if editingActivityId === activity.id}
                     <div class="py-3" transition:slide>
                       <ActivityQuickAdd
@@ -243,6 +262,8 @@
                       />
                     </div>
                   {:else}
+                    <!-- svelte-ignore a11y_click_events_have_key_events -->
+                    <!-- svelte-ignore a11y_no_static_element_interactions -->
                     <div
                       onclick={() => (editingActivityId = activity.id)}
                       class="py-3 hover:bg-teren-background/50 transition-colors cursor-pointer group flex flex-col gap-2 rounded-lg px-2 -mx-2"

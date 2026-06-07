@@ -84,12 +84,12 @@ function findRoute(from: string, to: string): RouteData | undefined {
   return routesData.routes.find(r => {
     const rFrom = normalizeName(r.from);
     const rTo = normalizeName(r.to);
-    
+
     // El dataset tiene nombres limpios (ej. "tokyo"). 
     // El usuario puede poner "tokyo (shinjuku)", así que usamos includes.
     const matchForward = normFrom.includes(rFrom) && normTo.includes(rTo);
     const matchBackward = normFrom.includes(rTo) && normTo.includes(rFrom);
-    
+
     return matchForward || matchBackward;
   });
 }
@@ -246,7 +246,6 @@ export function calculateTransport(
     ? Math.ceil(passPrice / (totalFare / routesFound.length))
     : null;
 
-  // Mensaje honesto TEREN
   let honestMessageKey = '';
   let honestMessageParams: Record<string, string> | undefined;
 

@@ -1,0 +1,450 @@
+{
+  "dashboard": {
+    "title": "Perjalanan saya",
+    "subtitle": "Rencanakan dan atur perjalanan Anda",
+    "button_new": "Perjalanan baru",
+    "destination": "Tujuan",
+    "destinations": "Tujuan",
+    "inspiration": "Inspirasi",
+    "inspiration_badge": "INSPIRASI"
+  },
+  "empty_state": {
+    "title": "Belum ada perjalanan",
+    "description": "Mulai rencanakan perjalanan pertama Anda",
+    "cta": "Buat perjalanan pertama Anda"
+  },
+  "common": {
+    "loading": "Memuat...",
+    "error": "Terjadi kesalahan",
+    "try_again": "Coba lagi",
+    "today": "Hari ini",
+    "today_short": "HARI INI",
+    "tomorrow": "Besok",
+    "tomorrow_short": "BSK",
+    "next": "Berikutnya",
+    "delete": "Hapus",
+    "save": "Simpan",
+    "add": "Tambah",
+    "inherit": "Wariskan",
+    "cancel": "Batal",
+    "done": "Selesai"
+  },
+  "trip_form": {
+    "title": "Buat perjalanan baru",
+    "name": "Nama Perjalanan",
+    "name_placeholder": "Nama perjalanan (mis. Jepang)",
+    "description": "Deskripsi (Opsional)",
+    "description_placeholder": "mis. Menjelajahi Tokyo, Kyoto, dan Osaka",
+    "start_date": "Tanggal Mulai",
+    "end_date": "Tanggal Selesai",
+    "currency": "Mata Uang Dasar",
+    "expense_currency": "Mata Uang Pengeluaran",
+    "cancel": "Batal",
+    "submit": "Buat Perjalanan",
+    "creating": "Membuat...",
+    "create_error": "Tidak dapat membuat perjalanan. Silakan coba lagi.",
+    "currency_help": "Mata uang bawaan adalah {currency}. Anda dapat mengubahnya di dalam perjalanan Anda kapan saja.",
+    "dates": "Tanggal",
+    "error_name_required": "Nama perjalanan wajib diisi.",
+    "error_start_required": "Tanggal mulai wajib diisi.",
+    "error_end_after_start": "Tanggal selesai harus setelah tanggal mulai."
+  },
+  "currencies": {
+    "eur": "Euro (€)",
+    "usd": "Dolar ($)",
+    "jpy": "Yen (¥)",
+    "gbp": "Pound (£)"
+  },
+  "detail": {
+    "back": "Kembali",
+    "edit": "Edit",
+    "settings": "Pengaturan Perjalanan",
+    "currency": "Mata Uang Dasar",
+    "summary_currency": "Mata uang ringkasan",
+    "default_expense_currency": "Mata uang pengeluaran bawaan",
+    "summary_currency_short": "Ringkasan",
+    "expense_currency_short": "Pengeluaran",
+    "currency_settings_help": "Total ringkasan tetap dalam {currency}. Tambah cepat terbuka dalam mata uang yang paling sering Anda gunakan.",
+    "description": "Deskripsi & Catatan",
+    "no_description": "Belum ada deskripsi yang ditambahkan.",
+    "save": "Simpan Perubahan",
+    "places": "Tempat",
+    "places_empty": "Ketuk untuk menambahkan tujuan",
+    "expenses": "Pengeluaran",
+    "expenses_empty": "Ketuk untuk melacak pengeluaran",
+    "notes_optional": "Catatan (opsional)",
+    "view_all_expenses": "Lihat Semua",
+    "destinations": "Tujuan",
+    "add_destination": "Tambah Tujuan",
+    "destinations_empty": "Belum ada tujuan yang ditambahkan.",
+    "destinations_empty_sub": "Tambahkan tempat untuk mengatur pengeluaran Anda berdasarkan lokasi.",
+    "add_place": "Tambah Tempat",
+    "places_empty_subtitle": "Tambahkan tempat untuk mengatur rencana perjalanan dan pengeluaran Anda berdasarkan tujuan.",
+    "add_first_place": "Tambahkan tempat pertama Anda"
+  },
+  "place": {
+    "view_place_expenses": "Lihat pengeluaran tempat",
+    "local": "Lokal",
+    "default_expense_currency": "Mata uang pengeluaran bawaan",
+    "currency_help": "Tempat ini menggunakan {currency} untuk tambah cepat. Biarkan diwariskan untuk mengikuti bawaan perjalanan.",
+    "no_date": "Tidak ada tanggal",
+    "days": "hari",
+    "day": "hari",
+    "no_expenses": "Belum ada pengeluaran lokal.",
+    "view_history": "Lihat Semua"
+  },
+  "itinerary": {
+    "title": "Aktivitas",
+    "agenda": "Agenda",
+    "view_all": "Lihat Semua",
+    "next_activity": "Berikutnya",
+    "no_activities": "Tidak ada aktivitas mendatang yang direncanakan.",
+    "add_activity": "Tambah Aktivitas",
+    "title_placeholder": "Judul (mis., TeamLab)",
+    "notes_placeholder": "Catatan (opsional)",
+    "adding": "Menambahkan...",
+    "add_to_agenda": "Tambahkan ke Agenda",
+    "local_activity": "Aktivitas Lokal",
+    "empty_state": "Belum ada aktivitas yang ditambahkan.",
+    "add": "Tambah",
+    "empty_state_subtitle": "Lacak penerbangan, hotel, dan pemandangan Anda di satu tempat.",
+    "plan_first_activity": "Rencanakan aktivitas pertama Anda"
+  },
+  "confirm": {
+    "delete_place_title": "Hapus Tujuan",
+    "delete_place_message": "Apakah Anda yakin ingin menghapus tujuan ini? Semua aktivitas terkait akan hilang.",
+    "delete_expense_title": "Hapus Pengeluaran",
+    "delete_expense_message": "Apakah Anda yakin ingin menghapus pengeluaran ini? Tindakan ini tidak dapat dibatalkan.",
+    "delete_activity_title": "Hapus Aktivitas",
+    "delete_activity_message": "Apakah Anda yakin ingin menghapus aktivitas ini?",
+    "delete_trip_title": "Hapus Perjalanan",
+    "delete_trip_message": "Anda akan menghapus \"{tripName}\" dan semua data terkait. Tindakan ini tidak dapat dibatalkan."
+  },
+  "place_form": {
+    "name_placeholder": "Nama tujuan (mis. Kyoto)",
+    "start_date": "Tanggal Mulai (Opsional)",
+    "end_date": "Tanggal Selesai (Opsional)",
+    "city_placeholder": "Kota (mis. Tokyo, Kyoto, Fukuoka)"
+  },
+  "expenses": {
+    "notes_placeholder": "Catatan (opsional)...",
+    "add_expense": "Tambah Pengeluaran",
+    "empty_title": "Mulai dengan penerbangan Anda",
+    "empty_subtitle": "Tambahkan biaya penerbangan Anda untuk melihat total anggaran perjalanan Anda",
+    "add_flight": "Tambah Biaya Penerbangan",
+    "add_other": "Tambah pengeluaran lainnya"
+  },
+  "landing": {
+    "travelers_planning": "wisatawan telah merencanakan perjalanan mereka",
+    "hero_title_plan": "Rencanakan perjalanan Anda",
+    "hero_title_frictionless": "tanpa hambatan",
+    "hero_subtitle": "Itinera adalah teman perencanaan Anda: mengutamakan tamu, siap offline, dan dikhususkan untuk Jepang. Mulai dalam hitungan detik.",
+    "cta_primary": "Mulai Merencanakan — Tanpa Daftar",
+    "cta_secondary": "Lihat Inspirasi",
+    "value_guest_title": "Mengutamakan Tamu",
+    "value_guest_desc": "Tidak ada tembok pendaftaran. Tidak ada iklan. Hanya perencanaan perjalanan yang elegan untuk wisatawan yang cermat.",
+    "value_offline_title": "Siap Offline",
+    "value_offline_desc": "Pesawat, kereta bawah tanah, pegunungan. Akses rencana Anda di mana saja, bahkan tanpa internet.",
+    "value_japan_title": "Keunggulan Jepang",
+    "value_japan_desc": "Alat khusus untuk Jepang: pengoptimalan JR Pass, penandaan stasiun, dan panduan etiket.",
+    "inspiration_title": "Mulai dari inspirasi",
+    "inspiration_subtitle": "Rencana perjalanan yang dikurasi yang dapat Anda jadikan milik Anda sendiri",
+    "customize": "Sesuaikan",
+    "how_title": "Tidak memerlukan akun",
+    "how_subtitle": "Tiga langkah menuju petualangan Anda berikutnya",
+    "how_step1_title": "Pilih templat atau mulai dari awal",
+    "how_step1_desc": "Jelajahi rencana perjalanan kurasi kami atau buat sendiri. Tidak perlu mendaftar.",
+    "how_step2_title": "Rencanakan perjalanan Anda",
+    "how_step2_desc": "Edit, tambah tempat, lacak pengeluaran. Semua data Anda disimpan selama 30 hari.",
+    "how_step3_title": "Simpan saat Anda siap",
+    "how_step3_desc": "Daftar kapan saja untuk menyinkronkan antar perangkat dan simpan rencana Anda selamanya.",
+    "give_feedback": "Berikan umpan balik"
+  },
+  "errors": {
+    "generic": "Terjadi kesalahan. Silakan coba lagi.",
+    "date_out_of_bounds": "Tanggal harus antara {tripStart} dan {tripEnd}.",
+    "required_fields": "Harap lengkapi semua bidang yang wajib diisi.",
+    "trip_not_found": "Kami tidak dapat menemukan perjalanan ini.",
+    "invalid_place": "Tujuan yang dipilih tidak valid."
+  },
+  "transport": {
+    "savings_estimated": "Perkiraan penghematan",
+    "jr_transport": "Transportasi JR",
+    "no_savings": "Transportasi: {total} (tidak ada penghematan JR Pass)",
+    "total_individual_tickets": "Total tiket individu",
+    "algorithm_note": "Diperkirakan berdasarkan urutan tempat. Tambahkan tanggal ke tujuan untuk keakuratan.",
+    "no_routes": "Tidak ada rute JR yang diketahui dalam rencana perjalanan ini.",
+    "significant_savings": "Direkomendasikan {passName}. Penghematan signifikan.",
+    "modest_savings": "Penghematan sederhana. Evaluasi kenyamanan vs fleksibilitas.",
+    "cheaper_individual": "Untuk rencana perjalanan ini, tiket individu lebih murah.",
+    "fallback_note": "Diperkirakan berdasarkan urutan tempat. Tambahkan tanggal untuk keakuratan.",
+    "closest_note": "Asal: {origin} (tanggal perkiraan)"
+  },
+  "station_guide": {
+    "section_title": "Panduan Stasiun",
+    "badge_label": "{station} — {complexity}",
+    "complexity_low": "Panduan stasiun",
+    "complexity_medium": "Panduan stasiun",
+    "complexity_high": "Stasiun kompleks",
+    "complexity_extreme": "Stasiun kompleks",
+    "tabs_tips": "Kiat",
+    "tabs_exits": "Pintu Keluar",
+    "tabs_map": "Peta",
+    "tip_category_navigation": "Navigasi",
+    "tip_category_practical": "Praktis",
+    "tip_category_safety": "Keselamatan",
+    "tip_category_cultural": "Budaya",
+    "priority_critical": "Kritis",
+    "priority_high": "Penting",
+    "priority_medium": "Bagus untuk diketahui",
+    "priority_low": "Tambahan",
+    "exit_time_to_surface": "{time} ke permukaan",
+    "exit_best_for": "Terbaik untuk: {categories}",
+    "best_for_nightlife": "Kehidupan Malam & Bar",
+    "best_for_shopping": "Belanja & Department Store",
+    "best_for_hotels": "Hotel & Penginapan",
+    "best_for_business": "Bisnis & Pencakar Langit",
+    "best_for_parks": "Taman & Kebun",
+    "best_for_buses": "Bus & Transit Bandara",
+    "best_for_day_trips": "Perjalanan Siang & Ekskursi",
+    "best_for_sightseeing": "Tamasya & Monumen",
+    "best_for_transit": "Transit Rel & Koneksi",
+    "best_for_dining": "Bersantap & Makanan Lokal",
+    "map_placeholder": "Peta Navigasi Stasiun — Segera Hadir",
+    "map_placeholder_subtitle": "Kami sedang merancang peta khusus yang disederhanakan untuk membantu Anda menavigasi {station_name} dengan mudah. Periksa kembali nanti!",
+    "map_insight_title": "Wawasan",
+    "map_insight_body": "Ini bukan peta satelit yang membingungkan. Ini adalah diagram orientasi cepat yang logis untuk 30 detik kritis setelah turun dari kereta."
+  },
+  "japan_context": {
+    "ui": {
+      "useful_phrases": "🗣️ Frasa Berguna",
+      "tips_count": "🎌 {count} kiat",
+      "tip_singular": "🎌 1 kiat",
+      "tips_plural": "🎌 {count} kiat",
+      "cultural_tip": "🎌 {count} kiat budaya",
+      "cultural_tip_singular": "🎌 1 kiat budaya",
+      "cultural_tips_plural": "🎌 {count} kiat budaya",
+      "more_tips": "+{count} lagi",
+      "category_restaurant": "🍜 Restoran",
+      "category_transport": "🚆 Transportasi",
+      "category_emergency": "🚨 Darurat",
+      "category_general": "💬 Umum"
+    },
+    "rules": {
+      "no_phone_transport": {
+        "title": "Hening di Transportasi Umum",
+        "body": "Jangan berbicara di telepon atau melakukan panggilan video di kereta, bus, atau kereta bawah tanah. Hal ini dianggap sangat tidak sopan.",
+        "consequence": "Anda mungkin ditegur oleh penumpang lain atau kondektur.",
+        "tip": "Jika Anda harus menerima panggilan, turunlah di perhentian berikutnya."
+      },
+      "no_eat_walk": {
+        "title": "Dilarang Makan atau Minum Sambil Berjalan",
+        "body": "Makan atau minum sambil berjalan di jalan atau di transportasi (kecuali Shinkansen) dianggap sebagai tata krama yang buruk.",
+        "consequence": "Tatapan tidak setuju.",
+        "tip": "Jika Anda membeli sesuatu dari mesin penjual otomatis atau toko, makanlah di dekat situ sebelum melanjutkan."
+      },
+      "shoes_genkan": {
+        "title": "Lepaskan Sepatu Anda di Pintu Masuk",
+        "body": "Anda harus meninggalkan sepatu Anda di genkan (area pintu masuk yang lebih rendah). Jangan pernah menginjak tikar tatami dengan sepatu.",
+        "consequence": "Sangat menyinggung tuan rumah atau diminta pergi.",
+        "tip": "Selalu bawa kaus kaki bersih dan tidak berlubang."
+      },
+      "no_tattoos_onsen": {
+        "title": "Tidak Boleh Ada Tato Terlihat di Onsen",
+        "body": "Tato secara historis dikaitkan dengan yakuza di Jepang. Banyak onsen dan kolam renang dengan tegas melarangnya.",
+        "consequence": "Diusir dari tempat tanpa penjelasan.",
+        "tip": "Cari onsen yang ramah tato atau gunakan koyo penutup tato."
+      },
+      "no_touch_geisha": {
+        "title": "Jangan Sentuh Geisha atau Maiko",
+        "body": "Di area seperti Gion, jangan sentuh atau halangi jalan geisha atau maiko untuk mengambil foto. Mereka adalah profesional yang sedang bekerja.",
+        "consequence": "Denda lokal dan ditegur oleh polisi.",
+        "tip": "Ambil foto dari jauh tanpa mengganggu jalan mereka."
+      },
+      "no_tipping": {
+        "title": "Tidak Ada Uang Tip",
+        "body": "Di Jepang, Anda tidak meninggalkan tip di restoran, taksi, atau hotel. Pelayanan yang baik sudah termasuk.",
+        "consequence": "Staf akan mengejar Anda untuk mengembalikan uangnya.",
+        "tip": "Ucapan gochisosama deshita (terima kasih atas makanannya) yang sederhana sudah cukup."
+      },
+      "ticket_machine_order": {
+        "title": "Pesan dari Mesin Sebelum Duduk",
+        "body": "Banyak tempat ramen atau makanan cepat saji mengharuskan Anda membeli tiket dari mesin di pintu masuk sebelum mencari tempat duduk.",
+        "consequence": "Menghalangi kelancaran aliran restoran.",
+        "tip": "Bawa uang tunai; banyak mesin lama tidak menerima kartu."
+      },
+      "hashi_etiquette": {
+        "title": "Etiket Sumpit",
+        "body": "Jangan pernah menancapkan sumpit secara vertikal ke dalam nasi atau memindahkan makanan dari sumpit Anda ke sumpit orang lain, karena menyerupai ritual pemakaman.",
+        "consequence": "Ini adalah tabu yang parah.",
+        "tip": "Gunakan sandaran sumpit saat Anda tidak menggunakannya."
+      },
+      "no_blow_nose": {
+        "title": "Jangan Membuang Ingus di Depan Umum",
+        "body": "Membuang ingus dengan keras di depan umum, terutama di restoran atau transportasi, dianggap menjijikkan.",
+        "consequence": "Ketidaknyamanan ekstrem di sekitar Anda.",
+        "tip": "Pergi ke kamar mandi untuk membuang ingus atau lakukan dengan hati-hati."
+      },
+      "kanpai_wait": {
+        "title": "Tunggu Kanpai",
+        "body": "Jangan mulai minum sampai semua orang mendapatkan minumannya dan seseorang mengatakan Kanpai (Bersulang!). Juga, jangan tuangkan minuman Anda sendiri; tuangkan untuk orang lain dan biarkan mereka menuangkannya untuk Anda.",
+        "consequence": "Terlihat egois dalam situasi sosial.",
+        "tip": "Jaga agar gelas teman-teman Anda tetap penuh."
+      },
+      "no_touch_products": {
+        "title": "Jangan Sentuh Produk Jika Tidak Perlu",
+        "body": "Di toko tradisional, toko kerajinan, atau pasar makanan, hindari menyentuh produk jika Anda tidak berniat membelinya.",
+        "consequence": "Membuat marah pemilik toko.",
+        "tip": "Jika Anda ingin memeriksa sesuatu, mintalah izin terlebih dahulu (mite mo ii desu ka?)."
+      },
+      "no_photos_restricted": {
+        "title": "Dilarang Memotret",
+        "body": "Hormati dengan tegas tanda dilarang memotret, umum di kuil, tempat suci, dan museum karena alasan spiritual atau pelestarian.",
+        "consequence": "Penyitaan kamera atau pengusiran.",
+        "tip": "Jika Anda tidak melihat tanda yang jelas, asumsikan Anda tidak dapat mengambil foto di dalam kuil."
+      },
+      "trash_separation": {
+        "title": "Pisahkan Sampah Anda",
+        "body": "Jepang memiliki sistem pemisahan sampah yang ketat (mudah terbakar, plastik, kaleng, botol PET).",
+        "consequence": "Tempat sampah umum diawasi ketat.",
+        "tip": "Seringkali lebih mudah membawa sampah Anda ke penginapan dan membuangnya di sana."
+      },
+      "no_smoking_street": {
+        "title": "Dilarang Merokok di Jalan",
+        "body": "Di sebagian besar kota, merokok sambil berjalan di jalan dilarang. Hanya dapat dilakukan di area yang ditentukan.",
+        "consequence": "Denda langsung.",
+        "tip": "Cari tanda hijau Area Merokok."
+      },
+      "bow_formal": {
+        "title": "Membungkuk Sedikit",
+        "body": "Salam standar adalah membungkuk. Anggukan sederhana sudah cukup bagi orang asing.",
+        "consequence": "Tidak membungkuk bukanlah hal yang serius bagi orang asing, tetapi melakukannya akan memberikan nilai tambah.",
+        "tip": "Jangan gabungkan membungkuk dengan jabat tangan kecuali penduduk setempat yang memulainya."
+      },
+      "wildlife_monkeys": {
+        "title": "Etiket Monyet Jigokudani",
+        "body": "Jangan sentuh atau beri makan kera liar. Hindari kontak mata langsung karena mereka menganggapnya sebagai ancaman.",
+        "consequence": "Monyet bisa menjadi agresif, mencakar atau menggigit, dan mencuri barang bawaan Anda.",
+        "tip": "Jaga jarak aman minimal 2 meter dan simpan semua makanan tertutup rapat di dalam tas Anda."
+      }
+    },
+    "phrases": {
+      "sumimasen": {
+        "translation": "Permisi / Maaf / Terima kasih",
+        "usage": "Kata yang paling berguna. Gunakan untuk memanggil pelayan, meminta maaf, atau lewat."
+      },
+      "arigatou": {
+        "translation": "Terima kasih (formal)",
+        "usage": "Untuk berterima kasih atas layanan, pembelian, atau bantuan dengan sopan."
+      },
+      "wakarimasen": {
+        "translation": "Saya tidak mengerti",
+        "usage": "Berguna saat diajak bicara dalam bahasa Jepang dan Anda tidak mengerti."
+      },
+      "eigo": {
+        "translation": "Apakah Anda berbicara bahasa Inggris?",
+        "usage": "Selalu tanyakan ini sebelum berbicara bahasa Inggris."
+      },
+      "ikura": {
+        "translation": "Berapa harganya?",
+        "usage": "Menunjuk benda yang ingin Anda beli."
+      },
+      "okaikei": {
+        "translation": "Minta tagihan, tolong",
+        "usage": "Untuk meminta tagihan. Buat tanda X dengan jari telunjuk Anda."
+      },
+      "hitori": {
+        "translation": "Untuk satu/dua orang",
+        "usage": "Acungkan satu atau dua jari saat memasuki restoran."
+      },
+      "bejitarian": {
+        "translation": "Saya vegetarian",
+        "usage": "Perhatian: banyak orang Jepang tidak menganggap kaldu ikan (dashi) sebagai daging."
+      },
+      "niku_nashi": {
+        "translation": "Saya tidak makan daging/ikan",
+        "usage": "Lebih spesifik daripada mengatakan vegetarian untuk memastikan tidak ada turunannya."
+      },
+      "toire": {
+        "translation": "Di mana kamar mandinya?",
+        "usage": "Penting di stasiun atau jalan-jalan besar."
+      },
+      "arerugii": {
+        "translation": "Saya alergi terhadap...",
+        "usage": "Gabungkan dengan bahannya, mis., piinatsu arerugii desu (kacang tanah)."
+      },
+      "tasukete": {
+        "translation": "Tolong!",
+        "usage": "Hanya untuk keadaan darurat."
+      },
+      "oishii": {
+        "translation": "Lezat!",
+        "usage": "Mengatakannya dengan keras di restoran akan membuat koki sangat senang."
+      },
+      "kanpai": {
+        "translation": "Bersulang!",
+        "usage": "Sulang resmi Jepang."
+      },
+      "ohayou": {
+        "translation": "Selamat pagi",
+        "usage": "Hingga jam 10:30-11:00 pagi."
+      },
+      "konbanwa": {
+        "translation": "Selamat malam",
+        "usage": "Dari matahari terbenam."
+      },
+      "arigatou_mashita": {
+        "translation": "Terima kasih (atas apa yang baru saja terjadi)",
+        "usage": "Sempurna untuk diucapkan saat meninggalkan toko atau restoran."
+      },
+      "densha": {
+        "translation": "Apakah ini kereta ke...?",
+        "usage": "Menunjuk kereta di peron untuk menghindari salah naik."
+      },
+      "deguchi": {
+        "translation": "Di mana pintu keluarnya?",
+        "usage": "Stasiun besar bisa menjadi labirin."
+      },
+      "byouin": {
+        "translation": "Saya butuh dokter/rumah sakit",
+        "usage": "Untuk meminta bantuan medis darurat."
+      }
+    }
+  },
+  "budget": {
+    "on_track": "Sesuai jalur",
+    "halfway": "Setengah jalan",
+    "over_by": "Lebih dari {amount}",
+    "under_budget": "{amount} di bawah anggaran",
+    "over_budget": "{amount} melebihi anggaran",
+    "actual": "Aktual",
+    "estimated": "Perkiraan",
+    "flight": "Penerbangan",
+    "daily_spent": "Pengeluaran harian",
+    "daily_estimated": "Anggaran harian",
+    "daily_remaining": "Sisa",
+    "daily_over": "Lebih",
+    "excl_flights": "(tidak termasuk penerbangan)",
+    "daily_excl_flights": "(Harian: {amount})",
+    "aria_label": "Lihat rincian pengeluaran",
+    "days_left": "{count} hari tersisa",
+    "trip_starts_today": "Perjalanan dimulai hari ini",
+    "trip_starts_tomorrow": "Perjalanan dimulai besok",
+    "trip_completed": "Perjalanan selesai",
+    "day_x_of_y": "Hari {day}/{total}"
+  },
+  "inspiration": {
+    "roma": {
+      "title": "Roma Express: 3 hari yang tak terlupakan",
+      "desc": "Rencana perjalanan yang dioptimalkan untuk liburan singkat di kota. Colosseum, Vatikan, Trastevere, dan keahlian memasak lokal. Dirancang untuk wisatawan yang menghargai waktu."
+    },
+    "japan": {
+      "title": "Jepang Klasik: 15 hari dari Tokyo ke Hiroshima",
+      "desc": "Rute yang dioptimalkan dengan JR Pass 7-hari. Keseimbangan antara budaya, alam, dan gastronomi. Termasuk etiket dasar dan frasa berguna."
+    },
+    "asia": {
+      "title": "Asia Mendalam: 60 hari dari Bangkok ke Bali",
+      "desc": "Rute untuk pengembara digital dan backpacker berpengalaman. Anggaran ketat, coworking, dan koneksi lokal. Multi-mata uang aktif."
+    }
+  }
+}

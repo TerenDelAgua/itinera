@@ -128,7 +128,11 @@
   },
   "expenses": {
     "notes_placeholder": "Notas (opcional)...",
-    "add_expense": "Añadir gasto"
+    "add_expense": "Añadir gasto",
+    "empty_title": "Comienza con tu vuelo",
+    "empty_subtitle": "Añade el coste de tu vuelo para ver el presupuesto total del viaje",
+    "add_flight": "Añadir Coste del Vuelo",
+    "add_other": "Añadir otro gasto"
   },
   "landing": {
     "travelers_planning": "viajeros han planificado sus viajes",
@@ -405,6 +409,42 @@
         "translation": "Necesito ir al hospital",
         "usage": "Para pedir ayuda médica urgente."
       }
+    }
+  },
+  "budget": {
+    "on_track": "En curso",
+    "halfway": "A mitad",
+    "over_by": "Excedido por {amount}",
+    "under_budget": "{amount} por debajo",
+    "over_budget": "{amount} por encima",
+    "actual": "Real",
+    "estimated": "Estimado",
+    "flight": "Vuelo",
+    "daily_spent": "Gasto diario",
+    "daily_estimated": "Presupuesto diario",
+    "daily_remaining": "Restante",
+    "daily_over": "Excedido",
+    "excl_flights": "(excl. vuelos)",
+    "daily_excl_flights": "(Diario: {amount})",
+    "aria_label": "Ver desglose de presupuesto",
+    "days_left": "Faltan {count} días",
+    "trip_starts_today": "El viaje empieza hoy",
+    "trip_starts_tomorrow": "El viaje empieza mañana",
+    "trip_completed": "Viaje completado",
+    "day_x_of_y": "Día {day}/{total}"
+  },
+  "inspiration": {
+    "roma": {
+      "title": "Roma Express: 3 días imperdibles",
+      "desc": "Itinerario optimizado para un city break corto. Coliseo, Vaticano, Trastevere y gastronomía local. Diseñado para viajeros que valoran el tiempo."
+    },
+    "japan": {
+      "title": "Japón Clásico: 15 días de Tokio a Hiroshima",
+      "desc": "Ruta optimizada con JR Pass 7-day. Equilibrio entre cultura, naturaleza y gastronomía. Incluye etiqueta básica y frases útiles."
+    },
+    "asia": {
+      "title": "Asia Profunda: 60 días de Bangkok a Bali",
+      "desc": "Ruta para nómadas digitales y mochileros experimentados. Presupuesto ajustado, coworkings, y conexiones locales. Multi-moneda activa."
     }
   }
 }
