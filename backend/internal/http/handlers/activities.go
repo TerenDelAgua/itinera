@@ -4,13 +4,13 @@ import (
 	"backend/internal/http/middleware"
 	"backend/internal/models"
 	"encoding/json"
+	"log"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
-
-
 
 // ListActivities godoc
 // @Summary      List trip activities
@@ -114,30 +114,37 @@ func (h *Handlers) CreateActivity(w http.ResponseWriter, r *http.Request) {
 		placeIdPtr = &pId
 	}
 
+	// Normalize empty strings to nil so they become SQL NULL instead of empty
+	// text. The previous behaviour (passing "" straight into a TIME or TEXT
+	// NOT NULL column) was the root cause of the 500 we hit on activity
+	// creation: PG rejects empty strings for TIME columns with SQLSTATE
+	// 22007 ("invalid input syntax for type time").
 	var notesPtr *string
 	if input.Notes != "" {
 		notesPtr = &input.Notes
 	}
-
 	var timePtr *string
 	if input.Time != nil && *input.Time != "" {
 		timePtr = input.Time
 	}
 
 	newActivity := models.Activity{
-		Id:      uuid.New(),
-		TripId:  tripId,
-		PlaceId: placeIdPtr,
-		Title:   input.Title,
-		Date:    input.Date,
-		Time:    timePtr,
-		Notes:   notesPtr,
+		Id:        uuid.New(),
+		TripId:    tripId,
+		PlaceId:   placeIdPtr,
+		Title:     input.Title,
+		Date:      input.Date,
+		Time:      timePtr,
+		Notes:     notesPtr,
+		CreatedAt: time.Now().UTC(),
 	}
 
 	if err := h.ActivityRepo.CreateActivity(r.Context(), &newActivity); err != nil {
+		log.Printf("❌ [CreateActivity] trip=%s title=%q date=%s time=%v err=%v", tripId, input.Title, input.Date, timePtr, err)
 		http.Error(w, "Failed to create activity", http.StatusInternalServerError)
 		return
 	}
+	log.Printf("✅ [CreateActivity] id=%s trip=%s title=%q", newActivity.Id, tripId, input.Title)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
