@@ -18,6 +18,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 
 	_ "backend/docs"
@@ -48,6 +49,10 @@ func main() {
 	cfg := config.Load()
 	cfg.LogSummary()
 
+	if err := cfg.Validate(); err != nil {
+		log.Fatalf("❌ Config validation failed: %v", err)
+	}
+
 	pool, err := database.NewPostgress(cfg)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
@@ -59,14 +64,15 @@ func main() {
 	expensesRepo := database.NewExpenseRepository(pool)
 	authRepo := database.NewAuthRepository(pool)
 	activityRepo := database.NewActivityRepository(pool)
+	eventsRepo := database.NewEventRepository(pool)
+	rateLimitRepo := database.NewRateLimitRepository(pool)
 
 	exchangeRateSvc := services.NewExchangeRateService(pool)
 	expenseSvc := services.NewExpenseService(tripsRepo, expensesRepo, exchangeRateSvc)
-	tripSvc := services.NewTripService(tripsRepo)
 
-	h := handlers.NewHandlers(tripsRepo, placesRepo, expensesRepo, authRepo, activityRepo, expenseSvc, tripSvc, cfg)
+	h := handlers.NewHandlers(tripsRepo, placesRepo, expensesRepo, authRepo, activityRepo, eventsRepo, rateLimitRepo, expenseSvc, cfg)
 
-	router := setupRouter(cfg, h)
+	router := setupRouter(cfg, h, pool)
 
 	server := &http.Server{
 		Addr:    ":" + cfg.Port,
@@ -94,7 +100,7 @@ func main() {
 
 }
 
-func setupRouter(cfg *config.Config, h *handlers.Handlers) *chi.Mux {
+func setupRouter(cfg *config.Config, h *handlers.Handlers, pool *pgxpool.Pool) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -118,9 +124,19 @@ func setupRouter(cfg *config.Config, h *handlers.Handlers) *chi.Mux {
 				return true
 			}
 
+			// Railway (staging y preview deployments del backend / tooling interno)
+			if strings.HasSuffix(origin, ".railway.app") {
+				return true
+			}
+
+			// Fly.io (deploy alternativo documentado en el README)
+			if strings.HasSuffix(origin, ".fly.dev") {
+				return true
+			}
+
 			if strings.Contains(origin, "ngrok-free.app") || strings.Contains(origin, "ngrok.io") {
-            return true
-        }
+				return true
+			}
 			return false
 		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
@@ -137,7 +153,7 @@ func setupRouter(cfg *config.Config, h *handlers.Handlers) *chi.Mux {
 		ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 		defer cancel()
 
-		if err := h.TripsRepo.Pool.Ping(ctx); err != nil {
+		if err := pool.Ping(ctx); err != nil {
 			w.WriteHeader(http.StatusServiceUnavailable)
 			w.Write([]byte(`{"status":"unhealthy","database":"disconnected"}`))
 			return

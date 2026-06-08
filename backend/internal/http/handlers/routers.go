@@ -23,7 +23,7 @@ func RegisterApiRoutes(r chi.Router, h *Handlers) {
 		r.Post("/auth/upgrade", h.UpgradeSession)
 
 		// Events: fire-and-forget analytics (no PII, rate-limited)
-		r.Post("/events", TrackEvent(h.TripsRepo.Pool))
+		r.Post("/events", h.TrackEvent)
 
 		r.With(middleware.ResolveTripContext(h.TripsRepo)).Group(func(r chi.Router) {
 			r.Get("/trips/{id}", h.GetTrip)
