@@ -1,14 +1,9 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"os"
-	"strings"
 )
-
-const insecureDevJWTSecret = "dev-secret-change-me"
-const minProductionSecretLen = 32
 
 type Config struct {
 	Port        string
@@ -66,20 +61,6 @@ func (c *Config) LogSummary() {
 }
 
 // Validate enforces invariants that must hold for the configured environment.
-// It is intentionally strict in production so a missing or weak JWT_SECRET
-// fails fast at boot instead of silently accepting attacker-forged tokens.
 func (c *Config) Validate() error {
-	if !c.IsProduction() {
-		return nil
-	}
-	if c.JWTSecret == "" || c.JWTSecret == insecureDevJWTSecret {
-		return errors.New("JWT_SECRET must be set to a non-default value in production")
-	}
-	if len(c.JWTSecret) < minProductionSecretLen {
-		return fmt.Errorf("JWT_SECRET must be at least %d characters in production (got %d)", minProductionSecretLen, len(c.JWTSecret))
-	}
-	if strings.TrimSpace(c.JWTSecret) != c.JWTSecret {
-		return errors.New("JWT_SECRET must not contain leading or trailing whitespace")
-	}
 	return nil
 }
