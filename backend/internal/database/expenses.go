@@ -207,6 +207,12 @@ func (r *ExpenseRepository) UpdateExpense(ctx context.Context, id uuid.UUID, exp
 		Scan(&res.Id, &res.TripId, &res.PlaceId, &res.Amount, &res.OriginalAmount, &res.OriginalCurrency, &res.ExchangeRate, &res.ConversionDate, &res.Currency, &res.CategoryId, &res.Notes, &res.Date, &res.CreatedAt)
 	return &res, err
 }
+
+func (r *ExpenseRepository) DeleteExpense(ctx context.Context, id uuid.UUID) error {
+	_, err := r.Pool.Exec(ctx, "DELETE FROM expenses WHERE id = $1", id)
+	return err
+}
+
 func (r *ExpenseRepository) GetPlaceExpensesSummary(ctx context.Context, placeID uuid.UUID) ([]models.CategorySummary, error) {
 	rows, err := r.Pool.Query(ctx, `
 		SELECT category_id, SUM(amount) FROM expenses 

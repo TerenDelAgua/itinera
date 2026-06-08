@@ -12,6 +12,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+const authCookieName = "auth_token"
+const authCookieMaxAge = 72 * 60 * 60 // matches JWT exp (72h)
+
 type TokenResponse struct {
 	Token string      `json:"token"`
 	User  models.User `json:"user"`
@@ -24,6 +27,30 @@ func (h *Handlers) generateToken(user models.User) (string, error) {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(h.Config.JWTSecret))
+}
+
+// setAuthCookie writes the JWT as an HttpOnly cookie so the browser sends it
+// automatically with every request via credentials: 'include'. This removes
+// the need to store the token in localStorage (XSS-readable) on the client.
+// SameSite is set to None in secure contexts (production / TLS-terminated
+// proxies) so the cookie crosses the Vercel <-> Railway origin boundary,
+// and Lax otherwise for local development.
+func (h *Handlers) setAuthCookie(w http.ResponseWriter, r *http.Request, token string) {
+	isSecureContext := h.Config.IsProduction() || r.Header.Get("X-Forwarded-Proto") == "https"
+	sameSite := http.SameSiteLaxMode
+	if isSecureContext {
+		sameSite = http.SameSiteNoneMode
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     authCookieName,
+		Value:    token,
+		Path:     "/",
+		MaxAge:   authCookieMaxAge,
+		HttpOnly: true,
+		Secure:   isSecureContext,
+		SameSite: sameSite,
+	})
 }
 
 // Register godoc
@@ -56,6 +83,7 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token, _ := h.generateToken(*user)
+	h.setAuthCookie(w, r, token)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(TokenResponse{Token: token, User: *user})
 }
@@ -93,6 +121,7 @@ func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token, _ := h.generateToken(*user)
+	h.setAuthCookie(w, r, token)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(TokenResponse{Token: token, User: *user})
 }

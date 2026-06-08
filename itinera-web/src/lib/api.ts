@@ -4,36 +4,36 @@ if (!API_URL) {
     throw new Error("VITE_API_URL is not defined in the environment variables");
 }
 
+// Authentication is handled exclusively by HttpOnly cookies:
+//   - `session_id` is issued by SessionMiddleware for every visitor (guest or
+//     registered). The browser sends it on every request via credentials:
+//     'include' below.
+//   - `auth_token` is issued by Register/Login on top of the session cookie
+//     once the guest upgrades. It carries the JWT and is HttpOnly, so it is
+//     not readable from JavaScript and is therefore safe against XSS
+//     exfiltration. AuthMiddleware reads it server-side.
+//
+// We previously mirrored the session id and JWT in localStorage to send them
+// as X-Session-Id / Authorization headers. That path was XSS-readable and
+// redundant once cookies are present, so it has been removed.
+
 export async function apiFetch<T>(
     endpoint: string,
     options: RequestInit = {}
 ): Promise<T> {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('session_token') : null;
-    const sessionId = typeof window !== 'undefined' ? localStorage.getItem('session_id') : null;
-
     const headers: HeadersInit = {
         'Content-Type': 'application/json',
         'ngrok-skip-browser-warning': 'true',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...(sessionId ? { 'X-Session-Id': sessionId } : {}),
         ...options.headers,
     };
 
     const response = await fetch(`${API_URL}${endpoint}`, {
         ...options,
         headers,
-        credentials: 'include'
+        credentials: 'include',
     });
 
-    const newSessionId = response.headers.get('X-Session-Id');
-    if (newSessionId && typeof window !== 'undefined') {
-        localStorage.setItem('session_id', newSessionId);
-    }
-
     if (!response.ok) {
-        if (response.status === 401 || response.status === 403) {
-            localStorage.removeItem('session_token');
-        }
         let errorMessage = response.statusText;
         try {
             const bodyText = await response.text();
