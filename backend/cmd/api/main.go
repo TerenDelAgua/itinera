@@ -137,6 +137,14 @@ func setupRouter(cfg *config.Config, h *handlers.Handlers, pool *pgxpool.Pool) *
 			if strings.Contains(origin, "ngrok-free.app") || strings.Contains(origin, "ngrok.io") {
 				return true
 			}
+
+			// Producción: dominios custom (Sprint 1)
+			if origin == "https://goitinera.app" || origin == "https://www.goitinera.app" ||
+				origin == "https://api.goitinera.app" || origin == "https://teren.dev" ||
+				origin == "https://www.teren.dev" {
+				return true
+			}
+
 			return false
 		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
