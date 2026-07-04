@@ -141,6 +141,8 @@ jobs:
           done
 
       - name: Build Frontend
+        env:
+          VITE_API_URL: http://localhost:8080/api/v1
         run: pnpm --filter itinera-web build
 
       - name: Run E2E Tests
