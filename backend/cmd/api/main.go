@@ -18,7 +18,6 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 
 	_ "backend/docs"
@@ -64,15 +63,14 @@ func main() {
 	expensesRepo := database.NewExpenseRepository(pool)
 	authRepo := database.NewAuthRepository(pool)
 	activityRepo := database.NewActivityRepository(pool)
-	eventsRepo := database.NewEventRepository(pool)
-	rateLimitRepo := database.NewRateLimitRepository(pool)
 
 	exchangeRateSvc := services.NewExchangeRateService(pool)
 	expenseSvc := services.NewExpenseService(tripsRepo, expensesRepo, exchangeRateSvc)
+	tripSvc := services.NewTripService(tripsRepo)
 
-	h := handlers.NewHandlers(tripsRepo, placesRepo, expensesRepo, authRepo, activityRepo, eventsRepo, rateLimitRepo, expenseSvc, cfg)
+	h := handlers.NewHandlers(tripsRepo, placesRepo, expensesRepo, authRepo, activityRepo, expenseSvc, tripSvc, cfg)
 
-	router := setupRouter(cfg, h, pool)
+	router := setupRouter(cfg, h)
 
 	server := &http.Server{
 		Addr:    ":" + cfg.Port,
@@ -100,7 +98,7 @@ func main() {
 
 }
 
-func setupRouter(cfg *config.Config, h *handlers.Handlers, pool *pgxpool.Pool) *chi.Mux {
+func setupRouter(cfg *config.Config, h *handlers.Handlers) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -135,8 +133,8 @@ func setupRouter(cfg *config.Config, h *handlers.Handlers, pool *pgxpool.Pool) *
 			}
 
 			if strings.Contains(origin, "ngrok-free.app") || strings.Contains(origin, "ngrok.io") {
-				return true
-			}
+            return true
+        }
 			return false
 		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
@@ -153,7 +151,7 @@ func setupRouter(cfg *config.Config, h *handlers.Handlers, pool *pgxpool.Pool) *
 		ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
 		defer cancel()
 
-		if err := pool.Ping(ctx); err != nil {
+		if err := h.TripsRepo.Pool.Ping(ctx); err != nil {
 			w.WriteHeader(http.StatusServiceUnavailable)
 			w.Write([]byte(`{"status":"unhealthy","database":"disconnected"}`))
 			return

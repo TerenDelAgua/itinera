@@ -157,12 +157,12 @@ func (h *Handlers) ListExpenses(w http.ResponseWriter, r *http.Request) {
 // @Router       /trips/{id}/expenses/{expenseId} [delete]
 func (h *Handlers) DeleteExpense(w http.ResponseWriter, r *http.Request) {
 	expenseId := chi.URLParam(r, "expenseId")
-	parsedID, err := uuid.Parse(expenseId)
-	if err != nil {
+	if _, err := uuid.Parse(expenseId); err != nil {
 		http.Error(w, "Invalid expense ID", http.StatusBadRequest)
 		return
 	}
-	if err := h.ExpensesRepo.DeleteExpense(r.Context(), parsedID); err != nil {
+	if _, err := h.ExpensesRepo.Pool.Exec(r.Context(),
+		"DELETE FROM Expenses WHERE id = $1", expenseId); err != nil {
 		http.Error(w, "Failed to delete expense", http.StatusInternalServerError)
 		return
 	}

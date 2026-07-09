@@ -143,14 +143,10 @@ func (r *ActivityRepository) GetById(ctx context.Context, id uuid.UUID) (*models
 }
 
 func (r *ActivityRepository) CreateActivity(ctx context.Context, act *models.Activity) error {
-	// We deliberately avoid RETURNING here. pgx v5's Pool.Exec is intended
-	// for non-row-returning commands; using it with RETURNING can leave the
-	// returned rows undrained and the INSERT effectively aborted depending
-	// on the column types involved (we hit this with uuid + time). The
-	// created_at timestamp is set in the handler instead.
 	query := `
 		INSERT INTO activities (id, trip_id, place_id, title, date, time, notes)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		RETURNING id, created_at
 	`
 	_, err := r.Pool.Exec(ctx, query,
 		act.Id,
@@ -161,6 +157,7 @@ func (r *ActivityRepository) CreateActivity(ctx context.Context, act *models.Act
 		act.Time,
 		act.Notes,
 	)
+
 	return err
 }
 

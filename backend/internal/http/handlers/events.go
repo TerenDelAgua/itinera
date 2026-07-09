@@ -6,15 +6,45 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-const (
-	eventRateLimitWindow = time.Minute
-	eventRateLimitMax    = 60
-)
+// ── Rate Limiter ─────────────────────────────────────────────────────────────
+
+type eventRateLimiter struct {
+	mu     sync.Mutex
+	counts map[string]int
+	window map[string]time.Time
+}
+
+var evtLimiter = &eventRateLimiter{
+	counts: make(map[string]int),
+	window: make(map[string]time.Time),
+}
+
+func (rl *eventRateLimiter) allow(sessionID string) bool {
+	rl.mu.Lock()
+	defer rl.mu.Unlock()
+
+	now := time.Now()
+	start, exists := rl.window[sessionID]
+
+	if !exists || now.Sub(start) > time.Minute {
+		rl.window[sessionID] = now
+		rl.counts[sessionID] = 1
+		return true
+	}
+
+	if rl.counts[sessionID] >= 60 {
+		return false
+	}
+
+	rl.counts[sessionID]++
+	return true
+}
 
 // ── Request Shape ─────────────────────────────────────────────────────────────
 
@@ -35,62 +65,57 @@ type EventRequest struct {
 // @Success      204
 // @Failure      400  {string}  string "Bad request"
 // @Router       /events [post]
-func (h *Handlers) TrackEvent(w http.ResponseWriter, r *http.Request) {
-	// Resolve session from middleware context (set by SessionMiddleware)
-	sessionID := ""
-	if sid, ok := r.Context().Value(middleware.ContextKeySessionId{}).(string); ok {
-		sessionID = sid
-	}
+func TrackEvent(pool *pgxpool.Pool) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Resolve session from middleware context (set by SessionMiddleware)
+		sessionID := ""
+		if sid, ok := r.Context().Value(middleware.ContextKeySessionId{}).(string); ok {
+			sessionID = sid
+		}
 
-	// Rate limit: max 60 events/min per session, enforced globally via the
-	// RateLimitStore. Errors here are logged and treated as "allow" so a
-	// transient DB hiccup does not silently drop the event.
-	if h.RateLimitRepo != nil {
-		allowed, err := h.RateLimitRepo.CheckAndIncrement(r.Context(), "events:"+sessionID, eventRateLimitWindow, eventRateLimitMax)
-		if err != nil {
-			log.Printf("⚠️ [TrackEvent] rate limiter error, allowing event: %v", err)
-		} else if !allowed {
-			// Caller is over the cap. We respond 204 anyway (fire-and-forget
-			// UX), but skip the INSERT to keep the events table small.
+		// Rate limit: max 60 events/min per session
+		if !evtLimiter.allow(sessionID) {
 			w.WriteHeader(http.StatusNoContent)
 			return
 		}
+
+		var req EventRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		if !tracking.IsValid(req.Type) {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		// Sanitize and add server-side metadata
+		req.Metadata = tracking.SanitizeMetadata(req.Metadata)
+		req.Metadata["server.timestamp"] = time.Now().Unix()
+
+		metadataJSON, err := json.Marshal(req.Metadata)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		// Resolve user_id from JWT context if present (optional)
+		var userID interface{}
+		if uid, ok := r.Context().Value(middleware.ContextKeyUserId{}).(interface{ String() string }); ok {
+			userID = uid.String()
+		}
+
+		_, err = pool.Exec(r.Context(), `
+			INSERT INTO events (type, session_id, user_id, trip_id, metadata, created_at)
+			VALUES ($1, $2, $3, $4, $5, NOW())
+		`, req.Type, sessionID, userID, req.TripID, metadataJSON)
+
+		if err != nil {
+			// Fire-and-forget: log internally, never break UX
+			log.Printf("⚠️ [TrackEvent] Failed to insert event '%s': %v", req.Type, err)
+		}
+
+		w.WriteHeader(http.StatusNoContent)
 	}
-
-	var req EventRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	if !tracking.IsValid(req.Type) {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	// Sanitize and add server-side metadata
-	req.Metadata = tracking.SanitizeMetadata(req.Metadata)
-	req.Metadata["server.timestamp"] = time.Now().Unix()
-
-	metadataJSON, err := json.Marshal(req.Metadata)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	// Resolve user_id from JWT context if present (optional). The middleware
-	// stores a uuid.UUID; we surface it as a pointer so the EventStore can
-	// distinguish "no authenticated user" (NULL) from "user_id is empty".
-	var userID *string
-	if uid, ok := r.Context().Value(middleware.ContextKeyUserId{}).(uuid.UUID); ok {
-		s := uid.String()
-		userID = &s
-	}
-
-	if err := h.EventsRepo.Insert(r.Context(), req.Type, sessionID, userID, req.TripID, metadataJSON, time.Now().UTC()); err != nil {
-		// Fire-and-forget: log internally, never break UX
-		log.Printf("⚠️ [TrackEvent] Failed to insert event '%s': %v", req.Type, err)
-	}
-
-	w.WriteHeader(http.StatusNoContent)
 }

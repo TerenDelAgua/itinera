@@ -11,14 +11,14 @@ import (
 )
 
 type ExpenseService struct {
-	TripRepo     database.TripStore
-	ExpensesRepo database.ExpenseStore
+	TripRepo     *database.TripRepository
+	ExpensesRepo *database.ExpenseRepository
 	ExchangeRate *ExchangeRateService
 }
 
 func NewExpenseService(
-	tripRepo database.TripStore,
-	expensesRepo database.ExpenseStore,
+	tripRepo *database.TripRepository,
+	expensesRepo *database.ExpenseRepository,
 	exchangeRate *ExchangeRateService,
 ) *ExpenseService {
 	return &ExpenseService{
