@@ -2,6 +2,7 @@
   import "../app.css";
   import { locale } from "$lib/i18n/store";
   import { resolve } from "$app/paths";
+  import { localeToHtmlLang } from "$lib/utils/seo";
 
   import { themeStore } from "$lib/stores/theme";
   import { onMount } from "svelte";
@@ -12,6 +13,16 @@
   let logoHref = $derived(
     page.url.pathname.startsWith("/") ? resolve("/") : resolve("/"),
   );
+
+  // Keep <html lang> in sync with the active locale. This is the SEO-i18n
+  // strategy for F1: we rely on the lang attribute (which Google respects
+  // regardless of JS execution) rather than on hreflang alternates, which
+  // would require i18n subpath routing (out of scope for F1).
+  $effect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = localeToHtmlLang($locale);
+    }
+  });
 
   onMount(() => {
     themeStore.init();
@@ -86,7 +97,7 @@
             >ES</option
           >
           <option value="ja" class="bg-teren-surface text-teren-text-main"
-            >JP</option
+            >JA</option
           >
           <option value="id" class="bg-teren-surface text-teren-text-main"
             >ID</option

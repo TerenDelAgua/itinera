@@ -446,5 +446,13 @@
       "title": "ディープ・アジア：バンコクからバリまでの60日間",
       "desc": "デジタルノマドや経験豊富なバックパッカー向けのルート。限られた予算、コワーキング、現地でのつながり。多通貨対応。"
     }
+  },
+  "seo": {
+    "default_title": "Itinera",
+    "default_description": "摩擦なく旅を計画。思いやりのある旅行者向けの洗練された旅行プランニング。",
+    "trip_description_fallback": "{duration}日間で{destinationCount}都市を巡る旅行。予算管理、アクティビティ計画、オフライン対応 itinerary。",
+    "place_description_fallback": "{city}の旅行先。Itineraで費用、アクティビティ、駅ガイドを計画しましょう。",
+    "dashboard_title": "マイ旅行",
+    "dashboard_description": "Itineraで旅行を計画・整理しましょう。"
   }
 }

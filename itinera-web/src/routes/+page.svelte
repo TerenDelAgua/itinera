@@ -4,6 +4,7 @@
   import LandingHero from "$lib/components/landing/LandingHero.svelte";
   import DemoCard from "$lib/components/landing/DemoCard.svelte";
   import LandingFooter from "$lib/components/landing/LandingFooter.svelte";
+  import SeoHead from "$lib/components/seo/SeoHead.svelte";
   import { resolve } from "$app/paths";
   import { Events } from "$lib/services/tracking";
 
@@ -12,15 +13,50 @@
   onMount(() => {
     Events.landingView();
   });
+
+  // SEO: brand is appended by SeoHead as "| Itinera", so title is the hero phrase only.
+  const landingTitle = $derived(
+    `${$t("landing.hero_title_plan")} ${$t("landing.hero_title_frictionless")}`,
+  );
+  const landingJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        name: "Itinera",
+        url: "https://goitinera.app",
+        description:
+          "Plan your journeys without friction. Elegant trip planning for thoughtful travelers.",
+        inLanguage: ["en", "es", "ja", "id"],
+      },
+      {
+        "@type": "SoftwareApplication",
+        name: "Itinera",
+        applicationCategory: "TravelApplication",
+        operatingSystem: "Web, PWA",
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "EUR",
+        },
+        featureList: [
+          "Guest-first trip planning",
+          "Offline-ready PWA",
+          "Multi-currency expense tracking",
+          "Japan-specific travel tools",
+        ],
+      },
+    ],
+  };
 </script>
 
-<svelte:head>
-  <title
-    >Itinera — {$t("landing.hero_title_plan")}
-    {$t("landing.hero_title_frictionless")}</title
-  >
-  <meta name="description" content={$t("landing.hero_subtitle")} />
-</svelte:head>
+<SeoHead
+  title={landingTitle}
+  description={$t("landing.hero_subtitle")}
+  ogType="website"
+  ogImage="/og-landing.png"
+  jsonLd={landingJsonLd}
+/>
 
 <div class="landing-page bg-teren-background transition-colors duration-300">
   <!-- Hero Section -->

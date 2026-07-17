@@ -6,7 +6,7 @@
   import { t } from "$lib/i18n/store";
   import { Events } from "$lib/services/tracking";
   import { cubicOut } from "svelte/easing";
-  import { tweened } from "svelte/motion";
+  import { tween } from "svelte/motion";
   import { untrack } from "svelte";
   import { fly } from "svelte/transition";
 
@@ -26,7 +26,12 @@
   import ExpensesSummaryCard from "$lib/components/trip/ExpensesSummaryCard.svelte";
   import PlaceList from "$lib/components/trip/PlaceList.svelte";
   import TransportBadge from "$lib/components/trip/TransportBadge.svelte";
-  import { HeuristicPredictor, costModels, BackendExchangeService } from "$lib/services/costPredictor";
+  import {
+    HeuristicPredictor,
+    costModels,
+    BackendExchangeService,
+  } from "$lib/services/costPredictor";
+  import SeoHead from "$lib/components/seo/SeoHead.svelte";
   import type { CostEstimate } from "$lib/services/costPredictor";
   import type { Expense } from "$lib/types/Expense";
 
@@ -54,13 +59,17 @@
   let places = $state<Place[]>([]);
   let summary = $state<TripExpenseSummary | null>(null);
   let categories = $state<Expense_Category[]>([]);
-  let animatedGrandTotal = tweened(0, { duration: 600, easing: cubicOut });
+  let animatedGrandTotal = tween(0);
+  $effect(() => {
+    animatedGrandTotal.set(0, { duration: 600, easing: cubicOut });
+  });
   let estimate = $state<CostEstimate | null>(null);
   let expenses = $state<Expense[]>([]);
 
   let isDrawerOpen = $state(false);
   let isLoading = $state(true);
   let deletePlaceConfirmId = $state<string | null>(null);
+  let isPublicDemo = $state(false);
 
   let activities = $state<Activity[]>([]);
   let isAgendaOpen = $state(false);
@@ -97,23 +106,29 @@
     try {
       const tripData = await apiFetch<Trip>(`/trips/${tripId}`);
 
-      tripName = tripData.name?.startsWith("inspiration.") ? $t(tripData.name as any) : tripData.name;
-      tripDescription = tripData.description?.startsWith("inspiration.") ? $t(tripData.description as any) : (tripData.description || "");
+      tripName = tripData.name?.startsWith("inspiration.")
+        ? $t(tripData.name as any)
+        : tripData.name;
+      tripDescription = tripData.description?.startsWith("inspiration.")
+        ? $t(tripData.description as any)
+        : tripData.description || "";
+      isPublicDemo = !!tripData.is_public_demo;
       tripStartDate = tripData.start_date?.split("T")[0] || "";
       tripEndDate = tripData.end_date?.split("T")[0] || "";
       baseCurrency = tripData.base_currency || "EUR";
       tripDefaultCurrency =
         tripData.default_expense_currency || tripData.base_currency || "EUR";
 
-      const [placesData, summaryData, catsData, actsData, expensesData] = await Promise.all([
-        apiFetch<Place[]>(`/trips/${tripId}/places`),
-        apiFetch<TripExpenseSummary>(
-          `/trips/${tripId}/expenses/summary?currency=${baseCurrency}`,
-        ),
-        apiFetch<Expense_Category[]>(`/trips/${tripId}/expenses/categories`),
-        activityApi.list(tripId),
-        apiFetch<Expense[]>(`/trips/${tripId}/expenses`),
-      ]);
+      const [placesData, summaryData, catsData, actsData, expensesData] =
+        await Promise.all([
+          apiFetch<Place[]>(`/trips/${tripId}/places`),
+          apiFetch<TripExpenseSummary>(
+            `/trips/${tripId}/expenses/summary?currency=${baseCurrency}`,
+          ),
+          apiFetch<Expense_Category[]>(`/trips/${tripId}/expenses/categories`),
+          activityApi.list(tripId),
+          apiFetch<Expense[]>(`/trips/${tripId}/expenses`),
+        ]);
 
       places = (placesData || []).map((p) => ({
         ...p,
@@ -141,11 +156,20 @@
         is_public_demo: false,
         created_at: tripData.created_at,
         place_count: places.length,
-        total_spent: summaryData.grand_total || 0
+        total_spent: summaryData.grand_total || 0,
       };
 
-      const predictor = new HeuristicPredictor(costModels, new BackendExchangeService(tripId));
-      estimate = await predictor.estimate(tripObj, places, activities, expenses, categories);
+      const predictor = new HeuristicPredictor(
+        costModels,
+        new BackendExchangeService(tripId),
+      );
+      estimate = await predictor.estimate(
+        tripObj,
+        places,
+        activities,
+        expenses,
+        categories,
+      );
 
       if (tripData.is_public_demo) {
         Events.demoViewed(tripId, tripName);
@@ -165,27 +189,27 @@
     saveTimer = setTimeout(async () => {
       if (!tripName || isSaving) return;
       isSaving = true;
-    try {
-      const payload = {
-        name: tripName,
-        description: tripDescription,
-        start_date: tripStartDate
-          ? new Date(tripStartDate).toISOString()
-          : null,
-        end_date: tripEndDate ? new Date(tripEndDate).toISOString() : null,
-        base_currency: baseCurrency,
-        default_expense_currency: tripDefaultCurrency,
-      };
-      const response = await apiFetch<Trip>(`/trips/${tripId}`, {
-        method: "PUT",
-        body: JSON.stringify(payload),
-      });
+      try {
+        const payload = {
+          name: tripName,
+          description: tripDescription,
+          start_date: tripStartDate
+            ? new Date(tripStartDate).toISOString()
+            : null,
+          end_date: tripEndDate ? new Date(tripEndDate).toISOString() : null,
+          base_currency: baseCurrency,
+          default_expense_currency: tripDefaultCurrency,
+        };
+        const response = await apiFetch<Trip>(`/trips/${tripId}`, {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        });
 
-      // reload to sync with summary if currency changed
-      loadAllData();
-    } catch (e) {
-      console.error("Failed to update trip", e);
-    } finally {
+        // reload to sync with summary if currency changed
+        loadAllData();
+      } catch (e) {
+        console.error("Failed to update trip", e);
+      } finally {
         isSaving = false;
       }
     }, 300);
@@ -244,6 +268,56 @@
   <title>{tripName ? `${tripName} | Itinera` : $t("common.loading")}</title>
 </svelte:head>
 
+<!--
+  SeoHead is rendered as a sibling block so that it does not interfere with
+  the existing <svelte:head> title fallback (which keeps the document title
+  responsive even before the data finishes loading on the client). Once the
+  data is available, SeoHead's <svelte:head> takes over and emits the full
+  set of meta tags (description, OG, Twitter, JSON-LD).
+-->
+{#if tripName}
+  {@const seoDescription =
+    tripDescription ||
+    $t("seo.trip_description_fallback", {
+      duration: tripDurationDays || 0,
+      destinationCount: places.length,
+    })}
+  {@const tripJsonLd = isPublicDemo
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Trip",
+        name: tripName,
+        description: seoDescription,
+        url: `https://goitinera.app/trips/${tripId}`,
+        itinerary: {
+          "@type": "ItemList",
+          itemListElement: places.map((p, idx) => ({
+            "@type": "ListItem",
+            position: idx + 1,
+            item: {
+              "@type": "TouristAttraction",
+              name: p.name,
+            },
+          })),
+        },
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: baseCurrency || "EUR",
+        },
+      }
+    : null}
+  <SeoHead
+    title={tripName}
+    description={seoDescription}
+    ogType="article"
+    ogImage="/og-trip.png"
+    canonical={`/trips/${tripId}`}
+    noindex={!isPublicDemo}
+    jsonLd={tripJsonLd}
+  />
+{/if}
+
 <div class="min-h-screen bg-teren-background pb-20">
   <DetailHeader
     bind:name={tripName}
@@ -286,8 +360,8 @@
         {categories}
         categorySummary={summary?.by_category || []}
         displayCurrency={baseCurrency}
-        tripDefaultCurrency={tripDefaultCurrency}
-        effectiveCurrency={effectiveCurrency}
+        {tripDefaultCurrency}
+        {effectiveCurrency}
         grandTotalValue={$animatedGrandTotal}
         tripStart={tripStartDate}
         tripEnd={tripEndDate}

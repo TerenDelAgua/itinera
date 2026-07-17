@@ -6,6 +6,7 @@
   import { t } from "$lib/i18n/store";
 
   import { Events } from "$lib/services/tracking";
+  import SeoHead from "$lib/components/seo/SeoHead.svelte";
 
   // Components
   import CreateTripForm from "$lib/components/dashboard/CreateTripForm.svelte";
@@ -72,6 +73,15 @@
     tripToDelete = null;
   }
 </script>
+
+<SeoHead
+  title={$t("seo.dashboard_title")}
+  description={$t("seo.dashboard_description")}
+  ogType="website"
+  ogImage="/og-default.png"
+  noindex
+  nofollow
+/>
 
 <div class="max-w-5xl mx-auto px-4 py-8">
   <DashboardHeader {isCreatingTrip} onCreateClick={handleCreateTrip} />

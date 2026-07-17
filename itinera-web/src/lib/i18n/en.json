@@ -446,5 +446,13 @@
       "title": "Deep Asia: 60 days from Bangkok to Bali",
       "desc": "Route for digital nomads and experienced backpackers. Tight budget, coworkings, and local connections. Multi-currency active."
     }
+  },
+  "seo": {
+    "default_title": "Itinera",
+    "default_description": "Plan your journeys without friction. Elegant trip planning for thoughtful travelers.",
+    "trip_description_fallback": "{duration}-day trip to {destinationCount} destinations. Budget tracking, activity planning, and offline-ready itinerary.",
+    "place_description_fallback": "Travel destination in {city}. Plan expenses, activities, and station guides with Itinera.",
+    "dashboard_title": "My Trips",
+    "dashboard_description": "Plan and organize your journeys with Itinera."
   }
 }
