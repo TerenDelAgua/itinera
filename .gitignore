@@ -66,6 +66,7 @@ coverage/
 
 #playwright
 playwright-report/
+test-results/
 
 # Docs Features and Specs
 docs/features/

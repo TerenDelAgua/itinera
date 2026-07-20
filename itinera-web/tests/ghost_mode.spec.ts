@@ -14,10 +14,18 @@ test.describe('Ghost Mode Fork-On-Write', () => {
 	const forkedTripId = 'forked-trip-456';
 	const editedName = 'Japón Clásico (Demo) - Mi Viaje';
 
-	test('URL stays the same after editing demo, but data reflects the fork', async ({ page }) => {
+	/**
+	 * Instala TODOS los mocks que loadAllData() dispara al cargar la página de trip detail,
+	 * más los que disparan los componentes hijos (TransportBadge, ExpensesSummaryCard, etc.).
+	 *
+	 * Sin este set completo, los endpoints sin mockear caen al backend real, que rechaza
+	 * el ID fake (`demo-trip-123`) con HTTP 400, lo que rompe Promise.all y produce
+	 * la página de error 500 de SvelteKit antes de que se renderice el input del título.
+	 */
+	async function installMocks(page: import('@playwright/test').Page) {
 		let currentName = 'Japón Clásico (Demo)';
 
-		// ── Mock: GET initial demo ──────────────────────────────────────────────
+		// ── Trip detail (GET + PUT) ─────────────────────────────────────────────
 		await page.route(`**/api/v1/trips/${demoTripId}`, async (route, request) => {
 			if (request.method() === 'GET') {
 				await route.fulfill({
@@ -28,14 +36,17 @@ test.describe('Ghost Mode Fork-On-Write', () => {
 						start_date: '2024-05-01',
 						end_date: '2024-05-15',
 						base_currency: 'EUR',
+						default_expense_currency: 'EUR',
 						is_public_demo: true,
+						created_at: '2024-01-01T00:00:00Z',
 					},
 				});
-			} else if (request.method() === 'PUT') {
+				return;
+			}
+			if (request.method() === 'PUT') {
 				// Backend forks internally and returns the fork's data.
 				const body = JSON.parse(request.postData() || '{}');
 				if (body.name) currentName = body.name;
-
 				await route.fulfill({
 					json: {
 						id: forkedTripId,
@@ -44,32 +55,86 @@ test.describe('Ghost Mode Fork-On-Write', () => {
 						start_date: '2024-05-01',
 						end_date: '2024-05-15',
 						base_currency: 'EUR',
+						default_expense_currency: 'EUR',
 						is_public_demo: false,
 						forked_from: demoTripId,
+						created_at: '2024-01-01T00:00:00Z',
 					},
 				});
-			} else {
-				await route.continue();
+				return;
 			}
+			await route.continue();
 		});
 
-		// ── Mock: sub-resources for the demo URL ───────────────────────────────
+		// ── Sub-resources for the demo URL ─────────────────────────────────────
 		await page.route(`**/api/v1/trips/${demoTripId}/expenses/summary*`, async (route) => {
-			await route.fulfill({ json: { grand_total: 0, global_total: 0, places_total: 0, by_category: [], by_place: [] } });
+			await route.fulfill({
+				json: {
+					grand_total: 0,
+					global_total: 0,
+					places_total: 0,
+					total: 0,
+					currency: 'EUR',
+					by_category: [],
+					by_place: [],
+				},
+			});
 		});
+
 		await page.route(`**/api/v1/trips/${demoTripId}/expenses/categories`, async (route) => {
 			await route.fulfill({ json: [] });
 		});
-		await page.route(`**/api/v1/trips/${demoTripId}/places`, async (route) => {
-			await route.fulfill({ json: [] });
-		});
-		await page.route(`**/api/v1/trips/${demoTripId}/activities`, async (route) => {
+
+		await page.route(`**/api/v1/trips/${demoTripId}/expenses*`, async (route) => {
 			await route.fulfill({ json: [] });
 		});
 
+		await page.route(`**/api/v1/trips/${demoTripId}/places`, async (route) => {
+			await route.fulfill({ json: [] });
+		});
+
+		await page.route(`**/api/v1/trips/${demoTripId}/places/*`, async (route) => {
+			await route.fulfill({
+				json: {
+					id: 'mock-place-1',
+					name: 'Mock Place',
+					city: 'Tokyo',
+					start_date: null,
+					end_date: null,
+					notes: '',
+					default_expense_currency: null,
+				},
+			});
+		});
+
+		await page.route(`**/api/v1/trips/${demoTripId}/activities*`, async (route) => {
+			await route.fulfill({ json: [] });
+		});
+
+		// ── Exchange rates (consumed by BackendExchangeService in costPredictor) ─
+		// Sin este mock el predictor falla y la Promise.all de loadAllData se rompe.
+		await page.route(`**/api/v1/trips/${demoTripId}/rates**`, async (route) => {
+			await route.fulfill({ json: { rate: 1, from: 'EUR', to: 'EUR' } });
+		});
+
+		// ── Tracking endpoint (sendBeacon + fetch keepalive) ────────────────────
+		// Acepta cualquier método (POST desde sendBeacon o fetch). Sin este mock, los
+		// eventos de telemetría disparados por Events.demoViewed() y friends llegan
+		// al backend real y, combinados con el ID fake, producen 4xx que contaminan
+		// la consola del navegador.
+		await page.route('**/api/v1/events', async (route) => {
+			await route.fulfill({ json: { ok: true } });
+		});
+	}
+
+	test('URL stays the same after editing demo, but data reflects the fork', async ({ page }) => {
+		await installMocks(page);
+
 		// ── 1. Navigate to the demo trip ───────────────────────────────────────
 		await page.goto(`/trips/${demoTripId}`);
-		await expect(page.locator('input[type="text"]').first()).toHaveValue('Japón Clásico (Demo)', { timeout: 5000 });
+
+		// Wait until the trip data has hydrated into the DetailHeader input.
+		await expect(page.locator('input[type="text"]').first()).toHaveValue('Japón Clásico (Demo)', { timeout: 10000 });
 
 		// ── 2. Edit the title (Inline Editing) ─────────────────────────────────
 		const titleInput = page.locator('input[type="text"]').first();
@@ -80,7 +145,7 @@ test.describe('Ghost Mode Fork-On-Write', () => {
 		await titleInput.blur();
 
 		// ── 4. URL must NOT change (Backend-Centric Ghost Mode) ────────────────
-		await page.waitForTimeout(600); // allow debounce (300ms) + save round-trip
+		await page.waitForTimeout(800); // allow debounce (300ms) + save round-trip
 		expect(page.url()).toContain(`/trips/${demoTripId}`);
 		expect(page.url()).not.toContain(forkedTripId);
 

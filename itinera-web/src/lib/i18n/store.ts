@@ -1,7 +1,7 @@
 import { writable, derived } from 'svelte/store';
 import en from './en.json';
 import es from './es.json';
-import ja from './jp.json';
+import ja from './ja.json';
 import id from './id.json';
 
 type Locale = 'en' | 'es' | 'ja' | 'id';
