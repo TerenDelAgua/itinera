@@ -446,5 +446,13 @@
       "title": "Asia Mendalam: 60 hari dari Bangkok ke Bali",
       "desc": "Rute untuk pengembara digital dan backpacker berpengalaman. Anggaran ketat, coworking, dan koneksi lokal. Multi-mata uang aktif."
     }
+  },
+  "seo": {
+    "default_title": "Itinera",
+    "default_description": "Rencanakan perjalanan tanpa hambatan. Perencanaan perjalanan elegan untuk pelancong yang bijaksana.",
+    "trip_description_fallback": "Perjalanan {duration} hari ke {destinationCount} destinasi. Pelacakan anggaran, perencanaan aktivitas, dan itinerary siap offline.",
+    "place_description_fallback": "Destinasi wisata di {city}. Rencanakan pengeluaran, aktivitas, dan panduan stasiun dengan Itinera.",
+    "dashboard_title": "Perjalanan Saya",
+    "dashboard_description": "Rencanakan dan atur perjalanan Anda dengan Itinera."
   }
 }

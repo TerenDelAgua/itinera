@@ -1,13 +1,10 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import { apiFetch } from "$lib/api";
-  import { fly, slide } from "svelte/transition";
-  import { cubicOut } from "svelte/easing";
-  import { untrack, onMount } from "svelte";
+  import { onMount } from "svelte";
   import { t, locale } from "$lib/i18n/store";
   import ActivityDrawer from "$lib/components/activities/ActivityDrawer.svelte";
-  import { formatDate } from "$lib/utils/date";
   import { activityApi } from "$lib/api/activity";
 
   import type { Place } from "$lib/types/Place";
@@ -15,10 +12,7 @@
   import type { Expense, Expense_Category } from "$lib/index";
   import type { Trip } from "$lib/types/Trip";
 
-  import ExpenseQuickAdd from "$lib/components/Expenses/ExpenseQuickAdd.svelte";
   import ExpenseDrawer from "$lib/components/Expenses/ExpenseDrawer.svelte";
-  import ExpenseSummaryPills from "$lib/components/Expenses/ExpenseSummaryPills.svelte";
-  import CurrencySelector from "$lib/components/currency/CurrencySelector.svelte";
   import UpcomingActivityCard from "$lib/components/activities/UpcomingActivityCard.svelte";
   import DetailHeader from "$lib/components/trip/DetailHeader.svelte";
   import ExpensesSummaryCard from "$lib/components/trip/ExpensesSummaryCard.svelte";
@@ -32,6 +26,7 @@
   import PlaceContextWidget from "$lib/components/japan-context/PlaceContextWidget.svelte";
   import PhraseDrawer from "$lib/components/japan-context/PhraseDrawer.svelte";
   import { getPlaceLevelRules } from "$lib/services/japanContext";
+  import SeoHead from "$lib/components/seo/SeoHead.svelte";
 
   let tripId = $state("");
   let placeId = $state("");
@@ -54,8 +49,8 @@
   let isAgendaOpen = $state(false);
 
   onMount(() => {
-    tripId = $page.params.id ?? "";
-    placeId = $page.params.placeId ?? "";
+    tripId = page.params.id ?? "";
+    placeId = page.params.placeId ?? "";
     if (tripId && placeId) {
       loadAllData();
     }
@@ -176,6 +171,22 @@
   <title>{place ? `${place.name} | Itinera` : $t("common.loading")}</title>
 </svelte:head>
 
+{#if place}
+  {@const placeDescription =
+    place.notes?.trim() ||
+    $t("seo.place_description_fallback", {
+      city: place.city || "",
+    })}
+  <SeoHead
+    title={place.name}
+    description={placeDescription.slice(0, 160)}
+    ogType="website"
+    ogImage="/og-place.png"
+    canonical={`/trips/${tripId}/places/${placeId}`}
+    noindex
+  />
+{/if}
+
 <div class="min-h-screen bg-teren-background pb-20">
   {#if place}
     <DetailHeader
@@ -196,10 +207,7 @@
     />
   {/if}
 
-  <main 
-    class="max-w-3xl mx-auto px-4 py-8 space-y-8"
-    data-place-id={placeId}
-  >
+  <main class="max-w-3xl mx-auto px-4 py-8 space-y-8" data-place-id={placeId}>
     {#if isLoading}
       <div class="animate-pulse space-y-6">
         <div
@@ -224,7 +232,6 @@
         onOpenDrawer={() => (isDrawerOpen = true)}
       />
 
-
       <UpcomingActivityCard
         {tripId}
         {placeId}
@@ -242,10 +249,15 @@
       <!-- STATION GUIDE: Rendered fully expanded inside Place detail   -->
       <!-- ============================================================ -->
       {#if matchedGuide || placeRules.length > 0}
-        <div class="space-y-4 pt-4 border-t border-dashed border-teren-border/60">
+        <div
+          class="space-y-4 pt-4 border-t border-dashed border-teren-border/60"
+        >
           {#if matchedGuide}
-            <h2 class="text-lg font-semibold text-teren-text-main tracking-tight flex items-center gap-2">
-              <span>🚉</span> {$t("station_guide.section_title" as any)}
+            <h2
+              class="text-lg font-semibold text-teren-text-main tracking-tight flex items-center gap-2"
+            >
+              <span>🚉</span>
+              {$t("station_guide.section_title" as any)}
             </h2>
             <StationGuide
               cityName={matchedGuide.id}
@@ -253,7 +265,7 @@
               locale={$locale}
             />
           {/if}
-          
+
           {#if placeRules.length > 0}
             <PlaceContextWidget rules={placeRules} />
           {/if}

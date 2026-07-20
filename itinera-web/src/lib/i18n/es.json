@@ -446,5 +446,13 @@
       "title": "Asia Profunda: 60 días de Bangkok a Bali",
       "desc": "Ruta para nómadas digitales y mochileros experimentados. Presupuesto ajustado, coworkings, y conexiones locales. Multi-moneda activa."
     }
+  },
+  "seo": {
+    "default_title": "Itinera",
+    "default_description": "Planifica tus viajes sin fricciones. Planificación elegante para viajeros que valoran su tiempo.",
+    "trip_description_fallback": "Viaje de {duration} días a {destinationCount} destinos. Control de presupuesto, planificación de actividades e itinerario sin conexión.",
+    "place_description_fallback": "Destino en {city}. Planifica gastos, actividades y guías de estación con Itinera.",
+    "dashboard_title": "Mis viajes",
+    "dashboard_description": "Planifica y organiza tus viajes con Itinera."
   }
 }
