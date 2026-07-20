@@ -6,7 +6,7 @@
   import { t } from "$lib/i18n/store";
   import { Events } from "$lib/services/tracking";
   import { cubicOut } from "svelte/easing";
-  import { tween } from "svelte/motion";
+  import { tweened } from "svelte/motion";
   import { untrack } from "svelte";
   import { fly } from "svelte/transition";
 
@@ -59,10 +59,21 @@
   let places = $state<Place[]>([]);
   let summary = $state<TripExpenseSummary | null>(null);
   let categories = $state<Expense_Category[]>([]);
-  let animatedGrandTotal = tween(0);
-  $effect(() => {
-    animatedGrandTotal.set(0, { duration: 600, easing: cubicOut });
-  });
+  // SSR-safe animated total.
+  // We use the Svelte 4 `tweened` store here (not the Svelte 5 `tween` rune)
+  // because:
+  //   1. `tweened` is SSR-safe: it returns a plain Readable<number> at module
+  //      init that doesn't depend on `requestAnimationFrame`.
+  //   2. The child component `ExpensesSummaryCard` consumes this value via the
+  //      `$animatedGrandTotal` store syntax, which only works with Svelte 4
+  //      stores — not with `$state` runes.
+  //   3. It keeps the original API (`.set(value, opts)`) so the existing call
+  //      sites in this file do not need to change.
+  // Note: `tweened` is "deprecated" in Svelte 5 in the sense that the docs
+  // recommend `tween` for new code, but `tweened` is still fully supported
+  // and is the only viable option when downstream code depends on the store
+  // contract.
+  let animatedGrandTotal = tweened(0, { duration: 600, easing: cubicOut });
   let estimate = $state<CostEstimate | null>(null);
   let expenses = $state<Expense[]>([]);
 
