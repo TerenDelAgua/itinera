@@ -13,6 +13,10 @@ func RegisterApiRoutes(r chi.Router, h *Handlers) {
 	r.Get("/health", h.healthCheck)
 	r.Get("/stats/public", h.GetPublicStats)
 
+	// Public Share endpoints
+	r.Get("/share/{token}", h.GetSharedTrip)
+	r.Post("/share/fork", h.ForkFromShare) //require auth
+
 	r.Group(func(r chi.Router) {
 		r.Post("/auth/register", h.Register)
 		r.Post("/auth/login", h.Login)
@@ -25,10 +29,13 @@ func RegisterApiRoutes(r chi.Router, h *Handlers) {
 		// Events: fire-and-forget analytics (no PII, rate-limited)
 		r.Post("/events", h.TrackEvent)
 
-		r.With(middleware.ResolveTripContext(h.TripsRepo)).Group(func(r chi.Router) {
+		r.With(middleware.ResolveTripContext(h.TripSvc)).Group(func(r chi.Router) {
 			r.Get("/trips/{id}", h.GetTrip)
 			r.Put("/trips/{id}", h.UpdateTrip)
 			r.Delete("/trips/{id}", h.DeleteTrip)
+
+			r.Post("/trips/{id}/share", h.EnableShare)
+			r.Delete("/trips/{id}/share", h.DisableShare)
 
 			r.Get("/trips/{id}/places", h.ListPlaces)
 			r.Post("/trips/{id}/places", h.CreatePlace)

@@ -20,6 +20,7 @@ import (
 	"backend/internal/models"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 )
 
 // ── Trips ────────────────────────────────────────────────────────────────────
@@ -33,11 +34,6 @@ type TripStore interface {
 	UpdateTrip(ctx context.Context, tripID string, userID *uuid.UUID, sessionID *string, updates map[string]any) (*models.Trip, error)
 	DeleteTrip(ctx context.Context, id string, userID *uuid.UUID, sessionID *string) error
 
-	// ForkTrip clones a trip (and its dependent rows) within a single
-	// transaction; both source and destination share the same user/session
-	// ownership context.
-	ForkTrip(ctx context.Context, originalTripID string, userID *uuid.UUID, sessionID *string) (*models.Trip, error)
-
 	// GetFork returns the caller's existing fork of a public demo, if any.
 	// Used by the trip-context middleware to detect ghost-mode edits.
 	GetFork(ctx context.Context, forkedFrom string, userID *uuid.UUID, sessionID *string) (*models.Trip, error)
@@ -49,16 +45,23 @@ type TripStore interface {
 	// Public demo content for the landing page.
 	ListPublicDemos(ctx context.Context, limit int) ([]models.Trip, error)
 	GetPublicStats(ctx context.Context) (int, error)
+
+	//Share trip
+	EnableShare(ctx context.Context, tripID string, userID *uuid.UUID, sessionID *string) (token string, expiresAt *time.Time, err error)
+	DisableShare(ctx context.Context, tripID string, userID *uuid.UUID, sessionID *string) error
+	GetByShareToken(ctx context.Context, token string) (*models.Trip, error)
+	CountActiveSharesByUser(ctx context.Context, userID *uuid.UUID, sessionID *string) (int, error)
+	GetActiveShareTripID(ctx context.Context, token string) (uuid.UUID, error)
+	IsPublicDemo(ctx context.Context, tripID uuid.UUID) (bool, error)
+
+	//Clone helpers
+	GetBaseForClone(ctx context.Context, tx pgx.Tx, origID uuid.UUID) (*models.Trip, error)
+	InsertFork(ctx context.Context, tx pgx.Tx, newTripID uuid.UUID, userId *uuid.UUID, sessionID *string, origID uuid.UUID, base *models.Trip) error
 }
 
-// TripContextStore is the read-only + fork accessor used by the trip-context
-// middleware to detect when a request hits a public demo and must be
-// redirected to the caller's per-session fork. It exposes the same surface
-// the middleware needs and nothing more, so the middleware cannot
-// accidentally start mutating trips directly.
-type TripContextStore interface {
+type TripForker interface {
 	GetFork(ctx context.Context, forkedFrom string, userID *uuid.UUID, sessionID *string) (*models.Trip, error)
-	ForkTrip(ctx context.Context, originalTripID string, userID *uuid.UUID, sessionID *string) (*models.Trip, error)
+	ForkFromDemo(ctx context.Context, demoTripID uuid.UUID, userID *uuid.UUID, sessionID *string) (*models.Trip, error)
 	GetTripMeta(ctx context.Context, tripID string, userID *uuid.UUID, sessionID *string) (bool, bool, error)
 }
 
@@ -71,6 +74,8 @@ type PlaceStore interface {
 	CreatePlace(ctx context.Context, tripID uuid.UUID, p models.Place) (*models.Place, error)
 	UpdatePlace(ctx context.Context, placeID uuid.UUID, updates map[string]any) (*models.Place, error)
 	DeletePlace(ctx context.Context, placeID uuid.UUID) error
+	//Clone helper
+	CloneByTripID(ctx context.Context, tx pgx.Tx, origTripID, newTripID uuid.UUID) (map[uuid.UUID]uuid.UUID, error)
 }
 
 // ── Activities ───────────────────────────────────────────────────────────────
@@ -83,6 +88,9 @@ type ActivityStore interface {
 	CreateActivity(ctx context.Context, a *models.Activity) error
 	UpdateActivity(ctx context.Context, a *models.Activity) error
 	DeleteActivity(ctx context.Context, id uuid.UUID) error
+
+	//Clone helper
+	CloneByTripID(ctx context.Context, tx pgx.Tx, origTripID, newTripID uuid.UUID, placeMap map[uuid.UUID]uuid.UUID) error
 }
 
 // ── Expenses ─────────────────────────────────────────────────────────────────
@@ -98,6 +106,9 @@ type ExpenseStore interface {
 	UpdateExpense(ctx context.Context, id uuid.UUID, exp models.Expense) (*models.Expense, error)
 	DeleteExpense(ctx context.Context, id uuid.UUID) error
 	GetPlaceExpensesSummary(ctx context.Context, placeID uuid.UUID) ([]models.CategorySummary, error)
+
+	//Clone helper
+	CloneByTripID(ctx context.Context, tx pgx.Tx, origTripID, newTripID uuid.UUID, userID *uuid.UUID, placeMap map[uuid.UUID]uuid.UUID) error
 }
 
 // ── Auth ─────────────────────────────────────────────────────────────────────

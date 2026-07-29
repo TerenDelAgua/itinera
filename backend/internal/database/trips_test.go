@@ -11,6 +11,7 @@ import (
 
 	"backend/internal/database"
 	"backend/internal/models"
+	"backend/internal/services"
 )
 
 func TestTripRepository_Integration(t *testing.T) {
@@ -176,12 +177,12 @@ func TestTripRepository_Integration(t *testing.T) {
 
 	t.Run("TestForkTrip_Atomic", func(t *testing.T) {
 		guestSessionID := "fork-test-session-" + uuid.New().String()
-		
+
 		// 1. Create a demo trip directly
 		demoID := uuid.New()
-		_, err := pool.Exec(ctx, `INSERT INTO trips (id, name, is_public_demo, session_id, created_at, base_currency, default_expense_currency, start_date, end_date) 
+		_, err := pool.Exec(ctx, `INSERT INTO trips (id, name, is_public_demo, session_id, created_at, base_currency, default_expense_currency, start_date, end_date)
 			VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE, CURRENT_DATE)`,
-			demoID, "Demo for Forking", true, "DEMO", time.Now(), "EUR", "EUR")
+			demoID, "Demo for Forking", true, guestSessionID, time.Now(), "EUR", "EUR")
 		require.NoError(t, err)
 		defer pool.Exec(ctx, "DELETE FROM trips WHERE id = $1", demoID)
 
@@ -200,8 +201,15 @@ func TestTripRepository_Integration(t *testing.T) {
 		_, err = pool.Exec(ctx, `INSERT INTO expenses (id, trip_id, amount, currency, date, original_amount, original_currency, exchange_rate) VALUES ($1, $2, $3, $4, CURRENT_DATE, $5, $6, $7)`, expenseID, demoID, 100.0, "EUR", 100.0, "EUR", 1.0)
 		require.NoError(t, err)
 
-		// 5. Perform Fork
-		forkedTrip, err := repo.ForkTrip(ctx, demoID.String(), nil, &guestSessionID)
+		// 5. Perform Fork via the orchestrating service.
+		//    Repositories no longer expose ForkTrip directly: the fork is a
+		//    multi-table operation coordinated by TripService.CloneTrip.
+		activitiesRepo := database.NewActivityRepository(pool)
+		eventsRepo := database.NewEventRepository(pool)
+		tripSvc := services.NewTripService(
+			pool, repo, placeRepo, activitiesRepo, expRepo, eventsRepo,
+		)
+		forkedTrip, err := tripSvc.ForkFromDemo(ctx, demoID, nil, &guestSessionID)
 		require.NoError(t, err)
 		require.NotNil(t, forkedTrip)
 		defer repo.DeleteTrip(ctx, forkedTrip.ID.String(), nil, &guestSessionID)
