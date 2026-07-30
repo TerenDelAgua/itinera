@@ -81,15 +81,16 @@ func (r *TripRepository) CreateTrip(ctx context.Context, userId *uuid.UUID, sess
 
 func (r *TripRepository) ListTrips(ctx context.Context, userId *uuid.UUID, sessionId *string) ([]models.Trip, error) {
 	query := `
-		SELECT 
-			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, 
+		SELECT
+			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency,
 			is_public_demo, forked_from, created_at,
 			COALESCE((SELECT SUM(amount) FROM expenses WHERE trip_id = trips.id), 0) as total_spent,
-			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count
+			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count,
+			share_token, share_enabled, share_expires_at, share_created_at
 		FROM trips
 		WHERE (user_id = $1 AND $1 IS NOT NULL) OR (session_id = $2 AND $2 IS NOT NULL) OR (is_public_demo = true)
-		ORDER BY 
-			is_public_demo ASC, 
+		ORDER BY
+			is_public_demo ASC,
 			CASE WHEN is_public_demo = false THEN created_at END DESC NULLS LAST,
 			CASE WHEN is_public_demo = true AND (name ILIKE '%Japón%' OR name ILIKE '%Japan%') THEN 0 ELSE 1 END ASC,
 			created_at DESC
@@ -104,6 +105,7 @@ func (r *TripRepository) ListTrips(ctx context.Context, userId *uuid.UUID, sessi
 	for rows.Next() {
 		var trip models.Trip
 		var startDate, endDate, createdAt time.Time
+		var shareExpiresAt, shareCreatedAt *time.Time
 		if err := rows.Scan(
 			&trip.ID,
 			&trip.UserId,
@@ -119,12 +121,24 @@ func (r *TripRepository) ListTrips(ctx context.Context, userId *uuid.UUID, sessi
 			&createdAt,
 			&trip.TotalSpent,
 			&trip.PlaceCount,
+			&trip.ShareToken,
+			&trip.ShareEnabled,
+			&shareExpiresAt,
+			&shareCreatedAt,
 		); err != nil {
 			return nil, err
 		}
 		trip.StartDate = startDate.Format("2006-01-02")
 		trip.EndDate = endDate.Format("2006-01-02")
 		trip.CreatedAt = createdAt.Format(time.RFC3339)
+		if shareExpiresAt != nil {
+			s := shareExpiresAt.Format(time.RFC3339)
+			trip.ShareExpiresAt = &s
+		}
+		if shareCreatedAt != nil {
+			s := shareCreatedAt.Format(time.RFC3339)
+			trip.ShareCreatedAt = &s
+		}
 		trips = append(trips, trip)
 	}
 
@@ -138,13 +152,15 @@ func (r *TripRepository) ListTrips(ctx context.Context, userId *uuid.UUID, sessi
 func (r *TripRepository) GetTrip(ctx context.Context, id string, userId *uuid.UUID, sessionId *string) (*models.Trip, error) {
 	var trip models.Trip
 	var startDate, endDate, createdAt time.Time
+	var shareExpiresAt, shareCreatedAt *time.Time
 
 	query := `
-		SELECT 
-			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, 
+		SELECT
+			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency,
 			is_public_demo, forked_from, created_at,
 			COALESCE((SELECT SUM(amount) FROM expenses WHERE trip_id = trips.id), 0) as total_spent,
-			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count
+			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count,
+			share_token, share_enabled, share_expires_at, share_created_at
 		FROM trips
 		WHERE id = $1 AND ((user_id = $2 AND $2 IS NOT NULL) OR (session_id = $3 AND $3 IS NOT NULL) OR (is_public_demo = true))
 	`
@@ -164,6 +180,10 @@ func (r *TripRepository) GetTrip(ctx context.Context, id string, userId *uuid.UU
 		&createdAt,
 		&trip.TotalSpent,
 		&trip.PlaceCount,
+		&trip.ShareToken,
+		&trip.ShareEnabled,
+		&shareExpiresAt,
+		&shareCreatedAt,
 	)
 	if err != nil {
 		return nil, err
@@ -172,6 +192,14 @@ func (r *TripRepository) GetTrip(ctx context.Context, id string, userId *uuid.UU
 	trip.StartDate = startDate.Format("2006-01-02")
 	trip.EndDate = endDate.Format("2006-01-02")
 	trip.CreatedAt = createdAt.Format(time.RFC3339)
+	if shareExpiresAt != nil {
+		s := shareExpiresAt.Format(time.RFC3339)
+		trip.ShareExpiresAt = &s
+	}
+	if shareCreatedAt != nil {
+		s := shareCreatedAt.Format(time.RFC3339)
+		trip.ShareCreatedAt = &s
+	}
 
 	return &trip, nil
 }
@@ -180,10 +208,11 @@ func (r *TripRepository) GetTripById(ctx context.Context, id uuid.UUID) (*models
 	var trip models.Trip
 	var startDate, endDate time.Time
 
-	query := `SELECT id, name, start_date, end_date, base_currency, default_expense_currency, forked_from FROM trips WHERE id = $1`
+	query := `SELECT id, name, start_date, end_date, base_currency, default_expense_currency, forked_from, share_token, share_enabled FROM trips WHERE id = $1`
 
 	err := r.Pool.QueryRow(ctx, query, id).Scan(
 		&trip.ID, &trip.Name, &startDate, &endDate, &trip.BaseCurrency, &trip.DefaultExpenseCurrency, &trip.ForkedFrom,
+		&trip.ShareToken, &trip.ShareEnabled,
 	)
 	if err != nil {
 		return nil, err
@@ -303,11 +332,12 @@ func (r *TripRepository) GetTripMeta(ctx context.Context, tripID string, userID 
 }
 func (r *TripRepository) ListPublicDemos(ctx context.Context, limit int) ([]models.Trip, error) {
 	query := `
-		SELECT 
-			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, 
+		SELECT
+			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency,
 			is_public_demo, forked_from, created_at,
 			COALESCE((SELECT SUM(amount) FROM expenses WHERE trip_id = trips.id), 0) as total_spent,
-			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count
+			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count,
+			share_token, share_enabled, share_expires_at, share_created_at
 		FROM trips
 		WHERE is_public_demo = true
 		ORDER BY created_at DESC
@@ -323,6 +353,7 @@ func (r *TripRepository) ListPublicDemos(ctx context.Context, limit int) ([]mode
 	for rows.Next() {
 		var trip models.Trip
 		var startDate, endDate, createdAt time.Time
+		var shareExpiresAt, shareCreatedAt *time.Time
 		if err := rows.Scan(
 			&trip.ID,
 			&trip.UserId,
@@ -338,12 +369,24 @@ func (r *TripRepository) ListPublicDemos(ctx context.Context, limit int) ([]mode
 			&createdAt,
 			&trip.TotalSpent,
 			&trip.PlaceCount,
+			&trip.ShareToken,
+			&trip.ShareEnabled,
+			&shareExpiresAt,
+			&shareCreatedAt,
 		); err != nil {
 			return nil, err
 		}
 		trip.StartDate = startDate.Format("2006-01-02")
 		trip.EndDate = endDate.Format("2006-01-02")
 		trip.CreatedAt = createdAt.Format(time.RFC3339)
+		if shareExpiresAt != nil {
+			s := shareExpiresAt.Format(time.RFC3339)
+			trip.ShareExpiresAt = &s
+		}
+		if shareCreatedAt != nil {
+			s := shareCreatedAt.Format(time.RFC3339)
+			trip.ShareCreatedAt = &s
+		}
 		trips = append(trips, trip)
 	}
 
@@ -478,12 +521,11 @@ func (r *TripRepository) EnableShare(
 
 	if err == nil && existingToken != nil {
 		if existingExpiry == nil || existingExpiry.After(time.Now()) {
-			if err := tx.Commit(ctx); err == nil {
+			if err := tx.Commit(ctx); err != nil {
 				return "", nil, err
 			}
-
+			return *existingToken, existingExpiry, nil
 		}
-		return *existingToken, existingExpiry, nil
 	}
 
 	newToken, err := generateShareToken()
@@ -495,7 +537,7 @@ func (r *TripRepository) EnableShare(
 	if ownerUserID != nil {
 		newExpiry = nil // permanent
 	} else {
-		exp := time.Now().Add(7 * 25 * time.Hour)
+		exp := time.Now().Add(7 * 24 * time.Hour)
 		newExpiry = &exp
 	}
 
@@ -526,7 +568,7 @@ func (r *TripRepository) DisableShare(
 			SET share_token = NULL, share_enabled = false,
 				share_expires_at = NULL, share_created_at = NULL
 			WHERE id = $1
-				AND ((user_id = $2 AND IS NOT NULL) OR (session_id = $3 AND IS NOT NULL))`,
+				AND ((user_id = $2 AND $2 IS NOT NULL) OR (session_id = $3 AND $3 IS NOT NULL))`,
 		tripID, userID, sessionID)
 	if err != nil {
 		return err
@@ -545,7 +587,7 @@ func (r *TripRepository) GetByShareToken(ctx context.Context, token string) (*mo
 	err := r.Pool.QueryRow(ctx,
 		`SELECT id, user_id, session_id, name, description,
 					start_date, end_date, base_currency, default_expense_currency,
-					is_public_demo, forked_from, created_at
+					is_public_demo, forked_from, created_at,
 					share_token, share_enabled, share_expires_at, share_created_at
 			FROM trips
 			WHERE share_token = $1
