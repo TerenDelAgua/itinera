@@ -13,15 +13,34 @@
   // Japan Context imports
   import ClimateBadge from "$lib/components/japan-context/ClimateBadge.svelte";
   import TipBadge from "$lib/components/japan-context/TipBadge.svelte";
-  import { getClimate, shouldShowClimate, getRulesForActivity, type ClimateDisplay } from "$lib/services/japanContext";
+  import {
+    getClimate,
+    shouldShowClimate,
+    getRulesForActivity,
+    type ClimateDisplay,
+  } from "$lib/services/japanContext";
   import { isJapanPlace } from "$lib/utils/place";
 
-  let { isOpen, tripId, placeId, city, places, tripStart, tripEnd, activities = [], defaultDate, onRefresh, onClose } = $props<{
+  import type { Place } from "$lib/types/Place";
+
+  let {
+    isOpen,
+    tripId,
+    placeId,
+    city,
+    places,
+    tripStart,
+    tripEnd,
+    activities = [],
+    defaultDate,
+    onRefresh,
+    onClose,
+  } = $props<{
     isOpen: boolean;
     tripId: string;
     placeId?: string;
     city?: string;
-    places?: any[];
+    places?: Place[];
     tripStart?: string;
     tripEnd?: string;
     activities: Activity[];
@@ -31,7 +50,8 @@
   }>();
 
   let showQuickAdd = $state(false);
-  let collapsedSections = $state<Set<string>>(new SvelteSet<string>());
+  let collapsedSections = new SvelteSet<string>();
+
   let todaySection = $state<Element | null>(null);
 
   let activityToDelete = $state<Activity | null>(null);
@@ -79,7 +99,8 @@
 
   function isActivityInJapan(activity: Activity): boolean {
     if (placeId) {
-      const currentPlace = places?.find((p) => p.id === placeId) || (places && places[0]) || { city, country_code: null };
+      const currentPlace = places?.find((p) => p.id === placeId) ||
+        (places && places[0]) || { city, country_code: null };
       return isJapanPlace(currentPlace);
     }
     if (activity.place_id && places) {
@@ -94,18 +115,30 @@
   $effect(() => {
     if (isOpen && (city || places?.length) && tripStart && tripEnd) {
       for (const date of grouped.keys()) {
-        if (shouldShowClimate(date, tripStart, tripEnd) && !dailyClimates[date]) {
+        if (
+          shouldShowClimate(date, tripStart, tripEnd) &&
+          !dailyClimates[date]
+        ) {
           let resolvedCity = city;
           let matchedPlace = null;
           if (places) {
-            matchedPlace = places.find((p: any) => p.start_date && p.end_date && date >= p.start_date.split('T')[0] && date <= p.end_date.split('T')[0]);
+            matchedPlace = places.find(
+              (p: any) =>
+                p.start_date &&
+                p.end_date &&
+                date >= p.start_date.split("T")[0] &&
+                date <= p.end_date.split("T")[0],
+            );
             if (matchedPlace) {
               resolvedCity = matchedPlace.city;
             }
           }
-          const checkPlace = matchedPlace || (placeId && places?.find((p) => p.id === placeId)) || { city: resolvedCity };
+          const checkPlace = matchedPlace ||
+            (placeId && places?.find((p) => p.id === placeId)) || {
+              city: resolvedCity,
+            };
           if (resolvedCity && isJapanPlace(checkPlace)) {
-            getClimate(resolvedCity, date).then(c => {
+            getClimate(resolvedCity, date).then((c) => {
               if (c) dailyClimates[date] = c;
             });
           }
@@ -135,7 +168,10 @@
               'section[data-future="true"]',
             );
             if (firstFuture) {
-              firstFuture.scrollIntoView({ behavior: "smooth", block: "start" });
+              firstFuture.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+              });
             }
           }
         });
@@ -168,6 +204,7 @@
         <button
           onclick={onClose}
           class="text-teren-text-muted hover:text-teren-text-main p-2 rounded-lg hover:bg-teren-interactive-hover transition"
+          aria-label={$t("common.close")}
         >
           <svg
             class="w-5 h-5"
@@ -245,7 +282,13 @@
                 transition:slide={{ duration: 200, easing: cubicOut }}
               >
                 {#each acts as activity (activity.id)}
-                  {@const rules = isActivityInJapan(activity) ? getRulesForActivity(activity.title, activity.notes, currentLocale) : []}
+                  {@const rules = isActivityInJapan(activity)
+                    ? getRulesForActivity(
+                        activity.title,
+                        activity.notes,
+                        currentLocale,
+                      )
+                    : []}
                   {#if editingActivityId === activity.id}
                     <div class="py-3" transition:slide>
                       <ActivityQuickAdd
@@ -360,7 +403,9 @@
       </div>
 
       <!-- Footer: Quick Add -->
-      <div class="px-6 py-4 border-t border-teren-border bg-teren-card shrink-0">
+      <div
+        class="px-6 py-4 border-t border-teren-border bg-teren-card shrink-0"
+      >
         <button
           onclick={() => (showQuickAdd = !showQuickAdd)}
           class="w-full text-center text-sm font-medium text-teren-primary hover:text-teren-primary-hover py-2 transition-colors"

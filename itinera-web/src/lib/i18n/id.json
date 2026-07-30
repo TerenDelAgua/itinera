@@ -27,7 +27,8 @@
     "add": "Tambah",
     "inherit": "Wariskan",
     "cancel": "Batal",
-    "done": "Selesai"
+    "done": "Selesai",
+    "close": "Tutup"
   },
   "trip_form": {
     "title": "Buat perjalanan baru",
@@ -91,7 +92,8 @@
     "days": "hari",
     "day": "hari",
     "no_expenses": "Belum ada pengeluaran lokal.",
-    "view_history": "Lihat Semua"
+    "view_history": "Lihat Semua",
+    "delete": "Hapus"
   },
   "itinerary": {
     "title": "Aktivitas",
@@ -454,5 +456,30 @@
     "place_description_fallback": "Destinasi wisata di {city}. Rencanakan pengeluaran, aktivitas, dan panduan stasiun dengan Itinera.",
     "dashboard_title": "Perjalanan Saya",
     "dashboard_description": "Rencanakan dan atur perjalanan Anda dengan Itinera."
+  },
+  "share": {
+    "active_link": "Tautan aktif",
+    "cta_share": "Bagikan",
+    "popover_title": "Bagikan itinerary",
+    "copy_cta": "Salin",
+    "expires_at": "Kedaluwarsa pada {date}",
+    "disable_cta": "Nonaktifkan tautan",
+    "readonly_banner": "Anda melihat itinerary bersama dalam mode hanya-baca",
+    "not_available_title": "Tautan tidak tersedia",
+    "discover_cta": "Jelajahi Itinera",
+    "places_title": "Tempat",
+    "activities_title": "Agenda",
+    "fork_prompt": "Suka itinerary ini?",
+    "fork_cta": "Gunakan sebagai dasar perjalanan saya",
+    "create_own_cta": "Buat itinerary sendiri",
+    "expires_in": "Kedaluwarsa dalam {days} hari",
+    "seo_fallback": "Itinerary bersama di Itinera",
+    "errors": {
+      "not_found": "Tautan ini sudah tidak tersedia atau telah kedaluwarsa.",
+      "generic": "Kami tidak dapat memuat itinerary.",
+      "network": "Kesalahan koneksi. Periksa jaringan Anda.",
+      "fork_failed": "Kami tidak dapat membuat salinan Anda. Silakan coba lagi.",
+      "copy_failed": "Kami tidak dapat menyalin tautan."
+    }
   }
 }

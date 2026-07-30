@@ -15,32 +15,129 @@
           "name": "JR East",
           "name_ja": "JR東日本",
           "lines": [
-            { "name": "Yamanote Line", "name_ja": "山手線", "color": "#9ACD32", "platforms": ["14", "15"], "directions": ["Shibuya", "Ikebukuro", "Ueno"] },
-            { "name": "Chuo Line (Rapid)", "name_ja": "中央線快速", "color": "#F15A22", "platforms": ["8", "9"], "directions": ["Tachikawa", "Hachioji", "Takao"] },
-            { "name": "Chuo-Sobu Line", "name_ja": "中央・総武線", "color": "#FFD400", "platforms": ["1", "2"], "directions": ["Akihabara", "Chiba"] },
-            { "name": "Shonan-Shinjuku Line", "name_ja": "湘南新宿ライン", "color": "#E21F26", "platforms": ["2", "3"], "directions": ["Yokohama", "Odawara"] },
-            { "name": "Saikyo Line", "name_ja": "埼京線", "color": "#00AC9B", "platforms": ["2", "3"], "directions": ["Ikebukuro", "Omiya"] }
+            {
+              "name": "Yamanote Line",
+              "name_ja": "山手線",
+              "color": "#9ACD32",
+              "platforms": [
+                "14",
+                "15"
+              ],
+              "directions": [
+                "Shibuya",
+                "Ikebukuro",
+                "Ueno"
+              ]
+            },
+            {
+              "name": "Chuo Line (Rapid)",
+              "name_ja": "中央線快速",
+              "color": "#F15A22",
+              "platforms": [
+                "8",
+                "9"
+              ],
+              "directions": [
+                "Tachikawa",
+                "Hachioji",
+                "Takao"
+              ]
+            },
+            {
+              "name": "Chuo-Sobu Line",
+              "name_ja": "中央・総武線",
+              "color": "#FFD400",
+              "platforms": [
+                "1",
+                "2"
+              ],
+              "directions": [
+                "Akihabara",
+                "Chiba"
+              ]
+            },
+            {
+              "name": "Shonan-Shinjuku Line",
+              "name_ja": "湘南新宿ライン",
+              "color": "#E21F26",
+              "platforms": [
+                "2",
+                "3"
+              ],
+              "directions": [
+                "Yokohama",
+                "Odawara"
+              ]
+            },
+            {
+              "name": "Saikyo Line",
+              "name_ja": "埼京線",
+              "color": "#00AC9B",
+              "platforms": [
+                "2",
+                "3"
+              ],
+              "directions": [
+                "Ikebukuro",
+                "Omiya"
+              ]
+            }
           ]
         },
         {
           "name": "Odakyu Electric Railway",
           "name_ja": "小田急電鉄",
           "lines": [
-            { "name": "Odakyu Line", "name_ja": "小田原線", "color": "#1B9AD8", "platforms": ["1-6"], "directions": ["Odawara", "Hakone-Yumoto", "Katase-Enoshima"] }
+            {
+              "name": "Odakyu Line",
+              "name_ja": "小田原線",
+              "color": "#1B9AD8",
+              "platforms": [
+                "1-6"
+              ],
+              "directions": [
+                "Odawara",
+                "Hakone-Yumoto",
+                "Katase-Enoshima"
+              ]
+            }
           ]
         },
         {
           "name": "Keio Corporation",
           "name_ja": "京王電鉄",
           "lines": [
-            { "name": "Keio Line", "name_ja": "京王線", "color": "#DD2C00", "platforms": ["1-4"], "directions": ["Keio-Hachioji", "Takahatafudo"] }
+            {
+              "name": "Keio Line",
+              "name_ja": "京王線",
+              "color": "#DD2C00",
+              "platforms": [
+                "1-4"
+              ],
+              "directions": [
+                "Keio-Hachioji",
+                "Takahatafudo"
+              ]
+            }
           ]
         },
         {
           "name": "Tokyo Metro",
           "name_ja": "東京メトロ",
           "lines": [
-            { "name": "Marunouchi Line", "name_ja": "丸ノ内線", "color": "#F62E36", "platforms": ["B1"], "directions": ["Ikebukuro", "Ginza", "Tokyo"] }
+            {
+              "name": "Marunouchi Line",
+              "name_ja": "丸ノ内線",
+              "color": "#F62E36",
+              "platforms": [
+                "B1"
+              ],
+              "directions": [
+                "Ikebukuro",
+                "Ginza",
+                "Tokyo"
+              ]
+            }
           ]
         }
       ],
@@ -49,8 +146,17 @@
           "name": "East Exit (Higashi-guchi)",
           "name_es": "Salida Este (Higashi-guchi)",
           "name_ja": "東口",
-          "landmarks": ["Kabukicho", "Golden Gai", "Isetan Shinjuku", "Lumine Est"],
-          "best_for": ["nightlife", "shopping", "hotels"],
+          "landmarks": [
+            "Kabukicho",
+            "Golden Gai",
+            "Isetan Shinjuku",
+            "Lumine Est"
+          ],
+          "best_for": [
+            "nightlife",
+            "shopping",
+            "hotels"
+          ],
           "time_to_surface": "3 min",
           "tips": [
             "Kabukicho is 5 min walk from East Exit. Ignore touts.",
@@ -61,14 +167,27 @@
             "Kabukicho está a 5 min a pie de la salida Este. Ignora a los captadores.",
             "Isetan cierra a las 20:00. Último acceso a las 19:30.",
             "Golden Gai: más de 200 bares diminutos, solo efectivo, cover charge de ¥500-1000."
+          ],
+          "tips_ja": [
+            "Kabukicho は東口から5分歩。キャッチを無視してください。",
+            "Isetan は20:00に閉じます。最後のアクセスは19:30です。",
+            "Golden Gai は200+の小さなバーです。金額のみ、¥500-1000のcover chargeです。"
           ]
         },
         "west": {
           "name": "West Exit (Nishi-guchi)",
           "name_es": "Salida Oeste (Nishi-guchi)",
           "name_ja": "西口",
-          "landmarks": ["Tokyo Metropolitan Government", "Park Hyatt Tokyo", "Shinjuku Central Park"],
-          "best_for": ["business", "parks", "hotels"],
+          "landmarks": [
+            "Tokyo Metropolitan Government",
+            "Park Hyatt Tokyo",
+            "Shinjuku Central Park"
+          ],
+          "best_for": [
+            "business",
+            "parks",
+            "hotels"
+          ],
           "time_to_surface": "2 min",
           "tips": [
             "Tokyo Metropolitan Government: free observation deck, 9:30-23:00",
@@ -77,14 +196,26 @@
           "tips_es": [
             "Gobierno Metropolitano de Tokio: observatorio gratuito, 9:30-23:00.",
             "Park Hyatt: Bar de Lost in Translation (piso 52), código de vestimenta elegante sport."
+          ],
+          "tips_ja": [
+            "Tokyo Metropolitan Government は9:30-23:00で無料の観察台です。",
+            "Park Hyatt は52FでLost in Translationのバーです。"
           ]
         },
         "south": {
           "name": "South Exit (Minami-guchi)",
           "name_es": "Salida Sur (Minami-guchi)",
           "name_ja": "南口",
-          "landmarks": ["Takashimaya", "Shinjuku Bus Terminal (Busta)", "Lumine 1/2"],
-          "best_for": ["buses", "shopping", "day trips"],
+          "landmarks": [
+            "Takashimaya",
+            "Shinjuku Bus Terminal (Busta)",
+            "Lumine 1/2"
+          ],
+          "best_for": [
+            "buses",
+            "shopping",
+            "day trips"
+          ],
           "time_to_surface": "4 min",
           "tips": [
             "Busta Shinjuku: buses to Mt. Fuji, Kawaguchiko, Nikko, Hakone",
@@ -95,17 +226,31 @@
             "Busta Shinjuku: autobuses a Monte Fuji, Kawaguchiko, Nikko, Hakone.",
             "Compra billetes de autobús en ventanilla o máquinas. Efectivo + tarjeta IC.",
             "Takashimaya: libre de impuestos en piso 8, cierra a las 20:00."
+          ],
+          "tips_ja": [
+            "Busta Shinjuku はMonte Fuji、 Kawaguchiko、 Nikko、 Hakoneへの autobusesです。",
+            "Compra billetes de autobús en ventanilla o máquinas. Efectivo + tarjeta IC.",
+            "Takashimaya は8Fで税無料です。"
           ]
         },
         "new_south": {
           "name": "New South Exit (Shin-minami-guchi)",
           "name_es": "Nueva Salida Sur (Shin-minami-guchi)",
           "name_ja": "新南口",
-          "landmarks": ["JR Shinjuku Miraina Tower", "Flags"],
-          "best_for": ["business"],
+          "landmarks": [
+            "JR Shinjuku Miraina Tower",
+            "Flags"
+          ],
+          "best_for": [
+            "business"
+          ],
           "time_to_surface": "5 min",
-          "tips": ["Less crowded. Good for accessing southern hotels."],
-          "tips_es": ["Menos concurrida. Buena para acceder a hoteles del sur."]
+          "tips": [
+            "Less crowded. Good for accessing southern hotels."
+          ],
+          "tips_es": [
+            "Menos concurrida. Buena para acceder a hoteles del sur."
+          ]
         }
       },
       "key_tips": [
@@ -162,24 +307,95 @@
           "name": "JR West",
           "name_ja": "JR西日本",
           "lines": [
-            { "name": "Tokaido Shinkansen", "name_ja": "東海道新幹線", "color": "#0055A5", "platforms": ["11-14"], "directions": ["Tokyo", "Shin-Osaka", "Hakata"] },
-            { "name": "JR Kyoto Line", "name_ja": "JR京都線", "color": "#0072BC", "platforms": ["4-5"], "directions": ["Osaka", "Sannomiya", "Himeji"] },
-            { "name": "Sagano Line (San-in)", "name_ja": "嵯峨野線", "color": "#93278F", "platforms": ["31-34"], "directions": ["Saga-Arashiyama", "Kameoka"] },
-            { "name": "Nara Line", "name_ja": "奈良線", "color": "#8CBB26", "platforms": ["8-10"], "directions": ["Inari (Fushimi Inari)", "Uji", "Nara"] }
+            {
+              "name": "Tokaido Shinkansen",
+              "name_ja": "東海道新幹線",
+              "color": "#0055A5",
+              "platforms": [
+                "11-14"
+              ],
+              "directions": [
+                "Tokyo",
+                "Shin-Osaka",
+                "Hakata"
+              ]
+            },
+            {
+              "name": "JR Kyoto Line",
+              "name_ja": "JR京都線",
+              "color": "#0072BC",
+              "platforms": [
+                "4-5"
+              ],
+              "directions": [
+                "Osaka",
+                "Sannomiya",
+                "Himeji"
+              ]
+            },
+            {
+              "name": "Sagano Line (San-in)",
+              "name_ja": "嵯峨野線",
+              "color": "#93278F",
+              "platforms": [
+                "31-34"
+              ],
+              "directions": [
+                "Saga-Arashiyama",
+                "Kameoka"
+              ]
+            },
+            {
+              "name": "Nara Line",
+              "name_ja": "奈良線",
+              "color": "#8CBB26",
+              "platforms": [
+                "8-10"
+              ],
+              "directions": [
+                "Inari (Fushimi Inari)",
+                "Uji",
+                "Nara"
+              ]
+            }
           ]
         },
         {
           "name": "Kintetsu Railway",
           "name_ja": "近畿日本鉄道",
           "lines": [
-            { "name": "Kintetsu Kyoto Line", "name_ja": "近鉄京都線", "color": "#F39200", "platforms": ["1-4"], "directions": ["Tambabashi", "Nara", "Ise-Shima"] }
+            {
+              "name": "Kintetsu Kyoto Line",
+              "name_ja": "近鉄京都線",
+              "color": "#F39200",
+              "platforms": [
+                "1-4"
+              ],
+              "directions": [
+                "Tambabashi",
+                "Nara",
+                "Ise-Shima"
+              ]
+            }
           ]
         },
         {
           "name": "Kyoto Municipal Subway",
           "name_ja": "京都市営地下鉄",
           "lines": [
-            { "name": "Karasuma Line", "name_ja": "烏丸線", "color": "#009944", "platforms": ["1-2"], "directions": ["Shijo (Gion)", "Karasuma Oike", "Kokusaikaikan"] }
+            {
+              "name": "Karasuma Line",
+              "name_ja": "烏丸線",
+              "color": "#009944",
+              "platforms": [
+                "1-2"
+              ],
+              "directions": [
+                "Shijo (Gion)",
+                "Karasuma Oike",
+                "Kokusaikaikan"
+              ]
+            }
           ]
         }
       ],
@@ -188,8 +404,16 @@
           "name": "Central Exit (Karasuma-guchi)",
           "name_es": "Salida Central (Karasuma-guchi)",
           "name_ja": "中央口 (烏丸口)",
-          "landmarks": ["Kyoto Tower", "Kyoto Station Bus Terminal", "Porta Underground Mall"],
-          "best_for": ["buses", "shopping", "sightseeing"],
+          "landmarks": [
+            "Kyoto Tower",
+            "Kyoto Station Bus Terminal",
+            "Porta Underground Mall"
+          ],
+          "best_for": [
+            "buses",
+            "shopping",
+            "sightseeing"
+          ],
           "time_to_surface": "2 min",
           "tips": [
             "Main bus terminal is directly outside Central Exit. Follow lines for A, B, C bus platforms.",
@@ -206,8 +430,17 @@
           "name": "Hachijo Exit (Hachijo-guchi)",
           "name_es": "Salida Hachijo (Hachijo-guchi)",
           "name_ja": "八条口",
-          "landmarks": ["Shinkansen Gates", "Airport Limousine Bus", "Kyoto Avanti Mall", "Don Quijote"],
-          "best_for": ["transit", "shopping", "hotels"],
+          "landmarks": [
+            "Shinkansen Gates",
+            "Airport Limousine Bus",
+            "Kyoto Avanti Mall",
+            "Don Quijote"
+          ],
+          "best_for": [
+            "transit",
+            "shopping",
+            "hotels"
+          ],
           "time_to_surface": "3 min",
           "tips": [
             "Limousine Bus to Kansai Airport (KIX) and Itami Airport departs from Hachijo-guchi.",
@@ -268,24 +501,95 @@
           "name": "JR Kyushu",
           "name_ja": "JR九州",
           "lines": [
-            { "name": "Kyushu Shinkansen", "name_ja": "九州新幹線", "color": "#E60012", "platforms": ["11-16"], "directions": ["Kumamoto", "Kagoshima-Chuo"] },
-            { "name": "Kagoshima Main Line", "name_ja": "鹿児島本線", "color": "#E60012", "platforms": ["1-4"], "directions": ["Kokura", "Mojiko", "Kurume", "Omuta"] },
-            { "name": "Fukuhoku Yutaka Line", "name_ja": "福北ゆたか線", "color": "#ECE51B", "platforms": ["8"], "directions": ["Nogata", "Iizuka"] }
+            {
+              "name": "Kyushu Shinkansen",
+              "name_ja": "九州新幹線",
+              "color": "#E60012",
+              "platforms": [
+                "11-16"
+              ],
+              "directions": [
+                "Kumamoto",
+                "Kagoshima-Chuo"
+              ]
+            },
+            {
+              "name": "Kagoshima Main Line",
+              "name_ja": "鹿児島本線",
+              "color": "#E60012",
+              "platforms": [
+                "1-4"
+              ],
+              "directions": [
+                "Kokura",
+                "Mojiko",
+                "Kurume",
+                "Omuta"
+              ]
+            },
+            {
+              "name": "Fukuhoku Yutaka Line",
+              "name_ja": "福北ゆたか線",
+              "color": "#ECE51B",
+              "platforms": [
+                "8"
+              ],
+              "directions": [
+                "Nogata",
+                "Iizuka"
+              ]
+            }
           ]
         },
         {
           "name": "JR West",
           "name_ja": "JR西日本",
           "lines": [
-            { "name": "Sanyo Shinkansen", "name_ja": "山陽新幹線", "color": "#0072BC", "platforms": ["11-16"], "directions": ["Hiroshima", "Shin-Osaka", "Tokyo"] }
+            {
+              "name": "Sanyo Shinkansen",
+              "name_ja": "山陽新幹線",
+              "color": "#0072BC",
+              "platforms": [
+                "11-16"
+              ],
+              "directions": [
+                "Hiroshima",
+                "Shin-Osaka",
+                "Tokyo"
+              ]
+            }
           ]
         },
         {
           "name": "Fukuoka City Subway",
           "name_ja": "福岡市営地下鉄",
           "lines": [
-            { "name": "Kuko (Airport) Line", "name_ja": "空港線", "color": "#FFA500", "platforms": ["B2F"], "directions": ["Fukuoka Airport (5 min)", "Tenjin", "Meinohama"] },
-            { "name": "Nanakuma Line", "name_ja": "七隈線", "color": "#00A0E9", "platforms": ["B3F"], "directions": ["Yakuin", "Ropponmatsu", "Hashimoto"] }
+            {
+              "name": "Kuko (Airport) Line",
+              "name_ja": "空港線",
+              "color": "#FFA500",
+              "platforms": [
+                "B2F"
+              ],
+              "directions": [
+                "Fukuoka Airport (5 min)",
+                "Tenjin",
+                "Meinohama"
+              ]
+            },
+            {
+              "name": "Nanakuma Line",
+              "name_ja": "七隈線",
+              "color": "#00A0E9",
+              "platforms": [
+                "B3F"
+              ],
+              "directions": [
+                "Yakuin",
+                "Ropponmatsu",
+                "Hashimoto"
+              ]
+            }
           ]
         }
       ],
@@ -294,8 +598,17 @@
           "name": "Hakata Exit (Hakata-guchi)",
           "name_es": "Salida Hakata (Hakata-guchi)",
           "name_ja": "博多口",
-          "landmarks": ["JR Hakata City (Amu Plaza)", "Canal City Hakata (10 min walk)", "Kushida Shrine", "Hakata Bus Terminal"],
-          "best_for": ["shopping", "sightseeing", "buses"],
+          "landmarks": [
+            "JR Hakata City (Amu Plaza)",
+            "Canal City Hakata (10 min walk)",
+            "Kushida Shrine",
+            "Hakata Bus Terminal"
+          ],
+          "best_for": [
+            "shopping",
+            "sightseeing",
+            "buses"
+          ],
           "time_to_surface": "2 min",
           "tips": [
             "Best exit for main shopping malls and sightseeing (Canal City is a pleasant 10 min walk or short bus ride).",
@@ -314,8 +627,16 @@
           "name": "Chikushi Exit (Chikushi-guchi)",
           "name_es": "Salida Chikushi (Chikushi-guchi)",
           "name_ja": "筑紫口",
-          "landmarks": ["Shinkansen Gates", "Deitos Street (Food court)", "Eastern Hotels"],
-          "best_for": ["transit", "dining", "hotels"],
+          "landmarks": [
+            "Shinkansen Gates",
+            "Deitos Street (Food court)",
+            "Eastern Hotels"
+          ],
+          "best_for": [
+            "transit",
+            "dining",
+            "hotels"
+          ],
           "time_to_surface": "1 min",
           "tips": [
             "Nearest exit for Shinkansen travelers.",
@@ -371,16 +692,62 @@
           "name": "JR East",
           "name_ja": "JR東日本",
           "lines": [
-            { "name": "Yamanote Line", "name_ja": "山手線", "color": "#9ACD32", "platforms": ["1", "2"], "directions": ["Shinjuku", "Shinagawa"] },
-            { "name": "Saikyo Line", "name_ja": "埼京線", "color": "#00AC9B", "platforms": ["3", "4"], "directions": ["Omiya", "Shinjuku"] }
+            {
+              "name": "Yamanote Line",
+              "name_ja": "山手線",
+              "color": "#9ACD32",
+              "platforms": [
+                "1",
+                "2"
+              ],
+              "directions": [
+                "Shinjuku",
+                "Shinagawa"
+              ]
+            },
+            {
+              "name": "Saikyo Line",
+              "name_ja": "埼京線",
+              "color": "#00AC9B",
+              "platforms": [
+                "3",
+                "4"
+              ],
+              "directions": [
+                "Omiya",
+                "Shinjuku"
+              ]
+            }
           ]
         },
         {
           "name": "Tokyo Metro",
           "name_ja": "東京メトロ",
           "lines": [
-            { "name": "Hanzomon Line", "name_ja": "半蔵門線", "color": "#8B4513", "platforms": ["B3F"], "directions": ["Otemachi", "Oshiage"] },
-            { "name": "Ginza Line", "name_ja": "銀座線", "color": "#FF9900", "platforms": ["3F"], "directions": ["Asakusa", "Ginza"] }
+            {
+              "name": "Hanzomon Line",
+              "name_ja": "半蔵門線",
+              "color": "#8B4513",
+              "platforms": [
+                "B3F"
+              ],
+              "directions": [
+                "Otemachi",
+                "Oshiage"
+              ]
+            },
+            {
+              "name": "Ginza Line",
+              "name_ja": "銀座線",
+              "color": "#FF9900",
+              "platforms": [
+                "3F"
+              ],
+              "directions": [
+                "Asakusa",
+                "Ginza"
+              ]
+            }
           ]
         }
       ],
@@ -389,8 +756,16 @@
           "name": "Hachiko Exit",
           "name_es": "Salida Hachiko",
           "name_ja": "ハチ公口",
-          "landmarks": ["Shibuya Crossing", "Hachiko Statue", "Shibuya 109"],
-          "best_for": ["sightseeing", "shopping", "nightlife"],
+          "landmarks": [
+            "Shibuya Crossing",
+            "Hachiko Statue",
+            "Shibuya 109"
+          ],
+          "best_for": [
+            "sightseeing",
+            "shopping",
+            "nightlife"
+          ],
           "time_to_surface": "1 min",
           "tips": [
             "Hachiko crossing is directly outside this exit. Watch out for crowds.",
@@ -428,22 +803,67 @@
           "name": "JR East",
           "name_ja": "JR東日本",
           "lines": [
-            { "name": "Yamanote Line", "name_ja": "山手線", "color": "#9ACD32", "platforms": ["4", "5"], "directions": ["Ueno", "Shinagawa"] },
-            { "name": "Keiyo Line (Disney)", "name_ja": "京葉線", "color": "#E60012", "platforms": ["B4F"], "directions": ["Maihama (Disneyland)"] }
+            {
+              "name": "Yamanote Line",
+              "name_ja": "山手線",
+              "color": "#9ACD32",
+              "platforms": [
+                "4",
+                "5"
+              ],
+              "directions": [
+                "Ueno",
+                "Shinagawa"
+              ]
+            },
+            {
+              "name": "Keiyo Line (Disney)",
+              "name_ja": "京葉線",
+              "color": "#E60012",
+              "platforms": [
+                "B4F"
+              ],
+              "directions": [
+                "Maihama (Disneyland)"
+              ]
+            }
           ]
         },
         {
           "name": "JR Central",
           "name_ja": "JR東海",
           "lines": [
-            { "name": "Tokaido Shinkansen", "name_ja": "東海道新幹線", "color": "#0055A5", "platforms": ["14-19"], "directions": ["Kyoto", "Shin-Osaka", "Nagoya"] }
+            {
+              "name": "Tokaido Shinkansen",
+              "name_ja": "東海道新幹線",
+              "color": "#0055A5",
+              "platforms": [
+                "14-19"
+              ],
+              "directions": [
+                "Kyoto",
+                "Shin-Osaka",
+                "Nagoya"
+              ]
+            }
           ]
         },
         {
           "name": "Tokyo Metro",
           "name_ja": "東京メトロ",
           "lines": [
-            { "name": "Marunouchi Line", "name_ja": "丸ノ内線", "color": "#F62E36", "platforms": ["B2F"], "directions": ["Shinjuku", "Ikebukuro"] }
+            {
+              "name": "Marunouchi Line",
+              "name_ja": "丸ノ内線",
+              "color": "#F62E36",
+              "platforms": [
+                "B2F"
+              ],
+              "directions": [
+                "Shinjuku",
+                "Ikebukuro"
+              ]
+            }
           ]
         }
       ],
@@ -452,8 +872,16 @@
           "name": "Marunouchi Exit (West side)",
           "name_es": "Salida Marunouchi (Lado Oeste)",
           "name_ja": "丸の内口",
-          "landmarks": ["Imperial Palace", "Marunouchi Brick Facade", "Gyoko-dori"],
-          "best_for": ["sightseeing", "business", "parks"],
+          "landmarks": [
+            "Imperial Palace",
+            "Marunouchi Brick Facade",
+            "Gyoko-dori"
+          ],
+          "best_for": [
+            "sightseeing",
+            "business",
+            "parks"
+          ],
           "time_to_surface": "2 min",
           "tips": [
             "Best exit to view the historic 1914 red brick station facade.",
@@ -468,8 +896,16 @@
           "name": "Yaesu Exit (East side)",
           "name_es": "Salida Yaesu (Lado Este)",
           "name_ja": "八重洲口",
-          "landmarks": ["Shinkansen Gates", "Daimaru Department Store", "Tokyo Character Street (B1F)"],
-          "best_for": ["transit", "shopping", "dining"],
+          "landmarks": [
+            "Shinkansen Gates",
+            "Daimaru Department Store",
+            "Tokyo Character Street (B1F)"
+          ],
+          "best_for": [
+            "transit",
+            "shopping",
+            "dining"
+          ],
           "time_to_surface": "1 min",
           "tips": [
             "Nearest exit to the Shinkansen gates.",
@@ -513,23 +949,80 @@
           "name": "JR West",
           "name_ja": "JR西日本",
           "lines": [
-            { "name": "Osaka Loop Line", "name_ja": "大阪環状線", "color": "#EA5404", "platforms": ["1", "2"], "directions": ["Kyobashi", "Tennoji", "Universal City (USJ)"] },
-            { "name": "JR Kyoto/Kobe Line", "name_ja": "JR京都線・神戸線", "color": "#0072BC", "platforms": ["3-6"], "directions": ["Kyoto", "Sannomiya (Kobe)", "Himeji"] }
+            {
+              "name": "Osaka Loop Line",
+              "name_ja": "大阪環状線",
+              "color": "#EA5404",
+              "platforms": [
+                "1",
+                "2"
+              ],
+              "directions": [
+                "Kyobashi",
+                "Tennoji",
+                "Universal City (USJ)"
+              ]
+            },
+            {
+              "name": "JR Kyoto/Kobe Line",
+              "name_ja": "JR京都線・神戸線",
+              "color": "#0072BC",
+              "platforms": [
+                "3-6"
+              ],
+              "directions": [
+                "Kyoto",
+                "Sannomiya (Kobe)",
+                "Himeji"
+              ]
+            }
           ]
         },
         {
           "name": "Hankyu Railway",
           "name_ja": "阪急電鉄",
           "lines": [
-            { "name": "Hankyu Kyoto Line", "name_ja": "阪急京都線", "color": "#800000", "platforms": ["1-3"], "directions": ["Kyoto-Kawaramachi"] },
-            { "name": "Hankyu Kobe Line", "name_ja": "阪急神戸線", "color": "#800000", "platforms": ["7-9"], "directions": ["Kobe-Sannomiya"] }
+            {
+              "name": "Hankyu Kyoto Line",
+              "name_ja": "阪急京都線",
+              "color": "#800000",
+              "platforms": [
+                "1-3"
+              ],
+              "directions": [
+                "Kyoto-Kawaramachi"
+              ]
+            },
+            {
+              "name": "Hankyu Kobe Line",
+              "name_ja": "阪急神戸線",
+              "color": "#800000",
+              "platforms": [
+                "7-9"
+              ],
+              "directions": [
+                "Kobe-Sannomiya"
+              ]
+            }
           ]
         },
         {
           "name": "Osaka Metro",
           "name_ja": "大阪メトロ",
           "lines": [
-            { "name": "Midosuji Line", "name_ja": "御堂筋線", "color": "#E51937", "platforms": ["B2F"], "directions": ["Namba", "Tennoji", "Shin-Osaka (Shinkansen)"] }
+            {
+              "name": "Midosuji Line",
+              "name_ja": "御堂筋線",
+              "color": "#E51937",
+              "platforms": [
+                "B2F"
+              ],
+              "directions": [
+                "Namba",
+                "Tennoji",
+                "Shin-Osaka (Shinkansen)"
+              ]
+            }
           ]
         }
       ],
@@ -538,8 +1031,16 @@
           "name": "Central Exit (JR Osaka)",
           "name_es": "Salida Central (JR Osaka)",
           "name_ja": "中央口",
-          "landmarks": ["Grand Front Osaka", "Yodobashi Camera", "Lucua Osaka"],
-          "best_for": ["shopping", "sightseeing", "transfers"],
+          "landmarks": [
+            "Grand Front Osaka",
+            "Yodobashi Camera",
+            "Lucua Osaka"
+          ],
+          "best_for": [
+            "shopping",
+            "sightseeing",
+            "transfers"
+          ],
           "time_to_surface": "2 min",
           "tips": [
             "Best exit to access the northern skyscrapers and Yodobashi Camera.",
@@ -554,8 +1055,15 @@
           "name": "Midosuji Exit (East)",
           "name_es": "Salida Midosuji (Este)",
           "name_ja": "御堂筋口",
-          "landmarks": ["Hankyu Department Store", "Hankyu Sanbangai", "Midosuji Subway"],
-          "best_for": ["metro", "shopping"],
+          "landmarks": [
+            "Hankyu Department Store",
+            "Hankyu Sanbangai",
+            "Midosuji Subway"
+          ],
+          "best_for": [
+            "metro",
+            "shopping"
+          ],
           "time_to_surface": "3 min",
           "tips": [
             "Direct escalator down to the Midosuji Subway Line.",
@@ -570,8 +1078,15 @@
           "name": "South Gate (Minami)",
           "name_es": "Puerta Sur (Minami)",
           "name_ja": "南ゲート",
-          "landmarks": ["Hanshin Department Store", "Kitashinchi Area", "Diamor Osaka"],
-          "best_for": ["dining", "hotels"],
+          "landmarks": [
+            "Hanshin Department Store",
+            "Kitashinchi Area",
+            "Diamor Osaka"
+          ],
+          "best_for": [
+            "dining",
+            "hotels"
+          ],
           "time_to_surface": "3 min",
           "tips": [
             "Connects directly to the Hanshin Umeda station.",
@@ -622,22 +1137,67 @@
           "name": "JR Central",
           "name_ja": "JR東海",
           "lines": [
-            { "name": "Tokaido Shinkansen", "name_ja": "東海道新幹線", "color": "#0055A5", "platforms": ["14-17"], "directions": ["Tokyo", "Kyoto", "Shin-Osaka"] },
-            { "name": "Chuo Main Line", "name_ja": "中央本線", "color": "#F15A22", "platforms": ["7-8"], "directions": ["Tajimi", "Nakatsugawa"] }
+            {
+              "name": "Tokaido Shinkansen",
+              "name_ja": "東海道新幹線",
+              "color": "#0055A5",
+              "platforms": [
+                "14-17"
+              ],
+              "directions": [
+                "Tokyo",
+                "Kyoto",
+                "Shin-Osaka"
+              ]
+            },
+            {
+              "name": "Chuo Main Line",
+              "name_ja": "中央本線",
+              "color": "#F15A22",
+              "platforms": [
+                "7-8"
+              ],
+              "directions": [
+                "Tajimi",
+                "Nakatsugawa"
+              ]
+            }
           ]
         },
         {
           "name": "Meitetsu Railway",
           "name_ja": "名古屋鉄道",
           "lines": [
-            { "name": "Meitetsu Nagoya Line", "name_ja": "名鉄名古屋本線", "color": "#E60012", "platforms": ["1-4"], "directions": ["Central Japan Int'l Airport (Centrair)", "Toyohashi"] }
+            {
+              "name": "Meitetsu Nagoya Line",
+              "name_ja": "名鉄名古屋本線",
+              "color": "#E60012",
+              "platforms": [
+                "1-4"
+              ],
+              "directions": [
+                "Central Japan Int'l Airport (Centrair)",
+                "Toyohashi"
+              ]
+            }
           ]
         },
         {
           "name": "Nagoya Municipal Subway",
           "name_ja": "名古屋市営地下鉄",
           "lines": [
-            { "name": "Higashiyama Line", "name_ja": "東山線", "color": "#FFD400", "platforms": ["B2F"], "directions": ["Sakae", "Fujigaoka"] }
+            {
+              "name": "Higashiyama Line",
+              "name_ja": "東山線",
+              "color": "#FFD400",
+              "platforms": [
+                "B2F"
+              ],
+              "directions": [
+                "Sakae",
+                "Fujigaoka"
+              ]
+            }
           ]
         }
       ],
@@ -646,8 +1206,16 @@
           "name": "Sakura-dori Exit (East)",
           "name_es": "Salida Sakura-dori (Este)",
           "name_ja": "桜通口",
-          "landmarks": ["Midland Square", "JR Central Towers", "Gold Clock Meeting Point"],
-          "best_for": ["shopping", "business", "hotels"],
+          "landmarks": [
+            "Midland Square",
+            "JR Central Towers",
+            "Gold Clock Meeting Point"
+          ],
+          "best_for": [
+            "shopping",
+            "business",
+            "hotels"
+          ],
           "time_to_surface": "2 min",
           "tips": [
             "Direct access to local buses and Higashiyama Subway Line.",
@@ -666,8 +1234,15 @@
           "name": "Taiko-dori Exit (West)",
           "name_es": "Salida Taiko-dori (Oeste)",
           "name_ja": "太閤通口",
-          "landmarks": ["Shinkansen Gates", "Bic Camera", "Silver Clock Meeting Point"],
-          "best_for": ["transit", "shopping"],
+          "landmarks": [
+            "Shinkansen Gates",
+            "Bic Camera",
+            "Silver Clock Meeting Point"
+          ],
+          "best_for": [
+            "transit",
+            "shopping"
+          ],
           "time_to_surface": "1 min",
           "tips": [
             "Nearest exit to the Shinkansen gates and highway bus stops.",
@@ -715,15 +1290,50 @@
           "name": "JR Hokkaido",
           "name_ja": "JR北海道",
           "lines": [
-            { "name": "Hakodate Main Line", "name_ja": "函館本線", "color": "#00A0E9", "platforms": ["1-10"], "directions": ["Otaru", "New Chitose Airport", "Asahikawa"] }
+            {
+              "name": "Hakodate Main Line",
+              "name_ja": "函館本線",
+              "color": "#00A0E9",
+              "platforms": [
+                "1-10"
+              ],
+              "directions": [
+                "Otaru",
+                "New Chitose Airport",
+                "Asahikawa"
+              ]
+            }
           ]
         },
         {
           "name": "Sapporo Municipal Subway",
           "name_ja": "札幌市営地下鉄",
           "lines": [
-            { "name": "Namboku Line", "name_ja": "南北線", "color": "#009944", "platforms": ["B2F"], "directions": ["Odori", "Susukino", "Makomanai"] },
-            { "name": "Toho Line", "name_ja": "東豊線", "color": "#0072BC", "platforms": ["B2F"], "directions": ["Odori", "Fukuzumi"] }
+            {
+              "name": "Namboku Line",
+              "name_ja": "南北線",
+              "color": "#009944",
+              "platforms": [
+                "B2F"
+              ],
+              "directions": [
+                "Odori",
+                "Susukino",
+                "Makomanai"
+              ]
+            },
+            {
+              "name": "Toho Line",
+              "name_ja": "東豊線",
+              "color": "#0072BC",
+              "platforms": [
+                "B2F"
+              ],
+              "directions": [
+                "Odori",
+                "Fukuzumi"
+              ]
+            }
           ]
         }
       ],
@@ -732,8 +1342,14 @@
           "name": "North Exit (Kita-guchi)",
           "name_es": "Salida Norte (Kita-guchi)",
           "name_ja": "北口",
-          "landmarks": ["Hokkaido University Campus", "North Exit Plaza"],
-          "best_for": ["sightseeing", "university"],
+          "landmarks": [
+            "Hokkaido University Campus",
+            "North Exit Plaza"
+          ],
+          "best_for": [
+            "sightseeing",
+            "university"
+          ],
           "time_to_surface": "1 min",
           "tips": [
             "Best exit to visit the historic and scenic Hokkaido University campus (5 min walk).",
@@ -752,8 +1368,17 @@
           "name": "South Exit (Minami-guchi)",
           "name_es": "Salida Sur (Minami-guchi)",
           "name_ja": "南口",
-          "landmarks": ["JR Tower", "Stellar Place", "Daimaru Sapporo", "Underground Walkway (Chi-Ka-Ho)"],
-          "best_for": ["shopping", "hotels", "city walk"],
+          "landmarks": [
+            "JR Tower",
+            "Stellar Place",
+            "Daimaru Sapporo",
+            "Underground Walkway (Chi-Ka-Ho)"
+          ],
+          "best_for": [
+            "shopping",
+            "hotels",
+            "city walk"
+          ],
           "time_to_surface": "2 min",
           "tips": [
             "Direct access to Daimaru, Stellar Place, and the underground pedestrian walkway (Chi-Ka-Ho).",
@@ -802,15 +1427,50 @@
           "name": "JR West",
           "name_ja": "JR西日本",
           "lines": [
-            { "name": "Sanyo Shinkansen", "name_ja": "山陽新幹線", "color": "#0055A5", "platforms": ["11-14"], "directions": ["Shin-Osaka", "Tokyo", "Hakata"] },
-            { "name": "Sanyo Main Line", "name_ja": "山陽本線", "color": "#E60012", "platforms": ["1", "2"], "directions": ["Miyajimaguchi (for Miyajima Ferry)", "Iwakuni"] }
+            {
+              "name": "Sanyo Shinkansen",
+              "name_ja": "山陽新幹線",
+              "color": "#0055A5",
+              "platforms": [
+                "11-14"
+              ],
+              "directions": [
+                "Shin-Osaka",
+                "Tokyo",
+                "Hakata"
+              ]
+            },
+            {
+              "name": "Sanyo Main Line",
+              "name_ja": "山陽本線",
+              "color": "#E60012",
+              "platforms": [
+                "1",
+                "2"
+              ],
+              "directions": [
+                "Miyajimaguchi (for Miyajima Ferry)",
+                "Iwakuni"
+              ]
+            }
           ]
         },
         {
           "name": "Hiroden Trams",
           "name_ja": "広島電鉄",
           "lines": [
-            { "name": "Hiroden Tram System", "name_ja": "市内電車", "color": "#009944", "platforms": ["South Exit (1F)"], "directions": ["Genbaku-Dome-mae (Peace Park)", "Miyajimaguchi"] }
+            {
+              "name": "Hiroden Tram System",
+              "name_ja": "市内電車",
+              "color": "#009944",
+              "platforms": [
+                "South Exit (1F)"
+              ],
+              "directions": [
+                "Genbaku-Dome-mae (Peace Park)",
+                "Miyajimaguchi"
+              ]
+            }
           ]
         }
       ],
@@ -819,8 +1479,16 @@
           "name": "South Exit (Minami-guchi)",
           "name_es": "Salida Sur (Minami-guchi)",
           "name_ja": "南口",
-          "landmarks": ["Hiroden Tram Station", "Ekie Shopping Mall", "Fukuya Dept Store"],
-          "best_for": ["sightseeing", "tram", "shopping"],
+          "landmarks": [
+            "Hiroden Tram Station",
+            "Ekie Shopping Mall",
+            "Fukuya Dept Store"
+          ],
+          "best_for": [
+            "sightseeing",
+            "tram",
+            "shopping"
+          ],
           "time_to_surface": "2 min",
           "tips": [
             "Direct connection to the Hiroden streetcar (tram) station for going to the Peace Memorial Park and Miyajima Ferry.",
@@ -839,8 +1507,16 @@
           "name": "Shinkansen Exit (North)",
           "name_es": "Salida Shinkansen (Norte)",
           "name_ja": "新幹線口 (北口)",
-          "landmarks": ["Shinkansen Gates", "Airport Limousine Bus", "Hotel Granvia"],
-          "best_for": ["transit", "airport bus", "hotels"],
+          "landmarks": [
+            "Shinkansen Gates",
+            "Airport Limousine Bus",
+            "Hotel Granvia"
+          ],
+          "best_for": [
+            "transit",
+            "airport bus",
+            "hotels"
+          ],
           "time_to_surface": "1 min",
           "tips": [
             "Nearest exit to the Shinkansen gates.",
@@ -888,28 +1564,72 @@
           "name": "JR West",
           "name_ja": "JR西日本",
           "lines": [
-            { "name": "JR Kobe Line", "name_ja": "JR神戸線", "color": "#0072BC", "platforms": ["1-4"], "directions": ["Osaka", "Kyoto", "Himeji"] }
+            {
+              "name": "JR Kobe Line",
+              "name_ja": "JR神戸線",
+              "color": "#0072BC",
+              "platforms": [
+                "1-4"
+              ],
+              "directions": [
+                "Osaka",
+                "Kyoto",
+                "Himeji"
+              ]
+            }
           ]
         },
         {
           "name": "Hankyu Railway",
           "name_ja": "阪急電鉄",
           "lines": [
-            { "name": "Hankyu Kobe Line", "name_ja": "阪急神戸線", "color": "#800000", "platforms": ["1-4"], "directions": ["Osaka-Umeda"] }
+            {
+              "name": "Hankyu Kobe Line",
+              "name_ja": "阪急神戸線",
+              "color": "#800000",
+              "platforms": [
+                "1-4"
+              ],
+              "directions": [
+                "Osaka-Umeda"
+              ]
+            }
           ]
         },
         {
           "name": "Hanshin Electric Railway",
           "name_ja": "阪神電気鉄道",
           "lines": [
-            { "name": "Hanshin Main Line", "name_ja": "阪神本線", "color": "#004499", "platforms": ["1-3"], "directions": ["Osaka-Umeda", "Koshien"] }
+            {
+              "name": "Hanshin Main Line",
+              "name_ja": "阪神本線",
+              "color": "#004499",
+              "platforms": [
+                "1-3"
+              ],
+              "directions": [
+                "Osaka-Umeda",
+                "Koshien"
+              ]
+            }
           ]
         },
         {
           "name": "Kobe New Transit",
           "name_ja": "神戸新交通",
           "lines": [
-            { "name": "Port Island Line (Port Liner)", "name_ja": "ポートアイランド線", "color": "#E60012", "platforms": ["2F Terminal"], "directions": ["Kobe Airport", "Port Island"] }
+            {
+              "name": "Port Island Line (Port Liner)",
+              "name_ja": "ポートアイランド線",
+              "color": "#E60012",
+              "platforms": [
+                "2F Terminal"
+              ],
+              "directions": [
+                "Kobe Airport",
+                "Port Island"
+              ]
+            }
           ]
         }
       ],
@@ -918,8 +1638,16 @@
           "name": "East Exit (JR / Port Liner Link)",
           "name_es": "Salida Este (JR / Port Liner Link)",
           "name_ja": "東口",
-          "landmarks": ["Port Liner Station", "Mint Kobe", "Bus Terminal"],
-          "best_for": ["airport access", "buses", "shopping"],
+          "landmarks": [
+            "Port Liner Station",
+            "Mint Kobe",
+            "Bus Terminal"
+          ],
+          "best_for": [
+            "airport access",
+            "buses",
+            "shopping"
+          ],
           "time_to_surface": "1 min",
           "tips": [
             "Best exit to transfer to the Port Liner for Kobe Airport (18 mins) or the main highway bus terminal.",
@@ -938,8 +1666,16 @@
           "name": "West Exit (Hankyu / Subway Link)",
           "name_es": "Salida Oeste (Hankyu / Subway Link)",
           "name_ja": "西口",
-          "landmarks": ["Hankyu Station", "Ikuta Road", "Subway Seishin-Yamate Line"],
-          "best_for": ["sightseeing", "dining", "nightlife"],
+          "landmarks": [
+            "Hankyu Station",
+            "Ikuta Road",
+            "Subway Seishin-Yamate Line"
+          ],
+          "best_for": [
+            "sightseeing",
+            "dining",
+            "nightlife"
+          ],
           "time_to_surface": "2 min",
           "tips": [
             "Direct connection to the Hankyu Kobe-Sannomiya station.",
@@ -988,8 +1724,30 @@
           "name": "JR East",
           "name_ja": "JR東日本",
           "lines": [
-            { "name": "Hokuriku Shinkansen", "name_ja": "北陸新幹線", "color": "#0055A5", "platforms": ["11-14"], "directions": ["Tokyo", "Kanazawa"] },
-            { "name": "Shinano Railway", "name_ja": "しなの鉄道", "color": "#FFD400", "platforms": ["5-6"], "directions": ["Karuizawa", "Myoko-Kogen"] }
+            {
+              "name": "Hokuriku Shinkansen",
+              "name_ja": "北陸新幹線",
+              "color": "#0055A5",
+              "platforms": [
+                "11-14"
+              ],
+              "directions": [
+                "Tokyo",
+                "Kanazawa"
+              ]
+            },
+            {
+              "name": "Shinano Railway",
+              "name_ja": "しなの鉄道",
+              "color": "#FFD400",
+              "platforms": [
+                "5-6"
+              ],
+              "directions": [
+                "Karuizawa",
+                "Myoko-Kogen"
+              ]
+            }
           ]
         }
       ],
@@ -998,8 +1756,15 @@
           "name": "East Exit (Higashi-guchi)",
           "name_es": "Salida Este (Higashi-guchi)",
           "name_ja": "東口",
-          "landmarks": ["Zenkoji Temple", "Zenkoji-dori", "Bus Terminal"],
-          "best_for": ["sightseeing", "buses"],
+          "landmarks": [
+            "Zenkoji Temple",
+            "Zenkoji-dori",
+            "Bus Terminal"
+          ],
+          "best_for": [
+            "sightseeing",
+            "buses"
+          ],
           "time_to_surface": "3 min",
           "tips": [
             "Take the 'Shiritai Nagano' bus to Zenkoji from here.",
@@ -1018,8 +1783,14 @@
           "name": "West Exit (Nishi-guchi)",
           "name_es": "Salida Oeste (Nishi-guchi)",
           "name_ja": "西口",
-          "landmarks": ["City Center", "Togura-Kamiyamada Onsen"],
-          "best_for": ["business", "hotels"],
+          "landmarks": [
+            "City Center",
+            "Togura-Kamiyamada Onsen"
+          ],
+          "best_for": [
+            "business",
+            "hotels"
+          ],
           "time_to_surface": "2 min",
           "tips": [
             "Quiet area with local shops."
@@ -1065,22 +1836,66 @@
           "name": "JR East",
           "name_ja": "JR東日本",
           "lines": [
-            { "name": "Tokaido Line", "name_ja": "東海道線", "color": "#FFD400", "platforms": ["3-4"], "directions": ["Tokyo", "Odawara"] },
-            { "name": "Yokosuka Line", "name_ja": "横須賀線", "color": "#008000", "platforms": ["7-10"], "directions": ["Kamakura", "Kurihama"] }
+            {
+              "name": "Tokaido Line",
+              "name_ja": "東海道線",
+              "color": "#FFD400",
+              "platforms": [
+                "3-4"
+              ],
+              "directions": [
+                "Tokyo",
+                "Odawara"
+              ]
+            },
+            {
+              "name": "Yokosuka Line",
+              "name_ja": "横須賀線",
+              "color": "#008000",
+              "platforms": [
+                "7-10"
+              ],
+              "directions": [
+                "Kamakura",
+                "Kurihama"
+              ]
+            }
           ]
         },
         {
           "name": "Keikyu",
           "name_ja": "京急",
           "lines": [
-            { "name": "Keikyu Main Line", "name_ja": "京急本線", "color": "#CC0000", "platforms": ["1-2"], "directions": ["Haneda Airport", "Shinagawa"] }
+            {
+              "name": "Keikyu Main Line",
+              "name_ja": "京急本線",
+              "color": "#CC0000",
+              "platforms": [
+                "1-2"
+              ],
+              "directions": [
+                "Haneda Airport",
+                "Shinagawa"
+              ]
+            }
           ]
         },
         {
           "name": "Yokohama Municipal Subway",
           "name_ja": "横浜市営地下鉄",
           "lines": [
-            { "name": "Blue Line", "name_ja": "ブルーライン", "color": "#0096FF", "platforms": ["B1"], "directions": ["Shonandai", "Azamino"] }
+            {
+              "name": "Blue Line",
+              "name_ja": "ブルーライン",
+              "color": "#0096FF",
+              "platforms": [
+                "B1"
+              ],
+              "directions": [
+                "Shonandai",
+                "Azamino"
+              ]
+            }
           ]
         }
       ],
@@ -1089,8 +1904,16 @@
           "name": "East Exit (Higashi-guchi)",
           "name_es": "Salida Este (Higashi-guchi)",
           "name_ja": "東口",
-          "landmarks": ["Minato Mirai 21", "Cosmo Clock 21", "Landmark Tower"],
-          "best_for": ["sightseeing", "nightlife", "shopping"],
+          "landmarks": [
+            "Minato Mirai 21",
+            "Cosmo Clock 21",
+            "Landmark Tower"
+          ],
+          "best_for": [
+            "sightseeing",
+            "nightlife",
+            "shopping"
+          ],
           "time_to_surface": "10 min walk",
           "tips": [
             "Minato Mirai is a 10-15 min walk. Follow signs for 'Minato Mirai Line'."
@@ -1106,8 +1929,14 @@
           "name": "West Exit (Nishi-guchi)",
           "name_es": "Salida Oeste (Nishi-guchi)",
           "name_ja": "西口",
-          "landmarks": ["Yodobashi Camera", "Chinatown Bus Terminal"],
-          "best_for": ["shopping", "buses"],
+          "landmarks": [
+            "Yodobashi Camera",
+            "Chinatown Bus Terminal"
+          ],
+          "best_for": [
+            "shopping",
+            "buses"
+          ],
           "time_to_surface": "5 min",
           "tips": [
             "Yodobashi is huge electronics store. Chinatown bus departs from here."
@@ -1153,8 +1982,30 @@
           "name": "JR Kyushu",
           "name_ja": "JR九州",
           "lines": [
-            { "name": "Kyushu Shinkansen", "name_ja": "九州新幹線", "color": "#E60012", "platforms": ["1-2"], "directions": ["Hakata", "Kagoshima-Chuo"] },
-            { "name": "Hohi Main Line", "name_ja": "豊肥本线", "color": "#008000", "platforms": ["3-4"], "directions": ["Aso", "Oita"] }
+            {
+              "name": "Kyushu Shinkansen",
+              "name_ja": "九州新幹線",
+              "color": "#E60012",
+              "platforms": [
+                "1-2"
+              ],
+              "directions": [
+                "Hakata",
+                "Kagoshima-Chuo"
+              ]
+            },
+            {
+              "name": "Hohi Main Line",
+              "name_ja": "豊肥本线",
+              "color": "#008000",
+              "platforms": [
+                "3-4"
+              ],
+              "directions": [
+                "Aso",
+                "Oita"
+              ]
+            }
           ]
         }
       ],
@@ -1163,8 +2014,15 @@
           "name": "West Exit (Nishi-guchi)",
           "name_es": "Salida Oeste (Nishi-guchi)",
           "name_ja": "西口",
-          "landmarks": ["Kumamoto Castle", "City Center", "Tram Stop"],
-          "best_for": ["sightseeing", "tram"],
+          "landmarks": [
+            "Kumamoto Castle",
+            "City Center",
+            "Tram Stop"
+          ],
+          "best_for": [
+            "sightseeing",
+            "tram"
+          ],
           "time_to_surface": "5 min",
           "tips": [
             "Tram stop is right outside. Take Tram A to Kumamotojo-mae (Castle).",
@@ -1183,8 +2041,12 @@
           "name": "East Exit (Higashi-guchi)",
           "name_es": "Salida Este (Higashi-guchi)",
           "name_ja": "東口",
-          "landmarks": ["Shopping Street"],
-          "best_for": ["shopping"],
+          "landmarks": [
+            "Shopping Street"
+          ],
+          "best_for": [
+            "shopping"
+          ],
           "time_to_surface": "3 min",
           "tips": [
             "Less used by tourists."
@@ -1230,8 +2092,29 @@
           "name": "JR West",
           "name_ja": "JR西日本",
           "lines": [
-            { "name": "Yamatoji Line", "name_ja": "大和路線", "color": "#FFD700", "platforms": ["1-2"], "directions": ["Kyoto", "Osaka"] },
-            { "name": "Kansai Main Line", "name_ja": "関西本線", "color": "#008000", "platforms": ["3-4"], "directions": ["Nagoya"] }
+            {
+              "name": "Yamatoji Line",
+              "name_ja": "大和路線",
+              "color": "#FFD700",
+              "platforms": [
+                "1-2"
+              ],
+              "directions": [
+                "Kyoto",
+                "Osaka"
+              ]
+            },
+            {
+              "name": "Kansai Main Line",
+              "name_ja": "関西本線",
+              "color": "#008000",
+              "platforms": [
+                "3-4"
+              ],
+              "directions": [
+                "Nagoya"
+              ]
+            }
           ]
         }
       ],
@@ -1240,8 +2123,15 @@
           "name": "East Exit (Higashi-guchi)",
           "name_es": "Salida Este (Higashi-guchi)",
           "name_ja": "東口",
-          "landmarks": ["Nara Park", "Deer", "Todai-ji Temple"],
-          "best_for": ["sightseeing", "deer-park"],
+          "landmarks": [
+            "Nara Park",
+            "Deer",
+            "Todai-ji Temple"
+          ],
+          "best_for": [
+            "sightseeing",
+            "deer-park"
+          ],
           "time_to_surface": "1 min",
           "tips": [
             "Walk straight 15-20 min to reach Nara Park and Deer.",
@@ -1260,8 +2150,12 @@
           "name": "West Exit (Nishi-guchi)",
           "name_es": "Salida Oeste (Nishi-guchi)",
           "name_ja": "西口",
-          "landmarks": ["Local shops"],
-          "best_for": ["business"],
+          "landmarks": [
+            "Local shops"
+          ],
+          "best_for": [
+            "business"
+          ],
           "time_to_surface": "2 min",
           "tips": [
             "Quiet area."
@@ -1307,7 +2201,18 @@
           "name": "JR West",
           "name_ja": "JR西日本",
           "lines": [
-            { "name": "Hokuriku Shinkansen", "name_ja": "北陸新幹線", "color": "#0055A5", "platforms": ["11-14"], "directions": ["Tokyo", "Toyama"] }
+            {
+              "name": "Hokuriku Shinkansen",
+              "name_ja": "北陸新幹線",
+              "color": "#0055A5",
+              "platforms": [
+                "11-14"
+              ],
+              "directions": [
+                "Tokyo",
+                "Toyama"
+              ]
+            }
           ]
         }
       ],
@@ -1316,8 +2221,16 @@
           "name": "East Exit (Higashi-guchi)",
           "name_es": "Salida Este (Higashi-guchi)",
           "name_ja": "東口",
-          "landmarks": ["Tsuzumi Gate", "Kenrokuen Bus Terminal", "Gold Leaf Museum"],
-          "best_for": ["sightseeing", "buses", "gold-leaf"],
+          "landmarks": [
+            "Tsuzumi Gate",
+            "Kenrokuen Bus Terminal",
+            "Gold Leaf Museum"
+          ],
+          "best_for": [
+            "sightseeing",
+            "buses",
+            "gold-leaf"
+          ],
           "time_to_surface": "2 min",
           "tips": [
             "Iconic 'Tsuzumi Gate' (drum) is here. Best photo spot.",
@@ -1336,8 +2249,12 @@
           "name": "West Exit (Nishi-guchi)",
           "name_es": "Salida Oeste (Nishi-guchi)",
           "name_ja": "西口",
-          "landmarks": ["Local shops"],
-          "best_for": ["shopping"],
+          "landmarks": [
+            "Local shops"
+          ],
+          "best_for": [
+            "shopping"
+          ],
           "time_to_surface": "3 min",
           "tips": [
             "Smaller exit."
@@ -1383,14 +2300,35 @@
           "name": "JR Kyushu",
           "name_ja": "JR九州",
           "lines": [
-            { "name": "Nishi Kyushu Shinkansen", "name_ja": "西九州新幹線", "color": "#E60012", "platforms": ["1-2"], "directions": ["Hakata"] }
+            {
+              "name": "Nishi Kyushu Shinkansen",
+              "name_ja": "西九州新幹線",
+              "color": "#E60012",
+              "platforms": [
+                "1-2"
+              ],
+              "directions": [
+                "Hakata"
+              ]
+            }
           ]
         },
         {
           "name": "Nagasaki Electric Tramway",
           "name_ja": "長崎電気軌道",
           "lines": [
-            { "name": "Tram", "name_ja": "路面電車", "color": "#008000", "platforms": ["1-3"], "directions": ["Peace Park", "Glover Garden"] }
+            {
+              "name": "Tram",
+              "name_ja": "路面電車",
+              "color": "#008000",
+              "platforms": [
+                "1-3"
+              ],
+              "directions": [
+                "Peace Park",
+                "Glover Garden"
+              ]
+            }
           ]
         }
       ],
@@ -1399,8 +2337,15 @@
           "name": "West Exit (Nishi-guchi)",
           "name_es": "Salida Oeste (Nishi-guchi)",
           "name_ja": "西口",
-          "landmarks": ["Tram Stop", "Harbor", "Peace Park Bus"],
-          "best_for": ["trams", "sightseeing"],
+          "landmarks": [
+            "Tram Stop",
+            "Harbor",
+            "Peace Park Bus"
+          ],
+          "best_for": [
+            "trams",
+            "sightseeing"
+          ],
           "time_to_surface": "3 min",
           "tips": [
             "Tram stops are right outside. Take Line 1 or 3 to Peace Park.",
@@ -1419,8 +2364,12 @@
           "name": "East Exit (Higashi-guchi)",
           "name_es": "Salida Este (Higashi-guchi)",
           "name_ja": "東口",
-          "landmarks": ["Bus Terminal"],
-          "best_for": ["buses"],
+          "landmarks": [
+            "Bus Terminal"
+          ],
+          "best_for": [
+            "buses"
+          ],
           "time_to_surface": "5 min",
           "tips": [
             "Bus terminal for longer trips."
@@ -1466,7 +2415,18 @@
           "name": "JR Hokkaido",
           "name_ja": "JR北海道",
           "lines": [
-            { "name": "Hakodate Main Line", "name_ja": "函館本線", "color": "#008000", "platforms": ["1-3"], "directions": ["Sapporo", "New Hakodate-Hokuto"] }
+            {
+              "name": "Hakodate Main Line",
+              "name_ja": "函館本線",
+              "color": "#008000",
+              "platforms": [
+                "1-3"
+              ],
+              "directions": [
+                "Sapporo",
+                "New Hakodate-Hokuto"
+              ]
+            }
           ]
         }
       ],
@@ -1475,8 +2435,16 @@
           "name": "North Exit (Kita-guchi)",
           "name_es": "Salida Norte (Kita-guchi)",
           "name_ja": "北口",
-          "landmarks": ["Tram Stop", "Morning Market", "Bay Area"],
-          "best_for": ["trams", "market", "sightseeing"],
+          "landmarks": [
+            "Tram Stop",
+            "Morning Market",
+            "Bay Area"
+          ],
+          "best_for": [
+            "trams",
+            "market",
+            "sightseeing"
+          ],
           "time_to_surface": "3 min",
           "tips": [
             "Tram stop is outside. Take Line 2 or 5 to Goryokaku or Motomachi.",
@@ -1495,8 +2463,12 @@
           "name": "South Exit (Minami-guchi)",
           "name_es": "Salida Sur (Minami-guchi)",
           "name_ja": "南口",
-          "landmarks": ["Taxi Stand"],
-          "best_for": ["taxis"],
+          "landmarks": [
+            "Taxi Stand"
+          ],
+          "best_for": [
+            "taxis"
+          ],
           "time_to_surface": "2 min",
           "tips": [
             "Mostly for taxis."
@@ -1542,8 +2514,30 @@
           "name": "JR East",
           "name_ja": "JR東日本",
           "lines": [
-            { "name": "Shinano Railway", "name_ja": "しなの鉄道", "color": "#FFD700", "platforms": ["3-4"], "directions": ["Nagano", "Karuizawa"] },
-            { "name": "Oito Line", "name_ja": "大糸線", "color": "#008000", "platforms": ["5-6"], "directions": ["Azumino", "Takayama"] }
+            {
+              "name": "Shinano Railway",
+              "name_ja": "しなの鉄道",
+              "color": "#FFD700",
+              "platforms": [
+                "3-4"
+              ],
+              "directions": [
+                "Nagano",
+                "Karuizawa"
+              ]
+            },
+            {
+              "name": "Oito Line",
+              "name_ja": "大糸線",
+              "color": "#008000",
+              "platforms": [
+                "5-6"
+              ],
+              "directions": [
+                "Azumino",
+                "Takayama"
+              ]
+            }
           ]
         }
       ],
@@ -1552,8 +2546,16 @@
           "name": "West Exit (Nishi-guchi)",
           "name_es": "Salida Oeste (Nishi-guchi)",
           "name_ja": "西口",
-          "landmarks": ["Matsumoto Castle", "City Center", "Nakamachi"],
-          "best_for": ["sightseeing", "castle", "shopping"],
+          "landmarks": [
+            "Matsumoto Castle",
+            "City Center",
+            "Nakamachi"
+          ],
+          "best_for": [
+            "sightseeing",
+            "castle",
+            "shopping"
+          ],
           "time_to_surface": "15 min walk",
           "tips": [
             "Walk straight west to reach Castle (15 min).",
@@ -1572,8 +2574,12 @@
           "name": "East Exit (Higashi-guchi)",
           "name_es": "Salida Este (Higashi-guchi)",
           "name_ja": "東口",
-          "landmarks": ["Hotels"],
-          "best_for": ["hotels"],
+          "landmarks": [
+            "Hotels"
+          ],
+          "best_for": [
+            "hotels"
+          ],
           "time_to_surface": "2 min",
           "tips": [
             "Quiet area with hotels."
@@ -1619,14 +2625,35 @@
           "name": "JR West",
           "name_ja": "JR西日本",
           "lines": [
-            { "name": "Sanyo Main Line", "name_ja": "山陽本線", "color": "#FFD700", "platforms": ["1-2"], "directions": ["Hiroshima", "Iwakuni"] }
+            {
+              "name": "Sanyo Main Line",
+              "name_ja": "山陽本線",
+              "color": "#FFD700",
+              "platforms": [
+                "1-2"
+              ],
+              "directions": [
+                "Hiroshima",
+                "Iwakuni"
+              ]
+            }
           ]
         },
         {
           "name": "Hiroshima Electric Railway",
           "name_ja": "広島電鉄",
           "lines": [
-            { "name": "Miyajima Line", "name_ja": "宮島線", "color": "#008000", "platforms": ["1"], "directions": ["Hiroshima"] }
+            {
+              "name": "Miyajima Line",
+              "name_ja": "宮島線",
+              "color": "#008000",
+              "platforms": [
+                "1"
+              ],
+              "directions": [
+                "Hiroshima"
+              ]
+            }
           ]
         }
       ],
@@ -1635,8 +2662,14 @@
           "name": "South Exit (Minami-guchi)",
           "name_es": "Salida Sur (Minami-guchi)",
           "name_ja": "南口",
-          "landmarks": ["Ferry Port to Miyajima", "Itsukushima Shrine"],
-          "best_for": ["ferry", "sightseeing"],
+          "landmarks": [
+            "Ferry Port to Miyajima",
+            "Itsukushima Shrine"
+          ],
+          "best_for": [
+            "ferry",
+            "sightseeing"
+          ],
           "time_to_surface": "2 min",
           "tips": [
             "Ferry to Miyajima is right outside (10 min ride).",
@@ -1655,8 +2688,12 @@
           "name": "North Exit (Kita-guchi)",
           "name_es": "Salida Norte (Kita-guchi)",
           "name_ja": "北口",
-          "landmarks": ["Tram Stop"],
-          "best_for": ["tram"],
+          "landmarks": [
+            "Tram Stop"
+          ],
+          "best_for": [
+            "tram"
+          ],
           "time_to_surface": "3 min",
           "tips": [
             "Tram goes back to Hiroshima (30 min)."
@@ -1702,8 +2739,30 @@
           "name": "JR West",
           "name_ja": "JR西日本",
           "lines": [
-            { "name": "Sanyo Shinkansen", "name_ja": "山陽新幹線", "color": "#0055A5", "platforms": ["21-24"], "directions": ["Osaka", "Hiroshima"] },
-            { "name": "JR Kobe Line", "name_ja": "JR神戸線", "color": "#008000", "platforms": ["1-4"], "directions": ["Osaka", "Kobe"] }
+            {
+              "name": "Sanyo Shinkansen",
+              "name_ja": "山陽新幹線",
+              "color": "#0055A5",
+              "platforms": [
+                "21-24"
+              ],
+              "directions": [
+                "Osaka",
+                "Hiroshima"
+              ]
+            },
+            {
+              "name": "JR Kobe Line",
+              "name_ja": "JR神戸線",
+              "color": "#008000",
+              "platforms": [
+                "1-4"
+              ],
+              "directions": [
+                "Osaka",
+                "Kobe"
+              ]
+            }
           ]
         }
       ],
@@ -1712,8 +2771,16 @@
           "name": "South Exit (Minami-guchi)",
           "name_es": "Salida Sur (Minami-guchi)",
           "name_ja": "南口",
-          "landmarks": ["Himeji Castle", "Koko-en Garden", "Otemae-dori"],
-          "best_for": ["sightseeing", "castle", "shopping"],
+          "landmarks": [
+            "Himeji Castle",
+            "Koko-en Garden",
+            "Otemae-dori"
+          ],
+          "best_for": [
+            "sightseeing",
+            "castle",
+            "shopping"
+          ],
           "time_to_surface": "15 min walk",
           "tips": [
             "Walk straight south to Himeji Castle (15 min).",
@@ -1732,8 +2799,12 @@
           "name": "North Exit (Kita-guchi)",
           "name_es": "Salida Norte (Kita-guchi)",
           "name_ja": "北口",
-          "landmarks": ["Bus Terminal"],
-          "best_for": ["buses"],
+          "landmarks": [
+            "Bus Terminal"
+          ],
+          "best_for": [
+            "buses"
+          ],
           "time_to_surface": "5 min",
           "tips": [
             "Buses for further trips depart here."
@@ -1779,15 +2850,48 @@
           "name": "JR East",
           "name_ja": "JR東日本",
           "lines": [
-            { "name": "Tohoku Shinkansen", "name_ja": "東北新幹線", "color": "#0055A5", "platforms": ["11-14"], "directions": ["Tokyo", "Morioka"] },
-            { "name": "Senseki Line", "name_ja": "仙石線", "color": "#008000", "platforms": ["5-6"], "directions": ["Matsushima", "Ishinomaki"] }
+            {
+              "name": "Tohoku Shinkansen",
+              "name_ja": "東北新幹線",
+              "color": "#0055A5",
+              "platforms": [
+                "11-14"
+              ],
+              "directions": [
+                "Tokyo",
+                "Morioka"
+              ]
+            },
+            {
+              "name": "Senseki Line",
+              "name_ja": "仙石線",
+              "color": "#008000",
+              "platforms": [
+                "5-6"
+              ],
+              "directions": [
+                "Matsushima",
+                "Ishinomaki"
+              ]
+            }
           ]
         },
         {
           "name": "Sendai Subway",
           "name_ja": "仙台市営地下鉄",
           "lines": [
-            { "name": "Namboku Line", "name_ja": "南北線", "color": "#008000", "platforms": ["B1"], "directions": ["Izumi-Chuo", "Tomizawa"] }
+            {
+              "name": "Namboku Line",
+              "name_ja": "南北線",
+              "color": "#008000",
+              "platforms": [
+                "B1"
+              ],
+              "directions": [
+                "Izumi-Chuo",
+                "Tomizawa"
+              ]
+            }
           ]
         }
       ],
@@ -1796,8 +2900,16 @@
           "name": "East Exit (Higashi-guchi)",
           "name_es": "Salida Este (Higashi-guchi)",
           "name_ja": "東口",
-          "landmarks": ["Aoba Castle Ruins", "Zuihoden", "City Center"],
-          "best_for": ["sightseeing", "castle", "shopping"],
+          "landmarks": [
+            "Aoba Castle Ruins",
+            "Zuihoden",
+            "City Center"
+          ],
+          "best_for": [
+            "sightseeing",
+            "castle",
+            "shopping"
+          ],
           "time_to_surface": "5 min",
           "tips": [
             "East Exit connects to Aoba-dori (shopping).",
@@ -1816,8 +2928,13 @@
           "name": "West Exit (Nishi-guchi)",
           "name_es": "Salida Oeste (Nishi-guchi)",
           "name_ja": "西口",
-          "landmarks": ["Hotels", "Local shops"],
-          "best_for": ["hotels"],
+          "landmarks": [
+            "Hotels",
+            "Local shops"
+          ],
+          "best_for": [
+            "hotels"
+          ],
           "time_to_surface": "2 min",
           "tips": [
             "Quieter area."
@@ -1863,7 +2980,18 @@
           "name": "Tobu Railway",
           "name_ja": "東武鉄道",
           "lines": [
-            { "name": "Tobu Nikko Line", "name_ja": "東武日光線", "color": "#CC0000", "platforms": ["1-2"], "directions": ["Asakusa (Tokyo)", "Shimo-Imaichi"] }
+            {
+              "name": "Tobu Nikko Line",
+              "name_ja": "東武日光線",
+              "color": "#CC0000",
+              "platforms": [
+                "1-2"
+              ],
+              "directions": [
+                "Asakusa (Tokyo)",
+                "Shimo-Imaichi"
+              ]
+            }
           ]
         }
       ],
@@ -1872,8 +3000,15 @@
           "name": "East Exit (Higashi-guchi)",
           "name_es": "Salida Este (Higashi-guchi)",
           "name_ja": "東口",
-          "landmarks": ["World Heritage Shrines", "Nikko Toshogu", "Rinnai-ji"],
-          "best_for": ["sightseeing", "shrines"],
+          "landmarks": [
+            "World Heritage Shrines",
+            "Nikko Toshogu",
+            "Rinnai-ji"
+          ],
+          "best_for": [
+            "sightseeing",
+            "shrines"
+          ],
           "time_to_surface": "1 min",
           "tips": [
             "Shrines are 30 min walk or take World Heritage Bus.",
@@ -1892,8 +3027,12 @@
           "name": "West Exit (Nishi-guchi)",
           "name_es": "Salida Oeste (Nishi-guchi)",
           "name_ja": "西口",
-          "landmarks": ["Local shops"],
-          "best_for": ["shopping"],
+          "landmarks": [
+            "Local shops"
+          ],
+          "best_for": [
+            "shopping"
+          ],
           "time_to_surface": "2 min",
           "tips": [
             "Local area."

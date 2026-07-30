@@ -23,6 +23,7 @@
     "tomorrow_short": "明日",
     "next": "次へ",
     "delete": "削除",
+    "close": "閉じる",
     "save": "保存",
     "add": "追加",
     "inherit": "引き継ぐ",
@@ -91,7 +92,8 @@
     "days": "日間",
     "day": "日",
     "no_expenses": "まだこの場所の支出はありません。",
-    "view_history": "すべて表示"
+    "view_history": "すべて表示",
+    "delete": "削除"
   },
   "itinerary": {
     "title": "アクティビティ",
@@ -454,5 +456,30 @@
     "place_description_fallback": "{city}の旅行先。Itineraで費用、アクティビティ、駅ガイドを計画しましょう。",
     "dashboard_title": "マイ旅行",
     "dashboard_description": "Itineraで旅行を計画・整理しましょう。"
+  },
+  "share": {
+    "active_link": "有効なリンク",
+    "cta_share": "共有",
+    "popover_title": "旅程を共有",
+    "copy_cta": "コピー",
+    "expires_at": "{date}に有効期限切れ",
+    "disable_cta": "リンクを無効化",
+    "readonly_banner": "共有された旅程を読専用モードで表示しています",
+    "not_available_title": "リンクは利用できません",
+    "discover_cta": "Itineraを発見",
+    "places_title": "場所",
+    "activities_title": "アクティビティ",
+    "fork_prompt": "この旅程はいかがですか?",
+    "fork_cta": "自分の旅行のベースに使う",
+    "create_own_cta": "自分の旅程を作成",
+    "expires_in": "{days}日後に有効期限切れ",
+    "seo_fallback": "Itineraで共有された旅程",
+    "errors": {
+      "not_found": "このリンクはすでに無効か、有効期限が切れています。",
+      "generic": "旅程を読み込めませんでした。",
+      "network": "接続エラー。ネットワークを確認してください。",
+      "fork_failed": "コピーの作成に失敗しました。もう一度お試しください。",
+      "copy_failed": "リンクをコピーできませんでした。"
+    }
   }
 }
