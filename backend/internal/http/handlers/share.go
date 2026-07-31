@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/internal/http/middleware"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -22,7 +23,16 @@ import (
 // @Failure      404   {string}  string  "Trip not found"
 // @Router       /trips/{id}/share [post]
 func (h *Handlers) EnableShare(w http.ResponseWriter, r *http.Request) {
-	tripID := chi.URLParam(r, "id")
+	// Use the working trip id from the middleware context, NOT the URL param.
+	// When a guest edits a public demo, the middleware silently forks it and
+	// rewrites WorkingTripIDKey to the fork's id. The URL param still points
+	// to the demo, but we must operate on the fork or the ownership check in
+	// the repository will 403 (because the demo's owner is a different session).
+	tripID := middleware.GetWorkingTripID(r)
+	if tripID == "" {
+		http.Error(w, "Invalid trip ID", http.StatusBadRequest)
+		return
+	}
 	if _, err := uuid.Parse(tripID); err != nil {
 		http.Error(w, "Invalid trip ID", http.StatusBadRequest)
 		return
@@ -70,7 +80,12 @@ func (h *Handlers) EnableShare(w http.ResponseWriter, r *http.Request) {
 // @Failure      403   {string}  string  "Forbidden"
 // @Router       /trips/{id}/share [delete]
 func (h *Handlers) DisableShare(w http.ResponseWriter, r *http.Request) {
-	tripID := chi.URLParam(r, "id")
+	// Same fix as EnableShare: operate on the fork id from the middleware.
+	tripID := middleware.GetWorkingTripID(r)
+	if tripID == "" {
+		http.Error(w, "Invalid trip ID", http.StatusBadRequest)
+		return
+	}
 	if _, err := uuid.Parse(tripID); err != nil {
 		http.Error(w, "Invalid trip ID", http.StatusBadRequest)
 		return

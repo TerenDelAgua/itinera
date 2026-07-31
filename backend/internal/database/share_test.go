@@ -27,12 +27,12 @@ func TestShare_FullLifecycle_EnabledToDisabled(t *testing.T) {
 	// 1. Setup: create a guest-owned trip.
 	sessionID := "test-share-session-" + uuid.New().String()
 	trip, err := repo.CreateTrip(ctx, nil, &sessionID, models.Trip{
-		Name:                   "Share Test Trip",
-		BaseCurrency:           "EUR",
+		Name:                  "Share Test Trip",
+		BaseCurrency:          "EUR",
 		DefaultExpenseCurrency: "EUR",
-		IsPublicDemo:           false,
-		StartDate:              "2026-08-01",
-		EndDate:                "2026-08-10",
+		IsPublicDemo:          false,
+		StartDate:             "2026-08-01",
+		EndDate:               "2026-08-10",
 	})
 	require.NoError(t, err)
 	require.NotNil(t, trip)
@@ -88,11 +88,11 @@ func TestShare_EnableShareIsIdempotent(t *testing.T) {
 
 	sessionID := "test-share-idempotent-" + uuid.New().String()
 	trip, err := repo.CreateTrip(ctx, nil, &sessionID, models.Trip{
-		Name:                   "Idempotent Share Test",
-		BaseCurrency:           "EUR",
+		Name:                  "Idempotent Share Test",
+		BaseCurrency:          "EUR",
 		DefaultExpenseCurrency: "EUR",
-		StartDate:              "2026-08-01",
-		EndDate:                "2026-08-10",
+		StartDate:             "2026-08-01",
+		EndDate:               "2026-08-10",
 	})
 	require.NoError(t, err)
 
@@ -127,11 +127,11 @@ func TestShare_GetByShareToken_ValidToken(t *testing.T) {
 
 	sessionID := "test-share-token-" + uuid.New().String()
 	trip, err := repo.CreateTrip(ctx, nil, &sessionID, models.Trip{
-		Name:                   "Token Lookup Test",
-		BaseCurrency:           "EUR",
+		Name:                  "Token Lookup Test",
+		BaseCurrency:          "EUR",
 		DefaultExpenseCurrency: "EUR",
-		StartDate:              "2026-08-01",
-		EndDate:                "2026-08-10",
+		StartDate:             "2026-08-01",
+		EndDate:               "2026-08-10",
 	})
 	require.NoError(t, err)
 
@@ -173,11 +173,11 @@ func TestShare_DisableShare_Unauthorized(t *testing.T) {
 	// Owner creates and enables.
 	ownerSession := "test-share-owner-" + uuid.New().String()
 	trip, err := repo.CreateTrip(ctx, nil, &ownerSession, models.Trip{
-		Name:                   "Auth Test Trip",
-		BaseCurrency:           "EUR",
+		Name:                  "Auth Test Trip",
+		BaseCurrency:          "EUR",
 		DefaultExpenseCurrency: "EUR",
-		StartDate:              "2026-08-01",
-		EndDate:                "2026-08-10",
+		StartDate:             "2026-08-01",
+		EndDate:               "2026-08-10",
 	})
 	require.NoError(t, err)
 
@@ -215,11 +215,11 @@ func TestShare_CountActiveSharesByUser(t *testing.T) {
 	// Create 2 trips and enable both.
 	for i := 0; i < 2; i++ {
 		trip, err := repo.CreateTrip(ctx, nil, &sessionID, models.Trip{
-			Name:                   "Count Test " + string(rune('A'+i)),
-			BaseCurrency:           "EUR",
+			Name:                  "Count Test " + string(rune('A'+i)),
+			BaseCurrency:          "EUR",
 			DefaultExpenseCurrency: "EUR",
-			StartDate:              "2026-08-01",
-			EndDate:                "2026-08-10",
+			StartDate:             "2026-08-01",
+			EndDate:               "2026-08-10",
 		})
 		require.NoError(t, err)
 		_, _, err = repo.EnableShare(ctx, trip.ID.String(), nil, &sessionID)
