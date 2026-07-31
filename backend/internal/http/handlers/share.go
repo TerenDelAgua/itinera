@@ -145,7 +145,7 @@ func (h *Handlers) GetSharedTrip(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type publicActivity struct {
-		ID      string
+		ID      string  `json:"id"`
 		PlaceID *string `json:"place_id,omitempty"`
 		Title   string  `json:"title"`
 		Date    string  `json:"date"`

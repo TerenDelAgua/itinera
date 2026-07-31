@@ -1,10 +1,13 @@
 package database_test
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -16,9 +19,6 @@ import (
 	"backend/internal/http/middleware"
 	"backend/internal/models"
 	"backend/internal/services"
-
-	"bytes"
-	"encoding/json"
 )
 
 // TestShareForkFlow_EnableShareAfterMiddlewareFork is the regression test
@@ -112,4 +112,112 @@ func TestShareForkFlow_EnableShareAfterMiddlewareFork(t *testing.T) {
 	demoState, err := h.TripsRepo.GetTrip(ctx, demo.ID.String(), nil, &originalOwner)
 	require.NoError(t, err)
 	assert.False(t, demoState.ShareEnabled, "demo itself must NOT be shared — only the fork")
+}
+
+// TestShareForkFlow_PublicEndpoint_JSONShape is a regression test for the
+// `each_key_duplicate` error on the frontend. The bug was that
+// publicActivity.ID in handlers/share.go lacked a `json:"id"` tag, so Go
+// serialized it as "ID" instead of "id". The frontend uses (activity.id)
+// as the each-block key, so all rows had key=undefined → duplicate keys.
+//
+// This test fetches /share/{token} and asserts that:
+//   - publicPlaces[i].id is present and is a non-empty string
+//   - publicActivities[i].id is present and is a non-empty string
+//
+// If either is missing, the each_key crash reappears on the frontend.
+func TestShareForkFlow_PublicEndpoint_JSONShape(t *testing.T) {
+	pool := getTestPool(t)
+	pgPool := pool
+
+	tripsRepo := database.NewTripRepository(pgPool)
+	placesRepo := database.NewPlaceRepository(pgPool)
+	expensesRepo := database.NewExpenseRepository(pgPool)
+	authRepo := database.NewAuthRepository(pgPool)
+	activityRepo := database.NewActivityRepository(pgPool)
+	eventsRepo := database.NewEventRepository(pgPool)
+	rateLimitRepo := database.NewRateLimitRepository(pgPool)
+
+	exchangeRateSvc := services.NewExchangeRateService(pgPool)
+	expenseSvc := services.NewExpenseService(tripsRepo, expensesRepo, exchangeRateSvc)
+	tripSvc := services.NewTripService(pgPool, tripsRepo, placesRepo, activityRepo, expensesRepo, eventsRepo)
+	h := handlers.NewHandlers(
+		tripsRepo, placesRepo, expensesRepo, authRepo,
+		activityRepo, eventsRepo, rateLimitRepo, expenseSvc, tripSvc, nil,
+	)
+
+	ctx := context.Background()
+
+	// Setup: create a trip, add a place + activity, enable share, save token.
+	ownerSession := "json-shape-owner-" + uuid.New().String()
+	trip, err := tripsRepo.CreateTrip(ctx, nil, &ownerSession, models.Trip{
+		Name:                   "JSON Shape Test",
+		BaseCurrency:           "EUR",
+		DefaultExpenseCurrency: "EUR",
+		StartDate:              "2026-08-01",
+		EndDate:                "2026-08-10",
+	})
+	require.NoError(t, err)
+
+	defer func() {
+		_, _ = pgPool.Exec(ctx, "DELETE FROM events WHERE trip_id = $1", trip.ID)
+		_, _ = pgPool.Exec(ctx, "DELETE FROM activities WHERE trip_id = $1", trip.ID)
+		_, _ = pgPool.Exec(ctx, "DELETE FROM places WHERE trip_id = $1", trip.ID)
+		_, _ = pgPool.Exec(ctx, "DELETE FROM trips WHERE id = $1", trip.ID)
+	}()
+
+	// Add a place (so the publicPlaces array is non-empty).
+	place, err := placesRepo.CreatePlace(ctx, trip.ID, models.Place{
+		Name: "Test Place",
+	})
+	require.NoError(t, err)
+
+	// Add an activity (so the publicActivities array is non-empty).
+	placeID := place.ID
+	now := time.Now()
+	_, err = pgPool.Exec(ctx, `
+		INSERT INTO activities (id, trip_id, place_id, title, date)
+		VALUES ($1, $2, $3, $4, $5)
+	`, uuid.New(), trip.ID, placeID, "Test Activity", now)
+	require.NoError(t, err)
+
+	// Enable share.
+	token, _, err := tripsRepo.EnableShare(ctx, trip.ID.String(), nil, &ownerSession)
+	require.NoError(t, err)
+
+	// Build a router and hit GET /share/{token}.
+	r := chi.NewRouter()
+	r.Get("/share/{token}", h.GetSharedTrip)
+
+	req := httptest.NewRequest(http.MethodGet, "/share/"+token, nil)
+	rec := httptest.NewRecorder()
+	r.ServeHTTP(rec, req)
+	require.Equal(t, http.StatusOK, rec.Code)
+
+	// Decode body and inspect JSON shape.
+	var body map[string]interface{}
+	require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &body))
+
+	// publicPlaces[i].id must exist (was correctly tagged, but check anyway).
+	places, ok := body["places"].([]interface{})
+	require.True(t, ok, "body.places must be a list")
+	require.NotEmpty(t, places, "test trip has a place — places list must not be empty")
+	for i, p := range places {
+		pm, _ := p.(map[string]interface{})
+		require.NotNil(t, pm, "place[%d] must be an object", i)
+		id, ok := pm["id"].(string)
+		require.True(t, ok, "places[%d].id must be a string (frontend uses it as each-key)", i)
+		assert.NotEmpty(t, id)
+	}
+
+	// publicActivities[i].id must exist — this was the bug.
+	activities, ok := body["activities"].([]interface{})
+	require.True(t, ok, "body.activities must be a list")
+	require.NotEmpty(t, activities, "test trip has an activity — activities list must not be empty")
+	for i, a := range activities {
+		am, _ := a.(map[string]interface{})
+		require.NotNil(t, am, "activity[%d] must be an object", i)
+		id, ok := am["id"].(string)
+		require.True(t, ok, "activities[%d].id must be a string (frontend uses it as each-key)", i)
+		assert.NotEmpty(t, id, "activities[%d].id must not be empty (would produce duplicate each-keys)", i)
+	}
 }
