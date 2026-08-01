@@ -123,12 +123,22 @@ func TestGetAnalyticsSessions_ReturnsBreakdown(t *testing.T) {
 
 	ctx := context.Background()
 
-	// Snapshot before so we can compute deltas and clean up after.
-	var beforeTrips, beforeSessions int
-	row := pool.QueryRow(ctx, "SELECT COUNT(*) FROM trips")
-	_ = row.Scan(&beforeTrips)
-	row = pool.QueryRow(ctx, "SELECT COUNT(DISTINCT session_id) FROM trips WHERE session_id IS NOT NULL")
-	_ = row.Scan(&beforeSessions)
+	// Snapshot before so we can compute deltas (per category) and clean up after.
+	// We snapshot each category separately because the test inserts 1 internal + 1 real;
+	// delta = before_internal - after_internal should equal 1, not before_total.
+	var beforeInternalTrips, beforeRealTrips, beforeInternalSessions, beforeRealSessions int
+	row := pool.QueryRow(ctx, "SELECT COUNT(*) FROM trips WHERE is_internal = true")
+	_ = row.Scan(&beforeInternalTrips)
+	row = pool.QueryRow(ctx, "SELECT COUNT(*) FROM trips WHERE is_internal = false")
+	_ = row.Scan(&beforeRealTrips)
+	row = pool.QueryRow(ctx, `
+		SELECT COUNT(DISTINCT session_id) FROM trips
+		WHERE is_internal = true AND session_id IS NOT NULL`)
+	_ = row.Scan(&beforeInternalSessions)
+	row = pool.QueryRow(ctx, `
+		SELECT COUNT(DISTINCT session_id) FROM trips
+		WHERE is_internal = false AND session_id IS NOT NULL`)
+	_ = row.Scan(&beforeRealSessions)
 
 	// Insert one internal trip and one real trip in dedicated sessions.
 	internalSession := "internal-" + uuid.NewString()
@@ -148,20 +158,20 @@ func TestGetAnalyticsSessions_ReturnsBreakdown(t *testing.T) {
 	}
 
 	repo := NewAnalyticsRepository(pool)
-	internalTrips, realTrips, internalSessions, realSessions, err := repo.GetAnalyticsSessions(ctx)
+	afterInternalTrips, afterRealTrips, afterInternalSessions, afterRealSessions, err := repo.GetAnalyticsSessions(ctx)
 	if err != nil {
 		t.Fatalf("GetAnalyticsSessions: %v", err)
 	}
 
 	// We added exactly 1 internal trip and 1 real trip vs the snapshot.
-	if got := internalTrips - beforeTrips; got != 1 {
+	if got := afterInternalTrips - beforeInternalTrips; got != 1 {
 		t.Errorf("internal trips delta = %d, want 1", got)
 	}
-	if got := realTrips - beforeTrips; got != 1 {
+	if got := afterRealTrips - beforeRealTrips; got != 1 {
 		t.Errorf("real trips delta = %d, want 1", got)
 	}
 	// Sessions: 2 new ones (one per new session_id).
-	if got := internalSessions + realSessions - beforeSessions; got != 2 {
+	if got := (afterInternalSessions - beforeInternalSessions) + (afterRealSessions - beforeRealSessions); got != 2 {
 		t.Errorf("total sessions delta = %d, want 2", got)
 	}
 
