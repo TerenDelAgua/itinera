@@ -41,7 +41,7 @@ func TestTripRepository_Integration(t *testing.T) {
 		}
 
 		// Create Trip
-		newTrip, err := repo.CreateTrip(ctx, nil, &sessionID, tripData)
+		newTrip, err := repo.CreateTrip(ctx, nil, &sessionID, false, tripData)
 		require.NoError(t, err)
 		require.NotNil(t, newTrip)
 
@@ -118,7 +118,7 @@ func TestTripRepository_Integration(t *testing.T) {
 		require.NoError(t, err)
 		defer pool.Exec(ctx, "DELETE FROM trips WHERE id = $1", otherDemoID)
 
-		guestTrip, err := repo.CreateTrip(ctx, nil, &guestSessionID, models.Trip{Name: "Guest Trip", BaseCurrency: "EUR", StartDate: "2024-01-01", EndDate: "2024-01-10"})
+		guestTrip, err := repo.CreateTrip(ctx, nil, &guestSessionID, false, models.Trip{Name: "Guest Trip", BaseCurrency: "EUR", StartDate: "2024-01-01", EndDate: "2024-01-10"})
 		require.NoError(t, err)
 		defer repo.DeleteTrip(ctx, guestTrip.ID.String(), nil, &guestSessionID)
 
@@ -156,7 +156,7 @@ func TestTripRepository_Integration(t *testing.T) {
 		require.NoError(t, err)
 		defer pool.Exec(ctx, "DELETE FROM trips WHERE id = $1", japanDemoID)
 
-		userTrip, err := repo.CreateTrip(ctx, &userID, nil, models.Trip{Name: "User Trip", BaseCurrency: "EUR", StartDate: "2024-01-01", EndDate: "2024-01-10"})
+		userTrip, err := repo.CreateTrip(ctx, &userID, nil, false, models.Trip{Name: "User Trip", BaseCurrency: "EUR", StartDate: "2024-01-01", EndDate: "2024-01-10"})
 		require.NoError(t, err)
 		defer repo.DeleteTrip(ctx, userTrip.ID.String(), &userID, nil)
 

@@ -24,6 +24,7 @@ type Handlers struct {
 	ActivityRepo  database.ActivityStore
 	EventsRepo    database.EventStore
 	RateLimitRepo database.RateLimitStore
+	AnalyticsRepo database.AnalyticsStore
 	ExpenseSvc    *services.ExpenseService
 	TripSvc       *services.TripService
 	Config        *config.Config
@@ -37,6 +38,7 @@ func NewHandlers(
 	activityRepo database.ActivityStore,
 	eventsRepo database.EventStore,
 	rateLimitRepo database.RateLimitStore,
+	analyticsRepo database.AnalyticsStore,
 	expenseSvc *services.ExpenseService,
 	tripSvc *services.TripService,
 	cfg *config.Config,
@@ -49,6 +51,7 @@ func NewHandlers(
 		ActivityRepo:  activityRepo,
 		EventsRepo:    eventsRepo,
 		RateLimitRepo: rateLimitRepo,
+		AnalyticsRepo: analyticsRepo,
 		ExpenseSvc:    expenseSvc,
 		TripSvc:       tripSvc,
 		Config:        cfg,

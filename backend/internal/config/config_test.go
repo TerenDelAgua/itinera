@@ -21,40 +21,62 @@ func TestConfig_Validate(t *testing.T) {
 		{
 			name: "production with valid secret",
 			config: Config{
-				Environment: "production",
-				JWTSecret:   "this-is-a-very-long-and-secure-jwt-secret-value-32-chars",
+				Environment:   "production",
+				JWTSecret:     "this-is-a-very-long-and-secure-jwt-secret-value-32-chars",
+				InternalToken: "this-is-a-very-long-and-secure-internal-token-32-chars",
 			},
 			expectError: false,
 		},
 		{
 			name: "production with empty secret",
 			config: Config{
-				Environment: "production",
-				JWTSecret:   "",
+				Environment:   "production",
+				JWTSecret:     "",
+				InternalToken: "this-is-a-very-long-and-secure-internal-token-32-chars",
 			},
 			expectError: true,
 		},
 		{
 			name: "production with default secret",
 			config: Config{
-				Environment: "production",
-				JWTSecret:   "dev-secret-change-me",
+				Environment:   "production",
+				JWTSecret:     "dev-secret-change-me",
+				InternalToken: "this-is-a-very-long-and-secure-internal-token-32-chars",
 			},
 			expectError: true,
 		},
 		{
 			name: "production with short secret",
 			config: Config{
-				Environment: "production",
-				JWTSecret:   "too-short",
+				Environment:   "production",
+				JWTSecret:     "too-short",
+				InternalToken: "this-is-a-very-long-and-secure-internal-token-32-chars",
 			},
 			expectError: true,
 		},
 		{
 			name: "production with spaces",
 			config: Config{
+				Environment:   "production",
+				JWTSecret:     "  this-is-a-very-long-and-secure-jwt-secret-value-32-chars  ",
+				InternalToken: "this-is-a-very-long-and-secure-internal-token-32-chars",
+			},
+			expectError: true,
+		},
+		{
+			name: "production with missing internal token",
+			config: Config{
 				Environment: "production",
-				JWTSecret:   "  this-is-a-very-long-and-secure-jwt-secret-value-32-chars  ",
+				JWTSecret:   "this-is-a-very-long-and-secure-jwt-secret-value-32-chars",
+			},
+			expectError: true,
+		},
+		{
+			name: "production with short internal token",
+			config: Config{
+				Environment:   "production",
+				JWTSecret:     "this-is-a-very-long-and-secure-jwt-secret-value-32-chars",
+				InternalToken: "too-short",
 			},
 			expectError: true,
 		},

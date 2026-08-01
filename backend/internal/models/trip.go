@@ -27,4 +27,6 @@ type Trip struct {
 	ShareEnabled   bool    `json:"share_enabled"`
 	ShareExpiresAt *string `json:"share_expires_at,omitempty"`
 	ShareCreatedAt *string `json:"share_created_at,omitempty"`
+
+	IsInternal bool `json:"is_internal" example:"false"`
 }
