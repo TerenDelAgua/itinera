@@ -37,11 +37,13 @@ export interface Line {
 
 export interface Exit {
   name: string;
+  name_es?: string;
   name_ja: string;
   landmarks: string[];
   best_for: string[];
   time_to_surface: string;
   tips: string[];
+  tips_es?: string[];
 }
 
 export interface Tip {
@@ -70,14 +72,14 @@ export interface GuideDecision {
 // DATASET
 // ============================================================
 
-const stations: StationGuide[] = stationData.stations as StationGuide[];
+const stations: StationGuide[] = stationData.stations as unknown as StationGuide[];
 
 // Mapa de normalización para búsqueda O(1)
 const cityToStation = new Map<string, StationGuide>();
 stations.forEach(s => {
   const cityLower = s.city.toLowerCase();
   cityToStation.set(cityLower, s);
-  
+
   // Soporte robusto de traducciones/variantes de ciudades del español (Tokio/Kioto)
   if (cityLower === 'tokyo') {
     cityToStation.set('tokio', s);

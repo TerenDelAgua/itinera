@@ -7,14 +7,12 @@ import id from './id.json';
 type Locale = 'en' | 'es' | 'ja' | 'id';
 type Messages = typeof en;
 
-type TranslationKeys<T> = {
-    [K in keyof T & string]:
-    T[K] extends string
-    ? K
-    : T[K] extends Record<string, string>
-    ? K | `${K}.${keyof T[K] & string}`
-    : K;
-}[keyof T & string];
+type Leaves<T, P extends string = ""> =
+    T extends string
+        ? P
+        : { [K in keyof T & string]: Leaves<T[K], `${P}${P extends "" ? "" : "."}${K}`> }[keyof T & string];
+
+type TranslationKeys<T> = Leaves<T>;
 
 export const locale = writable<Locale>('en');
 

@@ -17,9 +17,9 @@ import (
 )
 
 type mockTripContextStore struct {
-	getForkFunc     func(ctx context.Context, forkedFrom string, userID *uuid.UUID, sessionID *string) (*models.Trip, error)
-	getTripMetaFunc func(ctx context.Context, tripID string, userID *uuid.UUID, sessionID *string) (bool, bool, error)
-	forkTripFunc     func(ctx context.Context, originalTripID string, userID *uuid.UUID, sessionID *string) (*models.Trip, error)
+	getForkFunc      func(ctx context.Context, forkedFrom string, userID *uuid.UUID, sessionID *string) (*models.Trip, error)
+	getTripMetaFunc  func(ctx context.Context, tripID string, userID *uuid.UUID, sessionID *string) (bool, bool, error)
+	forkFromDemoFunc func(ctx context.Context, demoTripID uuid.UUID, userID *uuid.UUID, sessionID *string) (*models.Trip, error)
 }
 
 func (m *mockTripContextStore) GetFork(ctx context.Context, forkedFrom string, userID *uuid.UUID, sessionID *string) (*models.Trip, error) {
@@ -36,9 +36,9 @@ func (m *mockTripContextStore) GetTripMeta(ctx context.Context, tripID string, u
 	return false, false, nil
 }
 
-func (m *mockTripContextStore) ForkTrip(ctx context.Context, originalTripID string, userID *uuid.UUID, sessionID *string) (*models.Trip, error) {
-	if m.forkTripFunc != nil {
-		return m.forkTripFunc(ctx, originalTripID, userID, sessionID)
+func (m *mockTripContextStore) ForkFromDemo(ctx context.Context, demoTripID uuid.UUID, userID *uuid.UUID, sessionID *string) (*models.Trip, error) {
+	if m.forkFromDemoFunc != nil {
+		return m.forkFromDemoFunc(ctx, demoTripID, userID, sessionID)
 	}
 	return nil, nil
 }
@@ -90,7 +90,7 @@ func TestResolveTripContext_DemoGuestNoFork(t *testing.T) {
 		getTripMetaFunc: func(ctx context.Context, tripID string, userID *uuid.UUID, sessionID *string) (bool, bool, error) {
 			return false, true, nil
 		},
-		forkTripFunc: func(ctx context.Context, originalTripID string, userID *uuid.UUID, sessionID *string) (*models.Trip, error) {
+		forkFromDemoFunc: func(ctx context.Context, demoTripID uuid.UUID, userID *uuid.UUID, sessionID *string) (*models.Trip, error) {
 			newTrip := &models.Trip{ID: uuid.MustParse(forkTripID)}
 			return newTrip, nil
 		},
@@ -106,7 +106,7 @@ func TestResolveTripContext_DemoGuestNoFork(t *testing.T) {
 		r.Post("/trips/{id}/*", func(w http.ResponseWriter, r *http.Request) {
 			nextHandler.ServeHTTP(w, r)
 		})
-	})
+})
 
 	req := httptest.NewRequest(http.MethodPost, "/trips/"+demoTripID+"/places", nil)
 	req = req.WithContext(context.WithValue(context.Background(), middleware.ContextKeySessionId{}, sessionID))
@@ -169,7 +169,7 @@ func TestResolveTripContext_DemoUserNoFork(t *testing.T) {
 		getTripMetaFunc: func(ctx context.Context, tripID string, userID *uuid.UUID, sessionID *string) (bool, bool, error) {
 			return false, true, nil
 		},
-		forkTripFunc: func(ctx context.Context, originalTripID string, userID *uuid.UUID, sessionID *string) (*models.Trip, error) {
+		forkFromDemoFunc: func(ctx context.Context, demoTripID uuid.UUID, userID *uuid.UUID, sessionID *string) (*models.Trip, error) {
 			newTrip := &models.Trip{ID: uuid.MustParse(forkTripID)}
 			return newTrip, nil
 		},

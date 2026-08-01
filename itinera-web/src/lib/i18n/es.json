@@ -27,7 +27,8 @@
     "add": "Añadir",
     "inherit": "Heredar",
     "cancel": "Cancelar",
-    "done": "Hecho"
+    "done": "Hecho",
+    "close": "Cerrar"
   },
   "trip_form": {
     "title": "Crear un nuevo viaje",
@@ -91,7 +92,8 @@
     "days": "días",
     "day": "día",
     "no_expenses": "Aún no hay gastos locales.",
-    "view_history": "Ver Todos"
+    "view_history": "Ver Todos",
+    "delete": "Borrar"
   },
   "itinerary": {
     "title": "Actividades",
@@ -454,5 +456,30 @@
     "place_description_fallback": "Destino en {city}. Planifica gastos, actividades y guías de estación con Itinera.",
     "dashboard_title": "Mis viajes",
     "dashboard_description": "Planifica y organiza tus viajes con Itinera."
+  },
+  "share": {
+    "active_link": "Link activo",
+    "cta_share": "Compartir",
+    "popover_title": "Compartir itinerario",
+    "copy_cta": "Copiar",
+    "expires_at": "Expira el {date}",
+    "disable_cta": "Desactivar link",
+    "readonly_banner": "👁️ Itinerario compartido · Solo lectura",
+    "not_available_title": "Link no disponible",
+    "discover_cta": "Descubrir Itinera",
+    "places_title": "Lugares",
+    "activities_title": "Agenda",
+    "fork_prompt": "¿Te gusta este itinerario?",
+    "fork_cta": "Usar como base para mi viaje",
+    "create_own_cta": "Crear mi propio itinerario",
+    "expires_in": "Expira en {days} días",
+    "seo_fallback": "Itinerario compartido en Itinera",
+    "errors": {
+      "not_found": "Este link ya no está disponible o ha expirado.",
+      "generic": "No pudimos cargar el itinerario.",
+      "network": "Error de conexión. Comprueba tu red.",
+      "fork_failed": "No pudimos crear tu copia. Inténtalo de nuevo.",
+      "copy_failed": "No pudimos copiar el link."
+    }
   }
 }

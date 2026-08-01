@@ -3,9 +3,12 @@ package database
 import (
 	"backend/internal/models"
 	"context"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -194,4 +197,80 @@ func (r *ActivityRepository) DeleteActivity(ctx context.Context, id uuid.UUID) e
 	_, err := r.Pool.Exec(ctx, query, id)
 
 	return err
+}
+
+func (r *ActivityRepository) CloneByTripID(
+	ctx context.Context,
+	tx pgx.Tx,
+	origTripID, newTripID uuid.UUID,
+	placeMap map[uuid.UUID]uuid.UUID,
+) error {
+	rows, err := tx.Query(ctx,
+		`SELECT id, place_id, title, date, time, notes
+		FROM activities WHERE trip_id = $1`,
+		origTripID)
+
+	if err != nil {
+		return fmt.Errorf("failed to fetch activities: %w", err)
+	}
+
+	type actData struct {
+		ID      uuid.UUID
+		PlaceID *uuid.UUID
+		Title   string
+		Date    time.Time
+		Time    *time.Time
+		Notes   *string
+	}
+	var srcActs []actData
+	for rows.Next() {
+		var a actData
+		if err := rows.Scan(
+			&a.ID,
+			&a.PlaceID,
+			&a.Title,
+			&a.Date,
+			&a.Time,
+			&a.Notes,
+		); err != nil {
+			rows.Close()
+			return err
+		}
+		srcActs = append(srcActs, a)
+	}
+	rows.Close()
+
+	if len(srcActs) == 0 {
+		return nil
+	}
+
+	var actArgs []any
+	var actVals []string
+	for i, a := range srcActs {
+		newActID := uuid.New()
+		var mappedPlaceID *uuid.UUID
+		if a.PlaceID != nil {
+			if newPID, ok := placeMap[*a.PlaceID]; ok {
+				mappedPlaceID = &newPID
+			}
+		}
+		offset := i * 7
+		actVals = append(actVals, fmt.Sprintf(
+			"($%d, $%d, $%d, $%d, $%d, $%d, $%d)",
+			offset+1, offset+2, offset+3, offset+4, offset+5, offset+6, offset+7,
+		))
+		actArgs = append(actArgs, newActID, newTripID, mappedPlaceID,
+			a.Title, a.Date, a.Time, a.Notes,
+		)
+	}
+
+	queryInsertActs := fmt.Sprintf(
+		`INSERT INTO activities (id, trip_id, place_id, title, date, time, notes)
+		VALUES %s`,
+		strings.Join(actVals, ","))
+
+	if _, err := tx.Exec(ctx, queryInsertActs, actArgs...); err != nil {
+		return fmt.Errorf("failed to insert cloned activities: %w", err)
+	}
+	return nil
 }

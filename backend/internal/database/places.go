@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"backend/internal/models"
@@ -134,4 +135,89 @@ func (r *PlaceRepository) UpdatePlace(ctx context.Context, placeID uuid.UUID, up
 func (r *PlaceRepository) DeletePlace(ctx context.Context, placeID uuid.UUID) error {
 	_, err := r.Pool.Exec(ctx, "DELETE FROM places WHERE id = $1", placeID)
 	return err
+}
+
+// CloneByTripId - clone all places from a trip to a new trip
+// Returns a mapped oldPlaceId -> newPlaceId
+func (r *PlaceRepository) CloneByTripID(
+	ctx context.Context,
+	tx pgx.Tx,
+	origTripID, newTripID uuid.UUID,
+) (map[uuid.UUID]uuid.UUID, error) {
+	rows, err := tx.Query(ctx,
+		`SELECT id, name, notes, start_date, end_date, lat, lon,
+			default_expense_currency, city, country_code
+		FROM places WHERE trip_id = $1
+	`, origTripID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch places: %w", err)
+	}
+
+	type placeData struct {
+		ID                     uuid.UUID
+		Name                   string
+		Notes                  *string
+		StartDate              *time.Time
+		EndDate                *time.Time
+		Lat                    *float64
+		Lon                    *float64
+		DefaultExpenseCurrency *string
+		City                   *string
+		CountryCode            *string
+	}
+	var srcPlaces []placeData
+	for rows.Next() {
+		var p placeData
+		if err := rows.Scan(
+			&p.ID,
+			&p.Name,
+			&p.Notes,
+			&p.StartDate,
+			&p.EndDate,
+			&p.Lat,
+			&p.Lon,
+			&p.DefaultExpenseCurrency,
+			&p.City,
+			&p.CountryCode,
+		); err != nil {
+			rows.Close()
+			return nil, err
+		}
+		srcPlaces = append(srcPlaces, p)
+	}
+	rows.Close()
+
+	placeMap := make(map[uuid.UUID]uuid.UUID, len(srcPlaces))
+	if len(srcPlaces) == 0 {
+		return placeMap, nil
+	}
+
+	var placeInsertArgs []any
+	var placeValues []string
+	for i, p := range srcPlaces {
+		newPlaceID := uuid.New()
+		placeMap[p.ID] = newPlaceID
+
+		offset := i * 11
+		placeValues = append(placeValues, fmt.Sprintf(
+			"($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
+			offset+1, offset+2, offset+3, offset+4, offset+5,
+			offset+6, offset+7, offset+8, offset+9, offset+10, offset+11,
+		))
+		placeInsertArgs = append(placeInsertArgs,
+			newPlaceID, newTripID, p.Name, p.Notes, p.StartDate, p.EndDate,
+			p.Lat, p.Lon, p.DefaultExpenseCurrency, p.City, p.CountryCode,
+		)
+	}
+
+	queryInsertPlaces := fmt.Sprintf(`
+		INSERT INTO places (id, trip_id, name, notes, start_date, end_date,
+							lat, lon, default_expense_currency, city, country_code)
+		VALUES %s
+	`, strings.Join(placeValues, ","))
+
+	if _, err := tx.Exec(ctx, queryInsertPlaces, placeInsertArgs...); err != nil {
+		return nil, fmt.Errorf("failed to insert cloned places: %w", err)
+	}
+	return placeMap, nil
 }

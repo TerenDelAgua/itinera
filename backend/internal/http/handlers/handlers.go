@@ -3,8 +3,11 @@ package handlers
 import (
 	"backend/internal/config"
 	"backend/internal/database"
+	"backend/internal/http/middleware"
 	"backend/internal/services"
 	"net/http"
+
+	"github.com/google/uuid"
 )
 
 // Handlers wires the HTTP layer to the storage and service packages.
@@ -22,6 +25,7 @@ type Handlers struct {
 	EventsRepo    database.EventStore
 	RateLimitRepo database.RateLimitStore
 	ExpenseSvc    *services.ExpenseService
+	TripSvc       *services.TripService
 	Config        *config.Config
 }
 
@@ -34,6 +38,7 @@ func NewHandlers(
 	eventsRepo database.EventStore,
 	rateLimitRepo database.RateLimitStore,
 	expenseSvc *services.ExpenseService,
+	tripSvc *services.TripService,
 	cfg *config.Config,
 ) *Handlers {
 	return &Handlers{
@@ -45,8 +50,26 @@ func NewHandlers(
 		EventsRepo:    eventsRepo,
 		RateLimitRepo: rateLimitRepo,
 		ExpenseSvc:    expenseSvc,
+		TripSvc:       tripSvc,
 		Config:        cfg,
 	}
+}
+
+// helper for all handlers
+func extractIdentity(r *http.Request) (*uuid.UUID, *string) {
+	var userID *uuid.UUID
+	if uid, ok := r.Context().Value(middleware.ContextKeyUserId{}).(uuid.UUID); ok {
+		userID = &uid
+	}
+	var sessionID *string
+	if userID == nil {
+		if sid, ok := r.Context().Value(middleware.ContextKeySessionId{}).(string); ok &&
+			sid != "" {
+			sessionID = &sid
+		}
+	}
+
+	return userID, sessionID
 }
 
 func (h *Handlers) healthCheck(w http.ResponseWriter, r *http.Request) {
