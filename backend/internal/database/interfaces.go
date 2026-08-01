@@ -27,7 +27,7 @@ import (
 
 // TripStore is the read/write contract for trips.
 type TripStore interface {
-	CreateTrip(ctx context.Context, userID *uuid.UUID, sessionID *string, tripData models.Trip) (*models.Trip, error)
+	CreateTrip(ctx context.Context, userID *uuid.UUID, sessionID *string, isInternal bool, tripData models.Trip) (*models.Trip, error)
 	GetTrip(ctx context.Context, id string, userID *uuid.UUID, sessionID *string) (*models.Trip, error)
 	GetTripById(ctx context.Context, id uuid.UUID) (*models.Trip, error)
 	ListTrips(ctx context.Context, userID *uuid.UUID, sessionID *string) ([]models.Trip, error)
@@ -56,7 +56,7 @@ type TripStore interface {
 
 	//Clone helpers
 	GetBaseForClone(ctx context.Context, tx pgx.Tx, origID uuid.UUID) (*models.Trip, error)
-	InsertFork(ctx context.Context, tx pgx.Tx, newTripID uuid.UUID, userId *uuid.UUID, sessionID *string, origID uuid.UUID, base *models.Trip) error
+	InsertFork(ctx context.Context, tx pgx.Tx, newTripID uuid.UUID, userId *uuid.UUID, sessionID *string, isInternal bool, origID uuid.UUID, base *models.Trip) error
 }
 
 type TripForker interface {
@@ -142,4 +142,23 @@ type EventStore interface {
 // counter is reset to 1 before the comparison.
 type RateLimitStore interface {
 	CheckAndIncrement(ctx context.Context, key string, window time.Duration, max int) (allowed bool, err error)
+}
+
+// ── Analytics ────────────────────────────────────────────────────────────────
+
+// AnalyticsStore is the read contract for the admin-only analytics module.
+// Every method reads from v_real_sessions / v_real_trips / v_user_engagement
+// (or from events with the real-sessions filter applied), so the
+// "internal = excluded" invariant is centralised in the SQL views.
+type AnalyticsStore interface {
+	GetAnalyticsOverview(ctx context.Context) (models.AnalyticsOverview, error)
+	GetAnalyticsActivation(ctx context.Context) (models.AnalyticsActivation, error)
+	GetAnalyticsEngagement(ctx context.Context) (models.AnalyticsEngagement, error)
+	GetAnalyticsRetention(ctx context.Context, days int) (models.AnalyticsRetention, error)
+	GetAnalyticsFunnel(ctx context.Context) (models.AnalyticsFunnel, error)
+	GetAnalyticsPowerUsers(ctx context.Context, limit int) (models.AnalyticsPowerUsers, error)
+
+	// Internal-vs-real session/trip counts (Spec 015 v1).
+	// Returns (internalTrips, realTrips, internalSessions, realSessions).
+	GetAnalyticsSessions(ctx context.Context) (int, int, int, int, error)
 }

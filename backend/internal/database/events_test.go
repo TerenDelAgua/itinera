@@ -35,7 +35,7 @@ func TestForkFromDemo_LogsEvent(t *testing.T) {
 	t.Run("ForkFromDemo should log trip_forked event with ghost_mode_write trigger", func(t *testing.T) {
 		// 1. Setup: create a demo trip owned by a guest session.
 		sessionID := "test-session-fork-log-" + uuid.New().String()
-		demoTrip, err := tripsRepo.CreateTrip(ctx, nil, &sessionID, models.Trip{
+		demoTrip, err := tripsRepo.CreateTrip(ctx, nil, &sessionID, false, models.Trip{
 			Name:         "Original Demo Trip",
 			BaseCurrency: "JPY",
 			IsPublicDemo: true,
