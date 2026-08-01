@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"backend/internal/config"
 	"backend/internal/database"
 	"backend/internal/http/handlers"
 	"backend/internal/http/middleware"
@@ -44,9 +45,10 @@ func TestShareForkFlow_EnableShareAfterMiddlewareFork(t *testing.T) {
 	expenseSvc := services.NewExpenseService(tripsRepo, expensesRepo, exchangeRateSvc)
 	tripSvc := services.NewTripService(pgPool, tripsRepo, placesRepo, activityRepo, expensesRepo, eventsRepo)
 
+	cfg := config.Load()
 	h := handlers.NewHandlers(
 		tripsRepo, placesRepo, expensesRepo, authRepo,
-		activityRepo, eventsRepo, rateLimitRepo, expenseSvc, tripSvc, nil,
+		activityRepo, eventsRepo, rateLimitRepo, expenseSvc, tripSvc, cfg,
 	)
 
 	ctx := context.Background()
@@ -140,9 +142,10 @@ func TestShareForkFlow_PublicEndpoint_JSONShape(t *testing.T) {
 	exchangeRateSvc := services.NewExchangeRateService(pgPool)
 	expenseSvc := services.NewExpenseService(tripsRepo, expensesRepo, exchangeRateSvc)
 	tripSvc := services.NewTripService(pgPool, tripsRepo, placesRepo, activityRepo, expensesRepo, eventsRepo)
+	cfg := config.Load()
 	h := handlers.NewHandlers(
 		tripsRepo, placesRepo, expensesRepo, authRepo,
-		activityRepo, eventsRepo, rateLimitRepo, expenseSvc, tripSvc, nil,
+		activityRepo, eventsRepo, rateLimitRepo, expenseSvc, tripSvc, cfg,
 	)
 
 	ctx := context.Background()

@@ -58,10 +58,9 @@ func (h *Handlers) EnableShare(w http.ResponseWriter, r *http.Request) {
 		log.Printf("WARN user has %d active shares (>10 threshold)", count)
 	}
 
-	//TODO: Review hardcode url
 	response := map[string]any{
 		"token":      token,
-		"url":        "https://goitinera.app/share/" + token,
+		"url":        h.Config.BuildShareURL(token),
 		"expires_at": nil,
 	}
 	if expiresAt != nil {

@@ -11,19 +11,27 @@ const insecureDevJWTSecret = "dev-secret-change-me"
 const minProductionSecretLen = 32
 
 type Config struct {
-	Port        string
-	DatabaseURL string
-	JWTSecret   string
-	Environment string
+	Port         string
+	DatabaseURL  string
+	JWTSecret    string
+	Environment  string
+	PublicOrigin string
 }
 
 func Load() *Config {
 	return &Config{
-		Port:        getEnv("API_PORT", "8080"),
-		DatabaseURL: buildDatabaseURL(),
-		JWTSecret:   getEnv("JWT_SECRET", "dev-secret-change-me"),
-		Environment: getEnv("ENVIRONMENT", "development"),
+		Port:         getEnv("API_PORT", "8080"),
+		DatabaseURL:  buildDatabaseURL(),
+		JWTSecret:    getEnv("JWT_SECRET", "dev-secret-change-me"),
+		Environment:  getEnv("ENVIRONMENT", "development"),
+		PublicOrigin: normalizeOrigin(getEnv("PUBLIC_ORIGIN", "https://goitinera.app")),
 	}
+}
+
+// normalizeOrigin strips trailing slashes so URLs built from
+// origin + path don't end up with `//share/abc`.
+func normalizeOrigin(origin string) string {
+	return strings.TrimRight(origin, "/")
 }
 
 // buildDatabaseURL constructs the connection string with the following priority:
@@ -63,6 +71,15 @@ func (c *Config) IsProduction() bool {
 
 func (c *Config) LogSummary() {
 	fmt.Printf("🔧 Config loaded: port=%s, env=%s, db_url=***\n", c.Port, c.Environment)
+}
+
+// BuildShareURL constructs the absolute public URL for a share token,
+// e.g. "https://goitinera.app/share/<token>". Centralised here so that:
+//   - the origin is read from a single config value (PUBLIC_ORIGIN env),
+//   - the path "/share/" is not duplicated across handlers,
+//   - future share-targets (e.g. "/share/<token>/fork") can reuse it.
+func (c *Config) BuildShareURL(token string) string {
+	return c.PublicOrigin + "/share/" + token
 }
 
 // Validate enforces invariants that must hold for the configured environment.
