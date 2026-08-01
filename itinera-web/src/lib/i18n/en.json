@@ -464,7 +464,7 @@
     "copy_cta": "Copy",
     "expires_at": "Expires on {date}",
     "disable_cta": "Disable link",
-    "readonly_banner": "You are viewing a shared itinerary in read-only mode",
+    "readonly_banner": "👁️ Shared itinerary · Read-only",
     "not_available_title": "Link not available",
     "discover_cta": "Discover Itinera",
     "places_title": "Places",

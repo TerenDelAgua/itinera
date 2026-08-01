@@ -464,7 +464,7 @@
     "copy_cta": "コピー",
     "expires_at": "{date}に有効期限切れ",
     "disable_cta": "リンクを無効化",
-    "readonly_banner": "共有された旅程を読専用モードで表示しています",
+    "readonly_banner": "👁️ 共有された旅程 · 読み取り専用",
     "not_available_title": "リンクは利用できません",
     "discover_cta": "Itineraを発見",
     "places_title": "場所",

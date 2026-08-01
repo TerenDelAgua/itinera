@@ -464,7 +464,7 @@
     "copy_cta": "Copiar",
     "expires_at": "Expira el {date}",
     "disable_cta": "Desactivar link",
-    "readonly_banner": "Estás viendo un itinerario compartido en modo solo lectura",
+    "readonly_banner": "👁️ Itinerario compartido · Solo lectura",
     "not_available_title": "Link no disponible",
     "discover_cta": "Descubrir Itinera",
     "places_title": "Lugares",

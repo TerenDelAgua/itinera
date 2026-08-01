@@ -39,12 +39,29 @@
     const diff = new Date(data.trip.share_expires_at).getTime() - Date.now();
     return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
   });
+
+  // Translate i18n keys that the backend stores verbatim (e.g.
+  // "inspiration.asia.title", "inspiration.asia.desc") so SSR and client
+  // render the same string from the very first byte. Without this, the SSR
+  // emits the raw key ("inspiration.asia.desc") into <meta> tags and the
+  // client rewrites it on hydration → hydration_mismatch.
+  const isI18nKey = (s: unknown): s is string =>
+    typeof s === "string" && s.startsWith("inspiration.");
+
+  const resolvedTripName = $derived(
+    isI18nKey(data.trip?.name) ? $t(data.trip.name as any) : data.trip?.name,
+  );
+  const resolvedTripDescription = $derived(
+    isI18nKey(data.trip?.description)
+      ? $t(data.trip.description as any)
+      : data.trip?.description,
+  );
 </script>
 
 <svelte:head>
   <SeoHead
-    title={data.trip ? `${data.trip.name} | Itinera` : "Itinera"}
-    description={data.trip?.description || $t("share.seo_fallback")}
+    title={resolvedTripName ? `${resolvedTripName} | Itinera` : "Itinera"}
+    description={resolvedTripDescription || $t("share.seo_fallback")}
     canonical={data.shareUrl}
     ogImage={data.ogImage}
     ogType="article"
@@ -72,10 +89,9 @@
 {:else if data.trip}
   <div class="min-h-screen bg-teren-background">
     <div
-      class="sticky top-0 z-50 border-b border-teren-primary px-6 py-3 flex items-center justify-between gap-4 bg-teren-primary-subtle"
+      class="border-b border-teren-primary px-6 py-3 flex items-center justify-between gap-4 bg-teren-primary-subtle"
     >
       <div class="flex items-center gap-2 min-w-0">
-        <span class="text-lg shrink-0">👁️</span>
         <span class="text-sm font-medium text-teren-text-main truncate"
           >{$t("share.readonly_banner")}</span
         >
@@ -98,10 +114,10 @@
     <main class="max-w-2x1 mx-auto px-6 py-6 space-y-8">
       <header>
         <h1 class="text 3x1 font-bold tracking-tight text-teren-text-main mb-2">
-          {data.trip.name}
+          {resolvedTripName}
         </h1>
-        {#if data.trip.description}
-          <p class="text-lg text-teren-text-muted">{data.trip.description}</p>
+        {#if resolvedTripDescription}
+          <p class="text-lg text-teren-text-muted">{resolvedTripDescription}</p>
         {/if}
         <div
           class="flex flex-wrap items-center gap-4 mt-4 text-sm text-teren-text-muted"
