@@ -28,7 +28,8 @@ func Load() *Config {
 	}
 }
 
-// normalizeOrigin strips trailing slashes so URLs built from origin + path don't end up with `//share/abc`.
+// normalizeOrigin strips trailing slashes so URLs
+// built from origin + path don't end up with `//share/abc`.
 func normalizeOrigin(origin string) string {
 	return strings.TrimRight(origin, "/")
 }
