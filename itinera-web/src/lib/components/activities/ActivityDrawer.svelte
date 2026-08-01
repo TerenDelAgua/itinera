@@ -52,6 +52,10 @@
   let showQuickAdd = $state(false);
   let collapsedSections = new SvelteSet<string>();
 
+  let isCollapsed = $derived((date: string): boolean =>
+    collapsedSections.has(date),
+  );
+
   let todaySection = $state<Element | null>(null);
 
   let activityToDelete = $state<Activity | null>(null);
@@ -84,10 +88,6 @@
     }
     return map;
   });
-
-  function isCollapsed(date: string): boolean {
-    return collapsedSections.has(date);
-  }
 
   function toggleSection(date: string) {
     if (collapsedSections.has(date)) {
@@ -151,12 +151,17 @@
   $effect(() => {
     if (isOpen && !wasOpen) {
       untrack(() => {
-        // 1. Por defecto, colapsar actividades pasadas
+        // 1. We MUTATE the
+        // existing SvelteSet rather than reassigning the variable because
+        // Svelte 5 tracks reactivity per-SvelteSet-instance: reassigning
+        // `collapsedSections = new SvelteSet(...)` orphans the previous
+        // instance and breaks `isCollapsed(date)` derived tracking.
         const todayStr = new Date().toISOString().split("T")[0];
         const pastDates = new Set(
           activities.filter((a) => a.date < todayStr).map((a) => a.date),
         );
-        collapsedSections = new SvelteSet<string>(pastDates);
+        collapsedSections.clear();
+        for (const d of pastDates) collapsedSections.add(d);
 
         // 2. Scroll a "Today" o la primera sección futura disponible
         tick().then(() => {
