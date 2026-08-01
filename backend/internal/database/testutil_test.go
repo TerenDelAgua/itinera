@@ -29,7 +29,7 @@ func getTestPool(t *testing.T) *pgxpool.Pool {
 
 	pgxConfig, err := pgxpool.ParseConfig(dbURL)
 	if err != nil {
-		t.Fatalf("Failed to parse database config: %v", err)
+		t.Skipf("Skipping integration test: invalid DATABASE_URL: %v", err)
 	}
 
 	pgxConfig.MaxConns = 5
@@ -38,11 +38,11 @@ func getTestPool(t *testing.T) *pgxpool.Pool {
 
 	pool, err := pgxpool.NewWithConfig(context.Background(), pgxConfig)
 	if err != nil {
-		t.Fatalf("Failed to connect to database: %v", err)
+		t.Skipf("Skipping integration test: cannot connect to database: %v", err)
 	}
 
 	if err = pool.Ping(context.Background()); err != nil {
-		t.Fatalf("Failed to ping database: %v", err)
+		t.Skipf("Skipping integration test: database ping failed: %v", err)
 	}
 
 	testPool = pool
