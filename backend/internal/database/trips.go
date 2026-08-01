@@ -24,7 +24,12 @@ func NewTripRepository(pool *pgxpool.Pool) *TripRepository {
 	return &TripRepository{Pool: pool}
 }
 
-func (r *TripRepository) CreateTrip(ctx context.Context, userId *uuid.UUID, sessionId *string, tripData models.Trip) (*models.Trip, error) {
+func (r *TripRepository) CreateTrip(
+	ctx context.Context,
+	userId *uuid.UUID, sessionId *string,
+	isInternal bool,
+	tripData models.Trip) (*models.Trip, error) {
+
 	if tripData.BaseCurrency == "" {
 		tripData.BaseCurrency = "EUR"
 	}
@@ -37,10 +42,10 @@ func (r *TripRepository) CreateTrip(ctx context.Context, userId *uuid.UUID, sess
 
 	query := `
 	INSERT INTO trips (
-		user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, is_public_demo
-	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, is_public_demo, is_internal
+	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 	RETURNING 
-		id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, is_public_demo, forked_from, created_at
+		id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, is_public_demo, is_internal, forked_from, created_at
 	`
 
 	err := r.Pool.QueryRow(ctx, query,
@@ -53,6 +58,7 @@ func (r *TripRepository) CreateTrip(ctx context.Context, userId *uuid.UUID, sess
 		tripData.BaseCurrency,
 		tripData.DefaultExpenseCurrency,
 		tripData.IsPublicDemo,
+		isInternal,
 	).Scan(
 		&newTrip.ID,
 		&newTrip.UserId,
@@ -64,6 +70,7 @@ func (r *TripRepository) CreateTrip(ctx context.Context, userId *uuid.UUID, sess
 		&newTrip.BaseCurrency,
 		&newTrip.DefaultExpenseCurrency,
 		&newTrip.IsPublicDemo,
+		&newTrip.IsInternal,
 		&newTrip.ForkedFrom,
 		&createdAt,
 	)
@@ -83,7 +90,7 @@ func (r *TripRepository) ListTrips(ctx context.Context, userId *uuid.UUID, sessi
 	query := `
 		SELECT
 			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency,
-			is_public_demo, forked_from, created_at,
+			is_public_demo, is_internal, forked_from, created_at,
 			COALESCE((SELECT SUM(amount) FROM expenses WHERE trip_id = trips.id), 0) as total_spent,
 			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count,
 			share_token, share_enabled, share_expires_at, share_created_at
@@ -117,6 +124,7 @@ func (r *TripRepository) ListTrips(ctx context.Context, userId *uuid.UUID, sessi
 			&trip.BaseCurrency,
 			&trip.DefaultExpenseCurrency,
 			&trip.IsPublicDemo,
+			&trip.IsInternal,
 			&trip.ForkedFrom,
 			&createdAt,
 			&trip.TotalSpent,
@@ -157,7 +165,7 @@ func (r *TripRepository) GetTrip(ctx context.Context, id string, userId *uuid.UU
 	query := `
 		SELECT
 			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency,
-			is_public_demo, forked_from, created_at,
+			is_public_demo, is_internal, forked_from, created_at,
 			COALESCE((SELECT SUM(amount) FROM expenses WHERE trip_id = trips.id), 0) as total_spent,
 			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count,
 			share_token, share_enabled, share_expires_at, share_created_at
@@ -176,6 +184,7 @@ func (r *TripRepository) GetTrip(ctx context.Context, id string, userId *uuid.UU
 		&trip.BaseCurrency,
 		&trip.DefaultExpenseCurrency,
 		&trip.IsPublicDemo,
+		&trip.IsInternal,
 		&trip.ForkedFrom,
 		&createdAt,
 		&trip.TotalSpent,
@@ -334,7 +343,7 @@ func (r *TripRepository) ListPublicDemos(ctx context.Context, limit int) ([]mode
 	query := `
 		SELECT
 			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency,
-			is_public_demo, forked_from, created_at,
+			is_public_demo, is_internal, forked_from, created_at,
 			COALESCE((SELECT SUM(amount) FROM expenses WHERE trip_id = trips.id), 0) as total_spent,
 			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count,
 			share_token, share_enabled, share_expires_at, share_created_at
@@ -365,6 +374,7 @@ func (r *TripRepository) ListPublicDemos(ctx context.Context, limit int) ([]mode
 			&trip.BaseCurrency,
 			&trip.DefaultExpenseCurrency,
 			&trip.IsPublicDemo,
+			&trip.IsInternal,
 			&trip.ForkedFrom,
 			&createdAt,
 			&trip.TotalSpent,
@@ -465,6 +475,7 @@ func (r *TripRepository) InsertFork(
 	newTripID uuid.UUID,
 	userID *uuid.UUID,
 	sessionID *string,
+	isInternal bool,
 	origID uuid.UUID,
 	base *models.Trip,
 ) error {
@@ -473,10 +484,11 @@ func (r *TripRepository) InsertFork(
 	_, err := tx.Exec(ctx,
 		`INSERT INTO trips (id, user_id, session_id, name, description,
 							start_date, end_date, base_currency,
-							default_expense_currency, is_public_demo, forked_from)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+							default_expense_currency, is_public_demo, is_internal, forked_from)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
 		newTripID, userID, sessionID, base.Name, base.Description, startDate,
-		endDate, base.BaseCurrency, base.DefaultExpenseCurrency, base.IsPublicDemo, origID)
+		endDate, base.BaseCurrency, base.DefaultExpenseCurrency, base.IsPublicDemo,
+		isInternal, origID)
 
 	return err
 }
@@ -587,7 +599,7 @@ func (r *TripRepository) GetByShareToken(ctx context.Context, token string) (*mo
 	err := r.Pool.QueryRow(ctx,
 		`SELECT id, user_id, session_id, name, description,
 					start_date, end_date, base_currency, default_expense_currency,
-					is_public_demo, forked_from, created_at,
+					is_public_demo, is_internal, forked_from, created_at,
 					share_token, share_enabled, share_expires_at, share_created_at
 			FROM trips
 			WHERE share_token = $1
@@ -604,6 +616,7 @@ func (r *TripRepository) GetByShareToken(ctx context.Context, token string) (*mo
 		&t.BaseCurrency,
 		&t.DefaultExpenseCurrency,
 		&t.IsPublicDemo,
+		&t.IsInternal,
 		&t.ForkedFrom,
 		&createdAt,
 		&t.ShareToken,

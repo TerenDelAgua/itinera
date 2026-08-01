@@ -47,6 +47,7 @@ func (s *TripService) CloneTrip(
 	origID uuid.UUID,
 	userID *uuid.UUID,
 	sessionID *string,
+	isInternal bool,
 	trigger string,
 ) (*models.Trip, error) {
 	if userID == nil && sessionID == nil {
@@ -65,7 +66,7 @@ func (s *TripService) CloneTrip(
 
 	newTripID := uuid.New()
 	if err := s.TripsRepo.InsertFork(
-		ctx, tx, newTripID, userID, sessionID, origID, origTrip,
+		ctx, tx, newTripID, userID, sessionID, isInternal, origID, origTrip,
 	); err != nil {
 		return nil, fmt.Errorf("failed to insert forked trip: %w", err)
 	}
@@ -135,7 +136,7 @@ func (s *TripService) ForkFromDemo(
 	if !isDemo {
 		return nil, fmt.Errorf("trip %s is not a public demo", demoTripID)
 	}
-	return s.CloneTrip(ctx, demoTripID, userID, sessionID, "ghost_mode_write")
+	return s.CloneTrip(ctx, demoTripID, userID, sessionID, false, "ghost_mode_write")
 }
 
 func (s *TripService) ForkFromShareToken(
@@ -143,12 +144,13 @@ func (s *TripService) ForkFromShareToken(
 	token string,
 	userID *uuid.UUID,
 	sessionID *string,
+	isInternal bool,
 ) (*models.Trip, error) {
 	origID, err := s.TripsRepo.GetActiveShareTripID(ctx, token)
 	if err != nil {
 		return nil, err //pgx.ErrNoRows if not exists /expired / disabled
 	}
-	return s.CloneTrip(ctx, origID, userID, sessionID, "share_forked")
+	return s.CloneTrip(ctx, origID, userID, sessionID, isInternal, "share_forked")
 }
 
 func (s *TripService) GetFork(
