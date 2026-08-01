@@ -26,7 +26,7 @@ func TestShare_FullLifecycle_EnabledToDisabled(t *testing.T) {
 
 	// 1. Setup: create a guest-owned trip.
 	sessionID := "test-share-session-" + uuid.New().String()
-	trip, err := repo.CreateTrip(ctx, nil, &sessionID, models.Trip{
+	trip, err := repo.CreateTrip(ctx, nil, &sessionID, false, models.Trip{
 		Name:                  "Share Test Trip",
 		BaseCurrency:          "EUR",
 		DefaultExpenseCurrency: "EUR",
@@ -87,7 +87,7 @@ func TestShare_EnableShareIsIdempotent(t *testing.T) {
 	ctx := context.Background()
 
 	sessionID := "test-share-idempotent-" + uuid.New().String()
-	trip, err := repo.CreateTrip(ctx, nil, &sessionID, models.Trip{
+	trip, err := repo.CreateTrip(ctx, nil, &sessionID, false, models.Trip{
 		Name:                  "Idempotent Share Test",
 		BaseCurrency:          "EUR",
 		DefaultExpenseCurrency: "EUR",
@@ -126,7 +126,7 @@ func TestShare_GetByShareToken_ValidToken(t *testing.T) {
 	ctx := context.Background()
 
 	sessionID := "test-share-token-" + uuid.New().String()
-	trip, err := repo.CreateTrip(ctx, nil, &sessionID, models.Trip{
+	trip, err := repo.CreateTrip(ctx, nil, &sessionID, false, models.Trip{
 		Name:                  "Token Lookup Test",
 		BaseCurrency:          "EUR",
 		DefaultExpenseCurrency: "EUR",
@@ -172,7 +172,7 @@ func TestShare_DisableShare_Unauthorized(t *testing.T) {
 
 	// Owner creates and enables.
 	ownerSession := "test-share-owner-" + uuid.New().String()
-	trip, err := repo.CreateTrip(ctx, nil, &ownerSession, models.Trip{
+	trip, err := repo.CreateTrip(ctx, nil, &ownerSession, false, models.Trip{
 		Name:                  "Auth Test Trip",
 		BaseCurrency:          "EUR",
 		DefaultExpenseCurrency: "EUR",
@@ -214,7 +214,7 @@ func TestShare_CountActiveSharesByUser(t *testing.T) {
 
 	// Create 2 trips and enable both.
 	for i := 0; i < 2; i++ {
-		trip, err := repo.CreateTrip(ctx, nil, &sessionID, models.Trip{
+		trip, err := repo.CreateTrip(ctx, nil, &sessionID, false, models.Trip{
 			Name:                  "Count Test " + string(rune('A'+i)),
 			BaseCurrency:          "EUR",
 			DefaultExpenseCurrency: "EUR",

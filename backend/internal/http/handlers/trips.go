@@ -7,6 +7,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -49,7 +50,15 @@ func (h *Handlers) CreateTrip(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newTrip, err := h.TripsRepo.CreateTrip(r.Context(), userID, sessionID, input)
+	isInternal := middleware.IsInternalSession(r)
+
+	newTrip, err := h.TripsRepo.CreateTrip(
+		r.Context(),
+		userID,
+		sessionID,
+		isInternal,
+		input)
+
 	if err != nil {
 		log.Printf("ERROR creating trip: %v", err)
 		http.Error(w, "DB error: "+err.Error(), http.StatusInternalServerError)
@@ -286,4 +295,42 @@ func (h *Handlers) GetPublicStats(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]int{"total_trips": count})
+}
+
+// AnalyticsSessions godoc
+// @Summary      Internal session breakdown
+// @Description  Returns counts of internal vs real sessions/trips/events.
+//
+//	Only accessible if the request carries the internal token.
+//
+// @Tags         analytics
+// @Produce      json
+// @Success      200  {object}  AnalyticsResponse
+// @Failure      401  {string}  string "Internal token required"
+// @Failure      500  {string}  string "Internal Server Error"
+// @Router       /analytics/sessions [get]
+func (h *Handlers) AnalyticsSessions(w http.ResponseWriter, r *http.Request) {
+	if !middleware.IsInternalSession(r) {
+		http.Error(w, "Internal token required", http.StatusUnauthorized)
+		return
+	}
+
+	internalTrips, realTrips, internalSessions, realSessions, err := h.AnalyticsRepo.GetAnalyticsSessions(r.Context())
+	if err != nil {
+		http.Error(w, "DB error: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]any{
+		"trips": map[string]int{
+			"internal": internalTrips,
+			"real":     realTrips,
+		},
+		"sessions": map[string]int{
+			"internal": internalSessions,
+			"real":     realSessions,
+		},
+		"as_of": time.Now().UTC().Format(time.RFC3339),
+	})
 }

@@ -11,20 +11,22 @@ const insecureDevJWTSecret = "dev-secret-change-me"
 const minProductionSecretLen = 32
 
 type Config struct {
-	Port         string
-	DatabaseURL  string
-	JWTSecret    string
-	Environment  string
-	PublicOrigin string
+	Port          string
+	DatabaseURL   string
+	JWTSecret     string
+	Environment   string
+	PublicOrigin  string
+	InternalToken string
 }
 
 func Load() *Config {
 	return &Config{
-		Port:         getEnv("API_PORT", "8080"),
-		DatabaseURL:  buildDatabaseURL(),
-		JWTSecret:    getEnv("JWT_SECRET", "dev-secret-change-me"),
-		Environment:  getEnv("ENVIRONMENT", "development"),
-		PublicOrigin: normalizeOrigin(getEnv("PUBLIC_ORIGIN", "https://goitinera.app")),
+		Port:          getEnv("API_PORT", "8080"),
+		DatabaseURL:   buildDatabaseURL(),
+		JWTSecret:     getEnv("JWT_SECRET", "dev-secret-change-me"),
+		Environment:   getEnv("ENVIRONMENT", "development"),
+		PublicOrigin:  normalizeOrigin(getEnv("PUBLIC_ORIGIN", "https://goitinera.app")),
+		InternalToken: getEnv("ITINERA_INTERNAL_TOKEN", ""),
 	}
 }
 
@@ -97,6 +99,15 @@ func (c *Config) Validate() error {
 	}
 	if strings.TrimSpace(c.JWTSecret) != c.JWTSecret {
 		return errors.New("JWT_SECRET must not contain leading or trailing whitespace")
+	}
+	if c.InternalToken == "" {
+		return errors.New("ITINERA_INTERNAL_TOKEN must be set in production")
+	}
+	if len(c.InternalToken) < 32 {
+		return fmt.Errorf("ITINERA_INTERNAL_TOKEN must be at least 32 characters in production (got %d)", len(c.InternalToken))
+	}
+	if strings.TrimSpace(c.InternalToken) != c.InternalToken {
+		return errors.New("ITINERA_INTERNAL_TOKEN must not contain leading or trailing whitespace")
 	}
 	return nil
 }

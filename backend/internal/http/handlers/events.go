@@ -68,6 +68,16 @@ func (h *Handlers) TrackEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	conversionEvents := map[string]bool{
+		"trip_created":     true,
+		"demo_deep_forked": true,
+		"demo_fork_reused": true,
+	}
+	if middleware.IsInternalSession(r) && conversionEvents[req.Type] {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
 	// Sanitize and add server-side metadata
 	req.Metadata = tracking.SanitizeMetadata(req.Metadata)
 	req.Metadata["server.timestamp"] = time.Now().Unix()

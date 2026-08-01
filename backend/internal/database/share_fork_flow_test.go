@@ -40,6 +40,7 @@ func TestShareForkFlow_EnableShareAfterMiddlewareFork(t *testing.T) {
 	activityRepo := database.NewActivityRepository(pgPool)
 	eventsRepo := database.NewEventRepository(pgPool)
 	rateLimitRepo := database.NewRateLimitRepository(pgPool)
+	analyticsRepo := database.NewAnalyticsRepository(pgPool)
 
 	exchangeRateSvc := services.NewExchangeRateService(pgPool)
 	expenseSvc := services.NewExpenseService(tripsRepo, expensesRepo, exchangeRateSvc)
@@ -48,14 +49,14 @@ func TestShareForkFlow_EnableShareAfterMiddlewareFork(t *testing.T) {
 	cfg := config.Load()
 	h := handlers.NewHandlers(
 		tripsRepo, placesRepo, expensesRepo, authRepo,
-		activityRepo, eventsRepo, rateLimitRepo, expenseSvc, tripSvc, cfg,
+		activityRepo, eventsRepo, rateLimitRepo, analyticsRepo, expenseSvc, tripSvc, cfg,
 	)
 
 	ctx := context.Background()
 
 	// 1. Create a public demo owned by a different session.
 	originalOwner := "demo-owner-" + uuid.New().String()
-	demo, err := h.TripsRepo.CreateTrip(ctx, nil, &originalOwner, models.Trip{
+	demo, err := h.TripsRepo.CreateTrip(ctx, nil, &originalOwner, false, models.Trip{
 		Name:                   "Demo for fork",
 		BaseCurrency:           "JPY",
 		DefaultExpenseCurrency: "JPY",
@@ -138,6 +139,7 @@ func TestShareForkFlow_PublicEndpoint_JSONShape(t *testing.T) {
 	activityRepo := database.NewActivityRepository(pgPool)
 	eventsRepo := database.NewEventRepository(pgPool)
 	rateLimitRepo := database.NewRateLimitRepository(pgPool)
+	analyticsRepo := database.NewAnalyticsRepository(pgPool)
 
 	exchangeRateSvc := services.NewExchangeRateService(pgPool)
 	expenseSvc := services.NewExpenseService(tripsRepo, expensesRepo, exchangeRateSvc)
@@ -145,14 +147,14 @@ func TestShareForkFlow_PublicEndpoint_JSONShape(t *testing.T) {
 	cfg := config.Load()
 	h := handlers.NewHandlers(
 		tripsRepo, placesRepo, expensesRepo, authRepo,
-		activityRepo, eventsRepo, rateLimitRepo, expenseSvc, tripSvc, cfg,
+		activityRepo, eventsRepo, rateLimitRepo, analyticsRepo, expenseSvc, tripSvc, cfg,
 	)
 
 	ctx := context.Background()
 
 	// Setup: create a trip, add a place + activity, enable share, save token.
 	ownerSession := "json-shape-owner-" + uuid.New().String()
-	trip, err := tripsRepo.CreateTrip(ctx, nil, &ownerSession, models.Trip{
+	trip, err := tripsRepo.CreateTrip(ctx, nil, &ownerSession, false, models.Trip{
 		Name:                   "JSON Shape Test",
 		BaseCurrency:           "EUR",
 		DefaultExpenseCurrency: "EUR",

@@ -66,6 +66,7 @@ func main() {
 	activityRepo := database.NewActivityRepository(pool)
 	eventsRepo := database.NewEventRepository(pool)
 	rateLimitRepo := database.NewRateLimitRepository(pool)
+	analyticsRepo := database.NewAnalyticsRepository(pool)
 
 	exchangeRateSvc := services.NewExchangeRateService(pool)
 	expenseSvc := services.NewExpenseService(tripsRepo, expensesRepo, exchangeRateSvc)
@@ -73,7 +74,7 @@ func main() {
 		activityRepo, expensesRepo, eventsRepo)
 
 	h := handlers.NewHandlers(tripsRepo, placesRepo, expensesRepo, authRepo,
-		activityRepo, eventsRepo, rateLimitRepo, expenseSvc, tripSvc, cfg)
+		activityRepo, eventsRepo, rateLimitRepo, analyticsRepo, expenseSvc, tripSvc, cfg)
 
 	router := setupRouter(cfg, h, pool)
 

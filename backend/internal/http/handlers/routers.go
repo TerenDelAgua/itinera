@@ -13,6 +13,16 @@ func RegisterApiRoutes(r chi.Router, h *Handlers) {
 	r.Get("/health", h.healthCheck)
 	r.Get("/stats/public", h.GetPublicStats)
 
+	// Analytics (admin-only, behind IsInternalSession — 401 without token).
+	// No trip context required: these endpoints aggregate across sessions.
+	r.Get("/api/analytics/sessions", h.AnalyticsSessions)
+	r.Get("/api/analytics/overview", h.AnalyticsOverview)
+	r.Get("/api/analytics/activation", h.AnalyticsActivation)
+	r.Get("/api/analytics/engagement", h.AnalyticsEngagement)
+	r.Get("/api/analytics/retention", h.AnalyticsRetention)
+	r.Get("/api/analytics/funnel", h.AnalyticsFunnel)
+	r.Get("/api/analytics/power-users", h.AnalyticsPowerUsers)
+
 	// Public Share endpoints
 	r.Get("/share/{token}", h.GetSharedTrip)
 	r.Post("/share/fork", h.ForkFromShare) //require auth

@@ -243,8 +243,9 @@ func (h *Handlers) ForkFromShare(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	isInternal := middleware.IsInternalSession(r)
 
-	newTrip, err := h.TripSvc.ForkFromShareToken(r.Context(), body.Token, userId, sessionID)
+	newTrip, err := h.TripSvc.ForkFromShareToken(r.Context(), body.Token, userId, sessionID, isInternal)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			http.Error(w, "Share not found or expired", http.StatusNotFound)
