@@ -3,8 +3,12 @@ package database
 import (
 	"backend/internal/models"
 	"context"
+	"fmt"
+	"strings"
+	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -50,13 +54,13 @@ func (r *ExpenseRepository) CreateExpense(ctx context.Context, tripID, placeID *
 		RETURNING id, trip_id, place_id, amount, original_amount, original_currency, exchange_rate, conversion_date, currency, category_id, notes, date, created_at`
 
 	var res models.Expense
-	err := r.Pool.QueryRow(ctx, query, 
-		tripID, placeID, 
+	err := r.Pool.QueryRow(ctx, query,
+		tripID, placeID,
 		exp.Amount, exp.OriginalAmount, exp.OriginalCurrency, exp.ExchangeRate, exp.ConversionDate,
 		exp.Currency, exp.CategoryId, exp.Notes, exp.Date,
 	).
 		Scan(
-			&res.Id, &res.TripId, &res.PlaceId, 
+			&res.Id, &res.TripId, &res.PlaceId,
 			&res.Amount, &res.OriginalAmount, &res.OriginalCurrency, &res.ExchangeRate, &res.ConversionDate,
 			&res.Currency, &res.CategoryId, &res.Notes, &res.Date, &res.CreatedAt,
 		)
@@ -201,8 +205,8 @@ func (r *ExpenseRepository) UpdateExpense(ctx context.Context, id uuid.UUID, exp
 		WHERE id = $9 
 		RETURNING id, trip_id, place_id, amount, original_amount, original_currency, exchange_rate, conversion_date, currency, category_id, notes, date, created_at`
 	var res models.Expense
-	err := r.Pool.QueryRow(ctx, query, 
-		exp.Amount, exp.OriginalAmount, exp.OriginalCurrency, exp.ExchangeRate, exp.ConversionDate, 
+	err := r.Pool.QueryRow(ctx, query,
+		exp.Amount, exp.OriginalAmount, exp.OriginalCurrency, exp.ExchangeRate, exp.ConversionDate,
 		exp.Date, exp.Notes, exp.CategoryId, id).
 		Scan(&res.Id, &res.TripId, &res.PlaceId, &res.Amount, &res.OriginalAmount, &res.OriginalCurrency, &res.ExchangeRate, &res.ConversionDate, &res.Currency, &res.CategoryId, &res.Notes, &res.Date, &res.CreatedAt)
 	return &res, err
@@ -231,4 +235,97 @@ func (r *ExpenseRepository) GetPlaceExpensesSummary(ctx context.Context, placeID
 		summaries = append(summaries, s)
 	}
 	return summaries, nil
+}
+
+func (r *ExpenseRepository) CloneByTripID(
+	ctx context.Context,
+	tx pgx.Tx,
+	origTripID, newTripID uuid.UUID,
+	userID *uuid.UUID,
+	placeMap map[uuid.UUID]uuid.UUID,
+) error {
+	rows, err := tx.Query(ctx,
+		`SELECT amount, currency, converted_amount, date, notes, category_id,
+					place_id, original_amount, original_currency,
+					exchange_rate, conversion_date
+			FROM expenses WHERE trip_id = $1`,
+		origTripID)
+
+	if err != nil {
+		return fmt.Errorf("failed to fetch expenses: %w", err)
+	}
+
+	type expData struct {
+		Amount       float64
+		Currency     string
+		ConvertedAmt *float64
+		Date         time.Time
+		Notes        *string
+		CatID        *uuid.UUID
+		PlaceID      *uuid.UUID
+		OrigAmt      float64
+		OrigCur      string
+		ExchRate     float64
+		ConvDate     time.Time
+	}
+	var srcExps []expData
+	for rows.Next() {
+		var e expData
+		if err := rows.Scan(
+			&e.Amount,
+			&e.Currency,
+			&e.ConvertedAmt,
+			&e.Date,
+			&e.Notes,
+			&e.CatID,
+			&e.PlaceID,
+			&e.OrigAmt,
+			&e.OrigCur,
+			&e.ExchRate,
+			&e.ConvDate,
+		); err != nil {
+			rows.Close()
+			return err
+		}
+		srcExps = append(srcExps, e)
+	}
+	rows.Close()
+
+	if len(srcExps) == 0 {
+		return nil
+	}
+
+	var expArgs []any
+	var expVals []string
+	for i, e := range srcExps {
+		newExpID := uuid.New()
+		var mappedPlaceID *uuid.UUID
+		if e.PlaceID != nil {
+			if newPID, ok := placeMap[*e.PlaceID]; ok {
+				mappedPlaceID = &newPID
+			}
+		}
+		offset := i * 13
+		expVals = append(expVals, fmt.Sprintf(
+			"($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
+			offset+1, offset+2, offset+3, offset+4, offset+5, offset+6, offset+7,
+			offset+8, offset+9, offset+10, offset+11, offset+12, offset+13,
+		))
+		expArgs = append(expArgs, newExpID, newTripID, userID, e.Amount, e.Currency,
+			e.ConvertedAmt, e.Date, e.Notes, e.CatID, mappedPlaceID,
+			e.OrigAmt, e.OrigCur, e.ConvDate,
+		)
+	}
+
+	queryInsertExp := fmt.Sprintf(`
+		INSERT INTO expenses (id, trip_id, user_id, amount, currency, converted_amount,
+								date, notes, category_id, place_id, original_amount,
+								original_currency, conversion_date)
+		VALUES %s`,
+		strings.Join(expVals, ","))
+
+	if _, err := tx.Exec(ctx, queryInsertExp, expArgs...); err != nil {
+		return fmt.Errorf("failed to insert cloned expenses: %w", err)
+	}
+	return nil
 }

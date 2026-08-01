@@ -47,7 +47,10 @@
     if (insertionCurrency) {
       currency = insertionCurrency;
     } else {
-      const saved = typeof localStorage !== "undefined" ? localStorage.getItem("last_expense_currency") : null;
+      const saved =
+        typeof localStorage !== "undefined"
+          ? localStorage.getItem("last_expense_currency")
+          : null;
       currency = saved || baseCurrency || "EUR";
     }
   });
@@ -68,7 +71,9 @@
 
   $effect(() => {
     if (initialCategorySlug) {
-      const match = categories.find(c => c.slug.toLowerCase() === initialCategorySlug.toLowerCase());
+      const match = categories.find(
+        (c) => c.slug.toLowerCase() === initialCategorySlug.toLowerCase(),
+      );
       if (match) {
         categoryId = match.id;
         return;

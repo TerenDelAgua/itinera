@@ -2,6 +2,8 @@ package database
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"strings"
@@ -79,15 +81,16 @@ func (r *TripRepository) CreateTrip(ctx context.Context, userId *uuid.UUID, sess
 
 func (r *TripRepository) ListTrips(ctx context.Context, userId *uuid.UUID, sessionId *string) ([]models.Trip, error) {
 	query := `
-		SELECT 
-			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, 
+		SELECT
+			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency,
 			is_public_demo, forked_from, created_at,
 			COALESCE((SELECT SUM(amount) FROM expenses WHERE trip_id = trips.id), 0) as total_spent,
-			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count
+			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count,
+			share_token, share_enabled, share_expires_at, share_created_at
 		FROM trips
 		WHERE (user_id = $1 AND $1 IS NOT NULL) OR (session_id = $2 AND $2 IS NOT NULL) OR (is_public_demo = true)
-		ORDER BY 
-			is_public_demo ASC, 
+		ORDER BY
+			is_public_demo ASC,
 			CASE WHEN is_public_demo = false THEN created_at END DESC NULLS LAST,
 			CASE WHEN is_public_demo = true AND (name ILIKE '%Japón%' OR name ILIKE '%Japan%') THEN 0 ELSE 1 END ASC,
 			created_at DESC
@@ -102,6 +105,7 @@ func (r *TripRepository) ListTrips(ctx context.Context, userId *uuid.UUID, sessi
 	for rows.Next() {
 		var trip models.Trip
 		var startDate, endDate, createdAt time.Time
+		var shareExpiresAt, shareCreatedAt *time.Time
 		if err := rows.Scan(
 			&trip.ID,
 			&trip.UserId,
@@ -117,12 +121,24 @@ func (r *TripRepository) ListTrips(ctx context.Context, userId *uuid.UUID, sessi
 			&createdAt,
 			&trip.TotalSpent,
 			&trip.PlaceCount,
+			&trip.ShareToken,
+			&trip.ShareEnabled,
+			&shareExpiresAt,
+			&shareCreatedAt,
 		); err != nil {
 			return nil, err
 		}
 		trip.StartDate = startDate.Format("2006-01-02")
 		trip.EndDate = endDate.Format("2006-01-02")
 		trip.CreatedAt = createdAt.Format(time.RFC3339)
+		if shareExpiresAt != nil {
+			s := shareExpiresAt.Format(time.RFC3339)
+			trip.ShareExpiresAt = &s
+		}
+		if shareCreatedAt != nil {
+			s := shareCreatedAt.Format(time.RFC3339)
+			trip.ShareCreatedAt = &s
+		}
 		trips = append(trips, trip)
 	}
 
@@ -136,13 +152,15 @@ func (r *TripRepository) ListTrips(ctx context.Context, userId *uuid.UUID, sessi
 func (r *TripRepository) GetTrip(ctx context.Context, id string, userId *uuid.UUID, sessionId *string) (*models.Trip, error) {
 	var trip models.Trip
 	var startDate, endDate, createdAt time.Time
+	var shareExpiresAt, shareCreatedAt *time.Time
 
 	query := `
-		SELECT 
-			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, 
+		SELECT
+			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency,
 			is_public_demo, forked_from, created_at,
 			COALESCE((SELECT SUM(amount) FROM expenses WHERE trip_id = trips.id), 0) as total_spent,
-			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count
+			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count,
+			share_token, share_enabled, share_expires_at, share_created_at
 		FROM trips
 		WHERE id = $1 AND ((user_id = $2 AND $2 IS NOT NULL) OR (session_id = $3 AND $3 IS NOT NULL) OR (is_public_demo = true))
 	`
@@ -162,6 +180,10 @@ func (r *TripRepository) GetTrip(ctx context.Context, id string, userId *uuid.UU
 		&createdAt,
 		&trip.TotalSpent,
 		&trip.PlaceCount,
+		&trip.ShareToken,
+		&trip.ShareEnabled,
+		&shareExpiresAt,
+		&shareCreatedAt,
 	)
 	if err != nil {
 		return nil, err
@@ -170,6 +192,14 @@ func (r *TripRepository) GetTrip(ctx context.Context, id string, userId *uuid.UU
 	trip.StartDate = startDate.Format("2006-01-02")
 	trip.EndDate = endDate.Format("2006-01-02")
 	trip.CreatedAt = createdAt.Format(time.RFC3339)
+	if shareExpiresAt != nil {
+		s := shareExpiresAt.Format(time.RFC3339)
+		trip.ShareExpiresAt = &s
+	}
+	if shareCreatedAt != nil {
+		s := shareCreatedAt.Format(time.RFC3339)
+		trip.ShareCreatedAt = &s
+	}
 
 	return &trip, nil
 }
@@ -178,10 +208,11 @@ func (r *TripRepository) GetTripById(ctx context.Context, id uuid.UUID) (*models
 	var trip models.Trip
 	var startDate, endDate time.Time
 
-	query := `SELECT id, name, start_date, end_date, base_currency, default_expense_currency FROM trips WHERE id = $1`
+	query := `SELECT id, name, start_date, end_date, base_currency, default_expense_currency, forked_from, share_token, share_enabled FROM trips WHERE id = $1`
 
 	err := r.Pool.QueryRow(ctx, query, id).Scan(
-		&trip.ID, &trip.Name, &startDate, &endDate, &trip.BaseCurrency, &trip.DefaultExpenseCurrency,
+		&trip.ID, &trip.Name, &startDate, &endDate, &trip.BaseCurrency, &trip.DefaultExpenseCurrency, &trip.ForkedFrom,
+		&trip.ShareToken, &trip.ShareEnabled,
 	)
 	if err != nil {
 		return nil, err
@@ -271,199 +302,6 @@ func (r *TripRepository) DeleteTrip(ctx context.Context, id string, userId *uuid
 	return nil
 }
 
-func (r *TripRepository) ForkTrip(ctx context.Context, originalTripID string, userID *uuid.UUID, sessionID *string) (*models.Trip, error) {
-	tx, err := r.Pool.Begin(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer tx.Rollback(ctx)
-
-	origID, err := uuid.Parse(originalTripID)
-	if err != nil {
-		return nil, errors.New("invalid original trip ID")
-	}
-
-	// 1. Fetch original trip (only if it's a public demo)
-	var origTrip models.Trip
-	var startDate, endDate time.Time
-	queryOrig := `SELECT name, description, start_date, end_date, base_currency, default_expense_currency FROM trips WHERE id = $1 AND is_public_demo = true`
-	err = tx.QueryRow(ctx, queryOrig, origID).Scan(&origTrip.Name, &origTrip.Description, &startDate, &endDate, &origTrip.BaseCurrency, &origTrip.DefaultExpenseCurrency)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch original demo trip: %w", err)
-	}
-
-	// 2. Insert new Trip
-	newTripID := uuid.New()
-	queryInsertTrip := `
-		INSERT INTO trips (id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, is_public_demo, forked_from)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, false, $10)
-	`
-	_, err = tx.Exec(ctx, queryInsertTrip, newTripID, userID, sessionID, origTrip.Name, origTrip.Description, startDate, endDate, origTrip.BaseCurrency, origTrip.DefaultExpenseCurrency, origID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to insert forked trip: %w", err)
-	}
-
-	// 3. Clone Places
-	queryPlaces := `SELECT id, name, notes, lat, lon, start_date, end_date, default_expense_currency FROM places WHERE trip_id = $1`
-	rows, err := tx.Query(ctx, queryPlaces, origID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch places: %w", err)
-	}
-	
-	type placeData struct {
-		ID uuid.UUID
-		Name string
-		Notes *string
-		Lat *float64
-		Lon *float64
-		StartDate *time.Time
-		EndDate *time.Time
-		DefaultExpenseCurrency *string
-	}
-	var places []placeData
-	for rows.Next() {
-		var p placeData
-		if err := rows.Scan(&p.ID, &p.Name, &p.Notes, &p.Lat, &p.Lon, &p.StartDate, &p.EndDate, &p.DefaultExpenseCurrency); err != nil {
-			rows.Close()
-			return nil, err
-		}
-		places = append(places, p)
-	}
-	rows.Close()
-
-	placeMap := make(map[uuid.UUID]uuid.UUID)
-	if len(places) > 0 {
-		var placeInsertArgs []any
-		var placeValues []string
-		
-		for i, p := range places {
-			newPlaceID := uuid.New()
-			placeMap[p.ID] = newPlaceID
-			
-			offset := i * 9
-			placeValues = append(placeValues, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)", offset+1, offset+2, offset+3, offset+4, offset+5, offset+6, offset+7, offset+8, offset+9))
-			placeInsertArgs = append(placeInsertArgs, newPlaceID, newTripID, p.Name, p.Notes, p.Lat, p.Lon, p.StartDate, p.EndDate, p.DefaultExpenseCurrency)
-		}
-		
-		queryInsertPlaces := fmt.Sprintf(`INSERT INTO places (id, trip_id, name, notes, lat, lon, start_date, end_date, default_expense_currency) VALUES %s`, strings.Join(placeValues, ","))
-		if _, err := tx.Exec(ctx, queryInsertPlaces, placeInsertArgs...); err != nil {
-			return nil, fmt.Errorf("failed to insert places: %w", err)
-		}
-	}
-
-	// 4. Clone Activities
-	queryActivities := `SELECT id, place_id, title, date, time, notes FROM activities WHERE trip_id = $1`
-	aRows, err := tx.Query(ctx, queryActivities, origID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch activities: %w", err)
-	}
-	type activityData struct {
-		ID uuid.UUID
-		PlaceID *uuid.UUID
-		Title string
-		Date time.Time
-		Time *string
-		Notes *string
-	}
-	var activities []activityData
-	for aRows.Next() {
-		var a activityData
-		if err := aRows.Scan(&a.ID, &a.PlaceID, &a.Title, &a.Date, &a.Time, &a.Notes); err != nil {
-			aRows.Close()
-			return nil, err
-		}
-		activities = append(activities, a)
-	}
-	aRows.Close()
-
-	if len(activities) > 0 {
-		var actArgs []any
-		var actVals []string
-		for i, a := range activities {
-			newActID := uuid.New()
-			var mappedPlaceID *uuid.UUID
-			if a.PlaceID != nil {
-				if newPID, ok := placeMap[*a.PlaceID]; ok {
-					mappedPlaceID = &newPID
-				}
-			}
-			offset := i * 7
-			actVals = append(actVals, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d)", offset+1, offset+2, offset+3, offset+4, offset+5, offset+6, offset+7))
-			actArgs = append(actArgs, newActID, newTripID, mappedPlaceID, a.Title, a.Date, a.Time, a.Notes)
-		}
-		queryInsertActs := fmt.Sprintf(`INSERT INTO activities (id, trip_id, place_id, title, date, time, notes) VALUES %s`, strings.Join(actVals, ","))
-		if _, err := tx.Exec(ctx, queryInsertActs, actArgs...); err != nil {
-			return nil, fmt.Errorf("failed to insert activities: %w", err)
-		}
-	}
-
-	// 5. Clone Expenses
-	queryExpenses := `SELECT amount, currency, converted_amount, date, notes, category_id, place_id, original_amount, original_currency, exchange_rate, conversion_date FROM expenses WHERE trip_id = $1`
-	eRows, err := tx.Query(ctx, queryExpenses, origID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch expenses: %w", err)
-	}
-	type expData struct {
-		Amount float64
-		Currency string
-		ConvertedAmt *float64
-		Date time.Time
-		Notes *string
-		CatID *uuid.UUID
-		PlaceID *uuid.UUID
-		OrigAmt float64
-		OrigCur string
-		ExchRate float64
-		ConvDate time.Time
-	}
-	var expenses []expData
-	for eRows.Next() {
-		var e expData
-		if err := eRows.Scan(&e.Amount, &e.Currency, &e.ConvertedAmt, &e.Date, &e.Notes, &e.CatID, &e.PlaceID, &e.OrigAmt, &e.OrigCur, &e.ExchRate, &e.ConvDate); err != nil {
-			eRows.Close()
-			return nil, err
-		}
-		expenses = append(expenses, e)
-	}
-	eRows.Close()
-
-	if len(expenses) > 0 {
-		var expArgs []any
-		var expVals []string
-		for i, e := range expenses {
-			newExpID := uuid.New()
-			var mappedPlaceID *uuid.UUID
-			if e.PlaceID != nil {
-				if newPID, ok := placeMap[*e.PlaceID]; ok {
-					mappedPlaceID = &newPID
-				}
-			}
-			offset := i * 14
-			expVals = append(expVals, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)", 
-				offset+1, offset+2, offset+3, offset+4, offset+5, offset+6, offset+7, offset+8, offset+9, offset+10, offset+11, offset+12, offset+13, offset+14))
-			expArgs = append(expArgs, newExpID, newTripID, userID, e.Amount, e.Currency, e.ConvertedAmt, e.Date, e.Notes, e.CatID, mappedPlaceID, e.OrigAmt, e.OrigCur, e.ExchRate, e.ConvDate)
-		}
-		queryInsertExp := fmt.Sprintf(`INSERT INTO expenses (id, trip_id, user_id, amount, currency, converted_amount, date, notes, category_id, place_id, original_amount, original_currency, exchange_rate, conversion_date) VALUES %s`, strings.Join(expVals, ","))
-		if _, err := tx.Exec(ctx, queryInsertExp, expArgs...); err != nil {
-			return nil, fmt.Errorf("failed to insert expenses: %w", err)
-		}
-	}
-
-	// 6. Log event (using unified events table)
-	logQuery := `INSERT INTO events (type, session_id, user_id, trip_id, metadata, created_at) VALUES ($1, $2, $3, $4, $5, NOW())`
-	metadata := fmt.Sprintf(`{"forked_from": "%s", "trigger": "ghost_mode_write"}`, originalTripID)
-	if _, err := tx.Exec(ctx, logQuery, "demo_deep_forked", sessionID, userID, newTripID, metadata); err != nil {
-		return nil, fmt.Errorf("failed to log fork event: %w", err)
-	}
-
-	if err := tx.Commit(ctx); err != nil {
-		return nil, fmt.Errorf("failed to commit fork transaction: %w", err)
-	}
-
-	// Fetch full new trip to return
-	return r.GetTrip(ctx, newTripID.String(), userID, sessionID)
-}
-
 func (r *TripRepository) GetFork(ctx context.Context, forkedFrom string, userID *uuid.UUID, sessionID *string) (*models.Trip, error) {
 	var trip models.Trip
 	query := `
@@ -494,11 +332,12 @@ func (r *TripRepository) GetTripMeta(ctx context.Context, tripID string, userID 
 }
 func (r *TripRepository) ListPublicDemos(ctx context.Context, limit int) ([]models.Trip, error) {
 	query := `
-		SELECT 
-			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency, 
+		SELECT
+			id, user_id, session_id, name, description, start_date, end_date, base_currency, default_expense_currency,
 			is_public_demo, forked_from, created_at,
 			COALESCE((SELECT SUM(amount) FROM expenses WHERE trip_id = trips.id), 0) as total_spent,
-			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count
+			COALESCE((SELECT COUNT(*) FROM places WHERE trip_id = trips.id), 0) as place_count,
+			share_token, share_enabled, share_expires_at, share_created_at
 		FROM trips
 		WHERE is_public_demo = true
 		ORDER BY created_at DESC
@@ -514,6 +353,7 @@ func (r *TripRepository) ListPublicDemos(ctx context.Context, limit int) ([]mode
 	for rows.Next() {
 		var trip models.Trip
 		var startDate, endDate, createdAt time.Time
+		var shareExpiresAt, shareCreatedAt *time.Time
 		if err := rows.Scan(
 			&trip.ID,
 			&trip.UserId,
@@ -529,12 +369,24 @@ func (r *TripRepository) ListPublicDemos(ctx context.Context, limit int) ([]mode
 			&createdAt,
 			&trip.TotalSpent,
 			&trip.PlaceCount,
+			&trip.ShareToken,
+			&trip.ShareEnabled,
+			&shareExpiresAt,
+			&shareCreatedAt,
 		); err != nil {
 			return nil, err
 		}
 		trip.StartDate = startDate.Format("2006-01-02")
 		trip.EndDate = endDate.Format("2006-01-02")
 		trip.CreatedAt = createdAt.Format(time.RFC3339)
+		if shareExpiresAt != nil {
+			s := shareExpiresAt.Format(time.RFC3339)
+			trip.ShareExpiresAt = &s
+		}
+		if shareCreatedAt != nil {
+			s := shareCreatedAt.Format(time.RFC3339)
+			trip.ShareCreatedAt = &s
+		}
 		trips = append(trips, trip)
 	}
 
@@ -552,5 +404,257 @@ func (r *TripRepository) GetPublicStats(ctx context.Context) (int, error) {
 		// Fallback to real count if stats table fails
 		err = r.Pool.QueryRow(ctx, "SELECT COUNT(*) FROM trips").Scan(&count)
 	}
+	return count, err
+}
+
+func (r *TripRepository) IsPublicDemo(ctx context.Context, tripID uuid.UUID) (bool, error) {
+	var isDemo bool
+	err := r.Pool.QueryRow(ctx,
+		`SELECT is_public_demo FROM trips WHERE id = $1`, tripID,
+	).Scan(&isDemo)
+
+	// If the trip does not exist, it is by definition not a public demo.
+	// Any other error is a real database failure and must be propagated.
+	if err == pgx.ErrNoRows {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+
+	return isDemo, nil
+}
+
+func (r *TripRepository) GetActiveShareTripID(ctx context.Context, token string) (uuid.UUID, error) {
+	var id uuid.UUID
+	err := r.Pool.QueryRow(ctx,
+		`SELECT id FROM trips
+	WHERE share_token = $1
+		AND share_enabled = true
+		AND (share_expires_at IS NULL OR share_expires_at > NOW())`,
+		token).Scan(&id)
+
+	return id, err
+}
+
+func (r *TripRepository) GetBaseForClone(ctx context.Context, tx pgx.Tx, origID uuid.UUID) (*models.Trip, error) {
+	var t models.Trip
+	var startDate, endDate time.Time
+	err := tx.QueryRow(ctx,
+		`SELECT name, description, start_date, end_date, base_currency, default_expense_currency
+FROM trips WHERE id = $1`,
+		origID).Scan(
+		&t.Name,
+		&t.Description,
+		&startDate,
+		&endDate,
+		&t.BaseCurrency,
+		&t.DefaultExpenseCurrency,
+	)
+	if err != nil {
+		return nil, err
+	}
+	t.StartDate = startDate.Format("2006-01-02")
+	t.EndDate = endDate.Format("2006-01-02")
+	return &t, nil
+}
+
+func (r *TripRepository) InsertFork(
+	ctx context.Context,
+	tx pgx.Tx,
+	newTripID uuid.UUID,
+	userID *uuid.UUID,
+	sessionID *string,
+	origID uuid.UUID,
+	base *models.Trip,
+) error {
+	startDate, _ := time.Parse("2006-01-02", base.StartDate)
+	endDate, _ := time.Parse("2006-01-02", base.EndDate)
+	_, err := tx.Exec(ctx,
+		`INSERT INTO trips (id, user_id, session_id, name, description,
+							start_date, end_date, base_currency,
+							default_expense_currency, is_public_demo, forked_from)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+		newTripID, userID, sessionID, base.Name, base.Description, startDate,
+		endDate, base.BaseCurrency, base.DefaultExpenseCurrency, base.IsPublicDemo, origID)
+
+	return err
+}
+
+func (r *TripRepository) EnableShare(
+	ctx context.Context,
+	tripID string,
+	userID *uuid.UUID,
+	sessionID *string,
+) (string, *time.Time, error) {
+	tx, err := r.Pool.Begin(ctx)
+	if err != nil {
+		return "", nil, err
+	}
+	defer tx.Rollback(ctx)
+
+	var ownerUserID *uuid.UUID
+	var ownerSessionID *string
+	err = tx.QueryRow(ctx,
+		`SELECT user_id, session_id FROM trips WHERE id = $1`, tripID,
+	).Scan(&ownerUserID, &ownerSessionID)
+
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return "", nil, errors.New("trip not found")
+		}
+		return "", nil, err
+	}
+
+	isOwner := (userID != nil && ownerUserID != nil && *userID == *ownerUserID) ||
+		(sessionID != nil && ownerSessionID != nil && *sessionID == *ownerSessionID)
+	if !isOwner {
+		return "", nil, errors.New("unauthorized")
+	}
+
+	var existingToken *string
+	var existingExpiry *time.Time
+	err = tx.QueryRow(ctx,
+		`SELECT share_token, share_expires_at 
+			FROM trips WHERE id = $1 AND share_enabled = true`,
+		tripID).Scan(&existingToken, &existingExpiry)
+
+	if err == nil && existingToken != nil {
+		if existingExpiry == nil || existingExpiry.After(time.Now()) {
+			if err := tx.Commit(ctx); err != nil {
+				return "", nil, err
+			}
+			return *existingToken, existingExpiry, nil
+		}
+	}
+
+	newToken, err := generateShareToken()
+	if err != nil {
+		return "", nil, fmt.Errorf("failed to generate token: %w", err)
+	}
+
+	var newExpiry *time.Time
+	if ownerUserID != nil {
+		newExpiry = nil // permanent
+	} else {
+		exp := time.Now().Add(7 * 24 * time.Hour)
+		newExpiry = &exp
+	}
+
+	_, err = tx.Exec(ctx,
+		`UPDATE trips
+			SET share_token = $1, share_enabled = true,
+				share_expires_at = $2, share_created_at = NOW()
+			WHERE id = $3`,
+		newToken, newExpiry, tripID)
+	if err != nil {
+		return "", nil, fmt.Errorf("failed to enable share: %w", err)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return "", nil, err
+	}
+	return newToken, newExpiry, nil
+}
+
+func (r *TripRepository) DisableShare(
+	ctx context.Context,
+	tripID string,
+	userID *uuid.UUID,
+	sessionID *string,
+) error {
+	res, err := r.Pool.Exec(ctx,
+		`UPDATE trips
+			SET share_token = NULL, share_enabled = false,
+				share_expires_at = NULL, share_created_at = NULL
+			WHERE id = $1
+				AND ((user_id = $2 AND $2 IS NOT NULL) OR (session_id = $3 AND $3 IS NOT NULL))`,
+		tripID, userID, sessionID)
+	if err != nil {
+		return err
+	}
+	if res.RowsAffected() == 0 {
+		return errors.New("trip not found or unauthorized")
+	}
+	return nil
+}
+
+func (r *TripRepository) GetByShareToken(ctx context.Context, token string) (*models.Trip, error) {
+	var t models.Trip
+	var startDate, endDate, createdAt time.Time
+	var shareExpiresAt, shareCreatedAt *time.Time
+
+	err := r.Pool.QueryRow(ctx,
+		`SELECT id, user_id, session_id, name, description,
+					start_date, end_date, base_currency, default_expense_currency,
+					is_public_demo, forked_from, created_at,
+					share_token, share_enabled, share_expires_at, share_created_at
+			FROM trips
+			WHERE share_token = $1
+				AND share_enabled = true
+				AND (share_expires_at IS NULL OR share_expires_at > NOW())
+		`, token).Scan(
+		&t.ID,
+		&t.UserId,
+		&t.SessionId,
+		&t.Name,
+		&t.Description,
+		&startDate,
+		&endDate,
+		&t.BaseCurrency,
+		&t.DefaultExpenseCurrency,
+		&t.IsPublicDemo,
+		&t.ForkedFrom,
+		&createdAt,
+		&t.ShareToken,
+		&t.ShareEnabled,
+		&shareExpiresAt,
+		&shareCreatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	t.StartDate = startDate.Format("2006-01-02")
+	t.EndDate = endDate.Format("2006-01-02")
+	t.CreatedAt = createdAt.Format(time.RFC3339)
+	if shareExpiresAt != nil {
+		s := shareExpiresAt.Format(time.RFC3339)
+		t.ShareExpiresAt = &s
+	}
+	if shareCreatedAt != nil {
+		s := shareCreatedAt.Format(time.RFC3339)
+		t.ShareCreatedAt = &s
+	}
+	return &t, nil
+}
+
+// generateShareToken - 9 bytes random -> base64 URL without padding -> 12 chars exactly
+const shareTokenLength = 12
+
+func generateShareToken() (string, error) {
+	raw := make([]byte, 9)
+	if _, err := rand.Read(raw); err != nil {
+		return "", err
+	}
+	token := base64.RawURLEncoding.EncodeToString(raw)
+	if len(token) != shareTokenLength {
+		return "", fmt.Errorf("unexpected token length: got %d, want %d", len(token), shareTokenLength)
+	}
+	return token, nil
+}
+
+func (r *TripRepository) CountActiveSharesByUser(
+	ctx context.Context,
+	userID *uuid.UUID,
+	sessionID *string,
+) (int, error) {
+	var count int
+	err := r.Pool.QueryRow(ctx, `
+        SELECT COUNT(*) FROM trips
+        WHERE share_enabled = true
+          AND (share_expires_at IS NULL OR share_expires_at > NOW())
+          AND ((user_id = $1 AND $1 IS NOT NULL) OR (session_id = $2 AND $2 IS NOT NULL))
+    `, userID, sessionID).Scan(&count)
 	return count, err
 }

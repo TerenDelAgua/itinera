@@ -14,7 +14,10 @@ type contextKey string
 
 const WorkingTripIDKey contextKey = "workingTripID"
 
-func ResolveTripContext(store database.TripContextStore) func(next http.Handler) http.Handler {
+// ResolveTripContext accepts any value that satisfies database.TripForker
+// (GetFork + ForkFromDemo + GetTripMeta). In production this is
+// *services.TripService; in tests the package uses an in-memory mock.
+func ResolveTripContext(forker database.TripForker) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
@@ -49,7 +52,7 @@ func ResolveTripContext(store database.TripContextStore) func(next http.Handler)
 				return
 			}
 
-			forkedTrip, err := store.GetFork(ctx, tripID, userID, sessionID)
+			forkedTrip, err := forker.GetFork(ctx, tripID, userID, sessionID)
 
 			if err == nil {
 				ctx = context.WithValue(ctx, WorkingTripIDKey, forkedTrip.ID.String())
@@ -62,7 +65,7 @@ func ResolveTripContext(store database.TripContextStore) func(next http.Handler)
 				return
 			}
 
-			isOwner, isDemo, err := store.GetTripMeta(ctx, tripID, userID, sessionID)
+			isOwner, isDemo, err := forker.GetTripMeta(ctx, tripID, userID, sessionID)
 
 			if err != nil {
 				if err == pgx.ErrNoRows {
@@ -82,7 +85,14 @@ func ResolveTripContext(store database.TripContextStore) func(next http.Handler)
 			isMutating := r.Method == "POST" || r.Method == "PUT" || r.Method == "DELETE"
 
 			if isMutating {
-				forkedTrip, err = store.ForkTrip(ctx, tripID, userID, sessionID)
+				// tripID was validated as a UUID at the top of this middleware, so
+				// Parse must succeed; treat any failure here as a defensive 500.
+				demoID, parseErr := uuid.Parse(tripID)
+				if parseErr != nil {
+					http.Error(w, "Internal error: trip id was not a UUID", http.StatusInternalServerError)
+					return
+				}
+				forkedTrip, err = forker.ForkFromDemo(ctx, demoID, userID, sessionID)
 				if err != nil {
 					http.Error(w, "Failed to fork demo trip", http.StatusInternalServerError)
 					return
@@ -104,7 +114,7 @@ func GetWorkingTripID(r *http.Request) string {
 	if id, ok := r.Context().Value(WorkingTripIDKey).(string); ok && id != "" {
 		return id
 	}
-	
+
 	// Fallbacks just in case the middleware was bypassed somehow
 	if id := chi.URLParam(r, "trip_id"); id != "" {
 		return id

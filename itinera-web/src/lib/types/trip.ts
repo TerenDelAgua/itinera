@@ -14,4 +14,9 @@ export interface Trip {
     updated_at?: string;
     place_count: number;
     total_spent: number;
+
+    share_token?: string;
+    share_enabled: boolean;
+    share_expires_at?: string;
+    share_created_at?: string;
 }

@@ -7,7 +7,6 @@
   import { Events } from "$lib/services/tracking";
   import { cubicOut } from "svelte/easing";
   import { tweened } from "svelte/motion";
-  import { untrack } from "svelte";
   import { fly } from "svelte/transition";
 
   // Types
@@ -34,6 +33,7 @@
   import SeoHead from "$lib/components/seo/SeoHead.svelte";
   import type { CostEstimate } from "$lib/services/costPredictor";
   import type { Expense } from "$lib/types/Expense";
+  import ShareButton from "$lib/components/share-itinerary/ShareButton.svelte";
 
   let tripId = $state("");
 
@@ -84,15 +84,9 @@
 
   let activities = $state<Activity[]>([]);
   let isAgendaOpen = $state(false);
-  const refreshActivities = async () =>
-    (activities = await activityApi.list(tripId));
 
-  let initialActivityDate = $derived.by(() => {
-    const today = new Date().toISOString().split("T")[0];
-    if (!tripStartDate || !tripEndDate) return today;
-    if (today >= tripStartDate && today <= tripEndDate) return today;
-    return tripStartDate;
-  });
+  let shareToken = $state<string | null>(null);
+  let shareEnabled = $state(false);
 
   onMount(() => {
     tripId = $page.params.id ?? "";
@@ -168,6 +162,7 @@
         created_at: tripData.created_at,
         place_count: places.length,
         total_spent: summaryData.grand_total || 0,
+        share_enabled: tripData.share_enabled,
       };
 
       const predictor = new HeuristicPredictor(
@@ -181,6 +176,9 @@
         expenses,
         categories,
       );
+
+      shareToken = tripData.share_token || null;
+      shareEnabled = !!tripData.share_enabled;
 
       if (tripData.is_public_demo) {
         Events.demoViewed(tripId, tripName);
@@ -216,6 +214,7 @@
           body: JSON.stringify(payload),
         });
 
+        console.log("Trip updated:", response);
         // reload to sync with summary if currency changed
         loadAllData();
       } catch (e) {
@@ -247,6 +246,8 @@
         }),
       });
 
+      console.log("Trip updated:", response);
+
       // reload to sync with summary if currency changed
       loadAllData();
     } catch (e) {
@@ -273,6 +274,8 @@
       deletePlaceConfirmId = null;
     }
   }
+
+  let isOwner = $derived(!isPublicDemo && tripId !== "");
 </script>
 
 <svelte:head>
@@ -342,6 +345,13 @@
     onUpdateCurrency={updateTripCurrency}
     onBack={() => goto("/trips")}
   />
+
+  <!-- TODO: Change position of Share button to DetailHeader -->
+  <div class="max-w-3x1 mx-auto px-4 flex justify-end gap-2 mb-4">
+    {#if isOwner}
+      <ShareButton {tripId} bind:shareToken bind:shareEnabled />
+    {/if}
+  </div>
 
   <main class="max-w-3xl mx-auto px-4 py-8 space-y-10">
     {#if isLoading}

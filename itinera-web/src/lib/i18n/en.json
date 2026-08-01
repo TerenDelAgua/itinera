@@ -27,7 +27,8 @@
     "add": "Add",
     "inherit": "Inherit",
     "cancel": "Cancel",
-    "done": "Done"
+    "done": "Done",
+    "close": "Close"
   },
   "trip_form": {
     "title": "Create a new trip",
@@ -91,7 +92,8 @@
     "days": "days",
     "day": "day",
     "no_expenses": "No local expenses yet.",
-    "view_history": "View All"
+    "view_history": "View All",
+    "delete": "Delete"
   },
   "itinerary": {
     "title": "Activities",
@@ -454,5 +456,30 @@
     "place_description_fallback": "Travel destination in {city}. Plan expenses, activities, and station guides with Itinera.",
     "dashboard_title": "My Trips",
     "dashboard_description": "Plan and organize your journeys with Itinera."
+  },
+  "share": {
+    "active_link": "Active link",
+    "cta_share": "Share",
+    "popover_title": "Share itinerary",
+    "copy_cta": "Copy",
+    "expires_at": "Expires on {date}",
+    "disable_cta": "Disable link",
+    "readonly_banner": "👁️ Shared itinerary · Read-only",
+    "not_available_title": "Link not available",
+    "discover_cta": "Discover Itinera",
+    "places_title": "Places",
+    "activities_title": "Agenda",
+    "fork_prompt": "Like this itinerary?",
+    "fork_cta": "Use as base for my trip",
+    "create_own_cta": "Create my own itinerary",
+    "expires_in": "Expires in {days} days",
+    "seo_fallback": "Shared itinerary on Itinera",
+    "errors": {
+      "not_found": "This link is no longer available or has expired.",
+      "generic": "We could not load the itinerary.",
+      "network": "Connection error. Check your network.",
+      "fork_failed": "We could not create your copy. Please try again.",
+      "copy_failed": "We could not copy the link."
+    }
   }
 }
