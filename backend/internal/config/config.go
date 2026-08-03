@@ -17,6 +17,10 @@ type Config struct {
 	Environment   string
 	PublicOrigin  string
 	InternalToken string
+
+	AuthV2Enabled bool
+	ResendAPIKey  string
+	EmailFrom     string
 }
 
 func Load() *Config {
@@ -27,6 +31,9 @@ func Load() *Config {
 		Environment:   getEnv("ENVIRONMENT", "development"),
 		PublicOrigin:  normalizeOrigin(getEnv("PUBLIC_ORIGIN", "https://goitinera.app")),
 		InternalToken: getEnv("ITINERA_INTERNAL_TOKEN", ""),
+		AuthV2Enabled: getEnv("AUTH_V2_ENABLED", "false") == "true",
+		ResendAPIKey:  getEnv("RESEND_API_KEY", ""),
+		EmailFrom:     getEnv("EMAIL_FROM", "Itinera <hello@goitinera.app>"),
 	}
 }
 
@@ -108,6 +115,9 @@ func (c *Config) Validate() error {
 	}
 	if strings.TrimSpace(c.InternalToken) != c.InternalToken {
 		return errors.New("ITINERA_INTERNAL_TOKEN must not contain leading or trailing whitespace")
+	}
+	if c.AuthV2Enabled && c.ResendAPIKey == "" {
+		return errors.New("RESEND_API_KEY must be set in production when AUTH_V2_ENABLED=true")
 	}
 	return nil
 }

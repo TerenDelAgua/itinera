@@ -114,11 +114,13 @@ type ExpenseStore interface {
 // ── Auth ─────────────────────────────────────────────────────────────────────
 
 // AuthStore is the read/write contract for users and the guest-to-user trip
-// migration.
+// migration. The guest claim migration is named after its behaviour (moving
+// trips from a guest session into a user's account) rather than the legacy
+// "upgrade" wording.
 type AuthStore interface {
 	CreateUser(ctx context.Context, email, password string) (*models.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
-	UpgradeTrips(ctx context.Context, sessionID string, userID uuid.UUID) error
+	ClaimGuestTrips(ctx context.Context, sessionID string, userID uuid.UUID) (claimed int, err error)
 }
 
 // ── Events ───────────────────────────────────────────────────────────────────

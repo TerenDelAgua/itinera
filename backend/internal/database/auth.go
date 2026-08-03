@@ -53,13 +53,15 @@ func (r *AuthRepository) GetUserByEmail(ctx context.Context, email string) (*mod
 	return &user, nil
 }
 
-func (r *AuthRepository) UpgradeTrips(ctx context.Context, sessionId string, userID uuid.UUID) error {
+func (r *AuthRepository) ClaimGuestTrips(ctx context.Context, sessionID string, userID uuid.UUID) (int, error) {
 	query := `
 		UPDATE trips
-		SET user_id = $1, session_id = NULL
+		SET user_id = $1
 		WHERE session_id = $2 AND user_id IS NULL
 	`
-	_, err := r.Pool.Exec(ctx, query, userID, sessionId)
-
-	return err
+	res, err := r.Pool.Exec(ctx, query, userID, sessionID)
+	if err != nil {
+		return 0, err
+	}
+	return int(res.RowsAffected()), nil
 }

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"backend/internal/http/middleware"
+	"net/http"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -34,7 +35,8 @@ func RegisterApiRoutes(r chi.Router, h *Handlers) {
 		r.Get("/trips", h.ListTrips)
 		r.Post("/trips", h.CreateTrip)
 
-		r.Post("/auth/upgrade", h.UpgradeSession)
+		r.Post("/auth/claim-guest", h.ClaimGuest)
+		r.Method(http.MethodPost, "/auth/upgrade", upgradeAlias())
 
 		// Events: fire-and-forget analytics (no PII, rate-limited)
 		r.Post("/events", h.TrackEvent)
@@ -71,5 +73,16 @@ func RegisterApiRoutes(r chi.Router, h *Handlers) {
 			r.Put("/trips/{trip_id}/activities/{id}", h.UpdateActivity)
 			r.Delete("/trips/{trip_id}/activities/{id}", h.DeleteActivity)
 		})
+	})
+}
+
+// upgradeAlias returns an http.Handler that responds 301 to /auth/claim-guest,
+// preserving the request method and any cookies. It exists only as a backwards-
+// compatible shim during the cutover window and MUST be removed once the v3
+// rollout completes (Spec 017 §15 fase 4 paso 23).
+func upgradeAlias() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		target := r.URL.Scheme + "://" + r.URL.Host + "/api/v1/auth/claim-guest"
+		http.Redirect(w, r, target, http.StatusMovedPermanently)
 	})
 }

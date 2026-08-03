@@ -4,6 +4,7 @@ import (
 	"backend/internal/http/middleware"
 	"backend/internal/models"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -126,7 +127,7 @@ func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(TokenResponse{Token: token, User: *user})
 }
 
-func (h *Handlers) UpgradeSession(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) ClaimGuest(w http.ResponseWriter, r *http.Request) {
 	userIdRaw := r.Context().Value(middleware.ContextKeyUserId{})
 	userId, ok := userIdRaw.(uuid.UUID)
 
@@ -138,10 +139,16 @@ func (h *Handlers) UpgradeSession(w http.ResponseWriter, r *http.Request) {
 	sessionIdRaw := r.Context().Value(middleware.ContextKeySessionId{})
 	sessionId, _ := sessionIdRaw.(string)
 
-	if err := h.AuthRepo.UpgradeTrips(r.Context(), sessionId, userId); err != nil {
+	claimed, err := h.AuthRepo.ClaimGuestTrips(r.Context(), sessionId, userId)
+	if err != nil {
 		http.Error(w, "Migration failed", http.StatusInternalServerError)
+		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "Guest trips migrated successfully"}`))
+	json.NewEncoder(w).Encode(map[string]any{
+		"claimed_trips_count": claimed,
+		"message":             fmt.Sprintf("Hemos añadido %d viajes a tu cuenta", claimed),
+	})
 }
