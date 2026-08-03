@@ -9,7 +9,7 @@ BEGIN
         RETURN;
     END IF;
     IF NOT EXISTS (
-        SELECT 1 FROM information_schema.table
+        SELECT 1 FROM information_schema.tables
         WHERE table_schema = 'public' AND table_name = 'trips'
     ) THEN
         RAISE WARNING 'trips table does not exists; skipping 017_auth_mvp';
@@ -46,7 +46,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_unique
 -- =====================================================================
 -- 2. Tabla sessions (tokens opacos, rotación, reuse detection)
 -- =====================================================================
-CRATE TABLE IF NOT EXISTS sessions (
+CREATE TABLE IF NOT EXISTS sessions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     -- Hash SHA-256
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
     -- Hash SHA-256 of the 6 digits code send by email
     token_hash TEXT NOT NULL UNIQUE,
     expires_at TIMESTAMPTZ NOT NULL,
-    used_at TIMESTAMPTZ
+    used_at TIMESTAMPTZ,
     -- fail attempts counter
     attempts INT NOT NULL DEFAULT 0,
     locked_at TIMESTAMPTZ,
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
 CREATE INDEX IF NOT EXISTS idx_password_reset_user_id 
     ON password_reset_tokens (user_id);
 CREATE INDEX IF NOT EXISTS idx_password_reset_expires
-    ON password_reset_tokens (expires_at);
+    ON password_reset_tokens (expires_at)
     WHERE used_at IS NULL AND locked_at IS NULL;
 
 -- =====================================================================
