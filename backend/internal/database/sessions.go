@@ -197,6 +197,26 @@ func (r *SessionRepository) RevokeFamily(ctx context.Context, familyID uuid.UUID
 	return err
 }
 
+// RevokeSessionByAccessHash revokes just the session row whose access cookie
+// the caller supplied. Used by the per-device logout flow (Spec 017 §5.3)
+// because the handler knows the raw access token — it's the cookie — but
+// doesn't have the session.id on hand.
+//
+// Returns the number of rows revoked: 0 if the cookie was unknown or the
+// row was already revoked (idempotent). Errors from the UPDATE are passed
+// through unchanged.
+func (r *SessionRepository) RevokeSessionByAccessHash(ctx context.Context, accessHash string) (int, error) {
+	res, err := r.Pool.Exec(ctx, `
+		UPDATE sessions
+		SET revoked_at = now()
+		WHERE access_token_hash = $1 AND revoked_at IS NULL
+	`, accessHash)
+	if err != nil {
+		return 0, err
+	}
+	return int(res.RowsAffected()), nil
+}
+
 // RevokeAllSessionsForUser is used by the GDPR delete-account endpoint
 // and by /auth/logout-everywhere.
 func (r *SessionRepository) RevokeAllSessionsForUser(ctx context.Context, userID uuid.UUID) error {

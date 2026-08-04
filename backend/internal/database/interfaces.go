@@ -207,6 +207,7 @@ type SessionStore interface {
 	FindSessionByAccessTokenHash(ctx context.Context, accessHash string) (*models.Session, error)
 	RotateSession(ctx context.Context, sessionID uuid.UUID, newAccessHash, newRefreshHash string, newExpiry time.Time) error
 	RevokeSession(ctx context.Context, sessionID uuid.UUID) error
+	RevokeSessionByAccessHash(ctx context.Context, accessHash string) (int, error)
 	RevokeFamily(ctx context.Context, familyID uuid.UUID) error
 	RevokeAllSessionsForUser(ctx context.Context, userID uuid.UUID) error
 	CountActiveSessionsForUser(ctx context.Context, userID uuid.UUID) (int, error)

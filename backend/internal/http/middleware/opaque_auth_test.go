@@ -52,6 +52,9 @@ func (f *fakeSessionStore) RotateSession(context.Context, uuid.UUID, string, str
 func (f *fakeSessionStore) RevokeSession(context.Context, uuid.UUID) error {
 	panic("RevokeSession should not be called from AuthMiddlewareV2")
 }
+func (f *fakeSessionStore) RevokeSessionByAccessHash(context.Context, string) (int, error) {
+	panic("RevokeSessionByAccessHash should not be called from AuthMiddlewareV2")
+}
 func (f *fakeSessionStore) RevokeFamily(context.Context, uuid.UUID) error {
 	panic("RevokeFamily should not be called from AuthMiddlewareV2")
 }

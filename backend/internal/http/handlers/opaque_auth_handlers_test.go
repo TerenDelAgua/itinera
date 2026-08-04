@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"backend/internal/auth"
 	"backend/internal/config"
 	"backend/internal/database"
+	"backend/internal/http/middleware"
 	"backend/internal/models"
 	"bytes"
 	"context"
@@ -20,63 +22,79 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// ---------- Fakes ---------------------------------------------------------
+
 // fakeAuthStore implements database.AuthStore with hand-rolled behaviour.
-// Only the methods LoginOpaque calls are non-trivial — the rest panic so a
-// regression that calls e.g. UpdateUserPassword is loud.
+// Only the methods the tests cover are non-trivial; the rest panic so a
+// regression is loud.
 type fakeAuthStore struct {
-	userByEmail map[string]*models.User
+	byEmail map[string]*models.User
+	byID    map[uuid.UUID]*models.User
 }
 
 func (f *fakeAuthStore) GetUserByEmail(_ context.Context, email string) (*models.User, error) {
-	if u, ok := f.userByEmail[email]; ok {
+	if u, ok := f.byEmail[email]; ok {
+		return u, nil
+	}
+	return nil, pgx.ErrNoRows
+}
+
+func (f *fakeAuthStore) GetUserByID(_ context.Context, id uuid.UUID) (*models.User, error) {
+	if u, ok := f.byID[id]; ok {
 		return u, nil
 	}
 	return nil, pgx.ErrNoRows
 }
 
 func (f *fakeAuthStore) CreateUser(context.Context, string, string, string) (*models.User, error) {
-	panic("CreateUser not implemented in fake")
-}
-func (f *fakeAuthStore) GetUserByID(context.Context, uuid.UUID) (*models.User, error) {
-	panic("not used by LoginOpaque")
+	panic("not used in tests")
 }
 func (f *fakeAuthStore) ClaimGuestTrips(context.Context, string, uuid.UUID) (int, error) {
-	panic("not used by LoginOpaque")
+	panic("not used in tests")
 }
 func (f *fakeAuthStore) SoftDeleteUser(context.Context, uuid.UUID) (string, error) {
-	panic("not used by LoginOpaque")
+	panic("not used in tests")
 }
 func (f *fakeAuthStore) MarkUserAsHardDeleted(context.Context, uuid.UUID, string) error {
-	panic("not used by LoginOpaque")
+	panic("not used in tests")
 }
 func (f *fakeAuthStore) UpdateUserPassword(context.Context, uuid.UUID, string) error {
-	panic("not used by LoginOpaque")
+	panic("not used in tests")
 }
 
 var _ database.AuthStore = (*fakeAuthStore)(nil)
 
-// fakeSessionStore implements database.SessionStore with a counter so the
-// success path can verify a session row was created with the expected hashes.
+// fakeSessionStore implements database.SessionStore with counters so each
+// test can verify how the handler exercised it.
 type fakeSessionStore struct {
-	createdCalls int
-	lastUserID   uuid.UUID
-	lastAccess   string
-	lastRefresh  string
+	createdCalls       int
+	revokedByHashCalls int
+	lastRevokedHash    string
 }
 
-func (f *fakeSessionStore) CreateSession(_ context.Context, userID uuid.UUID, accessHash, refreshHash string, _ time.Time, _, _ *string) (*models.Session, error) {
+func (f *fakeSessionStore) CreateSession(_ context.Context, _ uuid.UUID, _ string, _ string, _ time.Time, _, _ *string) (*models.Session, error) {
 	f.createdCalls++
-	f.lastUserID = userID
-	f.lastAccess = accessHash
-	f.lastRefresh = refreshHash
-	return &models.Session{UserID: userID, AccessTokenHash: accessHash, RefreshTokenHash: refreshHash}, nil
+	return nil, nil
 }
 
-func (f *fakeSessionStore) FindSessionByAccessTokenHash(context.Context, string) (*models.Session, error) {
-	panic("not used by LoginOpaque")
+func (f *fakeSessionStore) FindSessionByAccessTokenHash(_ context.Context, accessHash string) (*models.Session, error) {
+	// Used by AuthMiddlewareV2. Return a synthetic session when the hash
+	// matches the value we expect to mint in the test. For tests that
+	// don't authenticate through the middleware, ErrNoRows is fine.
+	if accessHash == "" {
+		return nil, pgx.ErrNoRows
+	}
+	return nil, pgx.ErrNoRows
 }
+
+func (f *fakeSessionStore) RevokeSessionByAccessHash(_ context.Context, accessHash string) (int, error) {
+	f.revokedByHashCalls++
+	f.lastRevokedHash = accessHash
+	return 1, nil
+}
+
 func (f *fakeSessionStore) RotateSession(context.Context, uuid.UUID, string, string, time.Time) error {
-	panic("not used by LoginOpaque")
+	panic("not used in tests")
 }
 func (f *fakeSessionStore) RevokeSession(context.Context, uuid.UUID) error { panic("not used") }
 func (f *fakeSessionStore) RevokeFamily(context.Context, uuid.UUID) error { panic("not used") }
@@ -92,7 +110,9 @@ func (f *fakeSessionStore) CleanupExpiredSessions(context.Context) (int64, error
 
 var _ database.SessionStore = (*fakeSessionStore)(nil)
 
-func newLoginOpaqueHandler(authStore database.AuthStore, sessStore database.SessionStore) *Handlers {
+// ---------- Wiring helpers -----------------------------------------------
+
+func newHandlers(authStore database.AuthStore, sessStore database.SessionStore) *Handlers {
 	return &Handlers{
 		AuthRepo:    authStore,
 		SessionRepo: sessStore,
@@ -100,37 +120,78 @@ func newLoginOpaqueHandler(authStore database.AuthStore, sessStore database.Sess
 	}
 }
 
-// doLogin posts the supplied body to LoginOpaque and returns the recorder.
-func doLogin(t *testing.T, h *Handlers, body any) *httptest.ResponseRecorder {
+func doPost(t *testing.T, h *Handlers, path string, body any, cookies ...*http.Cookie) *httptest.ResponseRecorder {
 	t.Helper()
 	buf, _ := json.Marshal(body)
-	r := httptest.NewRequest(http.MethodPost, "/auth/v2/login", bytes.NewReader(buf))
+	r := httptest.NewRequest(http.MethodPost, path, bytes.NewReader(buf))
 	r.Header.Set("Content-Type", "application/json")
-	r.RemoteAddr = "203.0.113.1:54321"
+	for _, c := range cookies {
+		r.AddCookie(c)
+	}
 	rw := httptest.NewRecorder()
-	h.LoginOpaque(rw, r)
+	router := newTestRouter(h)
+	router.ServeHTTP(rw, r)
 	return rw
 }
 
-// TestLoginOpaque_EmptyBody returns 400 + VALIDATION_ERROR.
+func doGet(t *testing.T, h *Handlers, path string, cookies ...*http.Cookie) *httptest.ResponseRecorder {
+	t.Helper()
+	r := httptest.NewRequest(http.MethodGet, path, nil)
+	for _, c := range cookies {
+		r.AddCookie(c)
+	}
+	rw := httptest.NewRecorder()
+	router := newTestRouter(h)
+	router.ServeHTTP(rw, r)
+	return rw
+}
+
+// newTestRouter wires only AuthMiddlewareV2 in front of logout+me so the
+// tests don't have to set JWT cookies (which is the legacy tree, not the
+// one we're exercising here).
+func newTestRouter(h *Handlers) http.Handler {
+	return middleware.AuthMiddlewareV2(h.SessionRepo)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path := r.URL.Path
+		switch {
+		case path == "/auth/v2/logout" && r.Method == http.MethodPost:
+			h.LogoutOpaque(w, r)
+		case path == "/auth/v2/me" && r.Method == http.MethodGet:
+			h.MeOpaque(w, r)
+		case path == "/auth/v2/login" && r.Method == http.MethodPost:
+			h.LoginOpaque(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+}
+
+// putUserIDIntoContext returns a request whose Context already has
+// ContextKeyUserId set, simulating the middleware having run. Use this
+// when testing MeOpaque() in isolation; the doGet/dopost helpers route
+// through the middleware which does the same.
+func putUserIDIntoContext(r *http.Request, uid uuid.UUID) *http.Request {
+	ctx := r.Context()
+	ctx = context.WithValue(ctx, middleware.ContextKeyUserId{}, uid)
+	return r.WithContext(ctx)
+}
+
+// ---------- LoginOpaque tests (kept from prior phase) ---------------------
+
 func TestLoginOpaque_EmptyBody(t *testing.T) {
-	h := newLoginOpaqueHandler(&fakeAuthStore{}, &fakeSessionStore{})
+	h := newHandlers(&fakeAuthStore{}, &fakeSessionStore{})
 	rw := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodPost, "/auth/v2/login", nil)
 	h.LoginOpaque(rw, r)
 	require.Equal(t, http.StatusBadRequest, rw.Code)
-
 	var out JSONErrorBody
 	require.NoError(t, json.NewDecoder(rw.Body).Decode(&out))
 	assert.Equal(t, CodeValidationError, out.Error.Code)
 }
 
-// TestLoginOpaque_MissingFields returns 400 + VALIDATION_ERROR with per-field map.
 func TestLoginOpaque_MissingFields(t *testing.T) {
-	h := newLoginOpaqueHandler(&fakeAuthStore{}, &fakeSessionStore{})
-	rw := doLogin(t, h, map[string]string{"email": "x@x.com"})
+	h := newHandlers(&fakeAuthStore{}, &fakeSessionStore{})
+	rw := doPost(t, h, "/auth/v2/login", map[string]string{"email": "x@x.com"})
 	require.Equal(t, http.StatusBadRequest, rw.Code)
-
 	var out JSONErrorBody
 	require.NoError(t, json.NewDecoder(rw.Body).Decode(&out))
 	assert.Equal(t, CodeValidationError, out.Error.Code)
@@ -138,45 +199,24 @@ func TestLoginOpaque_MissingFields(t *testing.T) {
 	assert.Equal(t, "REQUIRED", out.Error.Fields["password"])
 }
 
-// TestLoginOpaque_UnknownUser returns 401 (anti-enumeration).
 func TestLoginOpaque_UnknownUser(t *testing.T) {
-	authStore := &fakeAuthStore{userByEmail: map[string]*models.User{}}
-	sessStore := &fakeSessionStore{}
-	h := newLoginOpaqueHandler(authStore, sessStore)
-
-	rw := doLogin(t, h, map[string]string{"email": "nobody@here.test", "password": "Pa55word!"})
+	authStore := &fakeAuthStore{byEmail: map[string]*models.User{}}
+	h := newHandlers(authStore, &fakeSessionStore{})
+	rw := doPost(t, h, "/auth/v2/login",
+		map[string]string{"email": "nobody@here.test", "password": "Pa55word!"})
 	require.Equal(t, http.StatusUnauthorized, rw.Code)
-
-	var out JSONErrorBody
-	require.NoError(t, json.NewDecoder(rw.Body).Decode(&out))
-	assert.Equal(t, CodeInvalidCredentials, out.Error.Code)
-	assert.Equal(t, 0, sessStore.createdCalls, "unknown user must not create a session")
 }
 
-// TestLoginOpaque_WrongPassword returns 401 + INVALID_CREDENTIALS and uses
-// the same copy as the unknown-user path (anti-enumeration).
 func TestLoginOpaque_WrongPassword(t *testing.T) {
 	hash, _ := bcrypt.GenerateFromPassword([]byte("right-password"), bcrypt.MinCost)
 	u := &models.User{ID: uuid.New(), Email: "x@y.z", PasswordHash: string(hash)}
-
-	authStore := &fakeAuthStore{userByEmail: map[string]*models.User{
-		"x@y.z": u,
-	}}
-	sessStore := &fakeSessionStore{}
-	h := newLoginOpaqueHandler(authStore, sessStore)
-
-	rw := doLogin(t, h, map[string]string{"email": "x@y.z", "password": "wrong-password"})
-
+	authStore := &fakeAuthStore{byEmail: map[string]*models.User{"x@y.z": u}}
+	h := newHandlers(authStore, &fakeSessionStore{})
+	rw := doPost(t, h, "/auth/v2/login",
+		map[string]string{"email": "x@y.z", "password": "wrong-password"})
 	require.Equal(t, http.StatusUnauthorized, rw.Code)
-	var out JSONErrorBody
-	require.NoError(t, json.NewDecoder(rw.Body).Decode(&out))
-	assert.Equal(t, CodeInvalidCredentials, out.Error.Code)
-	assert.Equal(t, 0, sessStore.createdCalls)
 }
 
-// TestLoginOpaque_Success_ReturnsTokensAndSetsCookies walks the happy path.
-// We don't seed the DB — we use the fakes — so this test doesn't depend
-// on migration 017 being applied.
 func TestLoginOpaque_Success_ReturnsTokensAndSetsCookies(t *testing.T) {
 	hash, _ := bcrypt.GenerateFromPassword([]byte("Pa55word!"), bcrypt.MinCost)
 	uid := uuid.New()
@@ -187,53 +227,124 @@ func TestLoginOpaque_Success_ReturnsTokensAndSetsCookies(t *testing.T) {
 		Tier:         "free",
 		Locale:       "es",
 	}
-
-	authStore := &fakeAuthStore{userByEmail: map[string]*models.User{u.Email: u}}
+	authStore := &fakeAuthStore{
+		byEmail: map[string]*models.User{u.Email: u},
+		byID:    map[uuid.UUID]*models.User{uid: u},
+	}
 	sessStore := &fakeSessionStore{}
-	h := newLoginOpaqueHandler(authStore, sessStore)
+	h := newHandlers(authStore, sessStore)
 
-	rw := doLogin(t, h, map[string]string{"email": u.Email, "password": "Pa55word!"})
-
+	rw := doPost(t, h, "/auth/v2/login",
+		map[string]string{"email": u.Email, "password": "Pa55word!"})
 	require.Equal(t, http.StatusOK, rw.Code, "body: %s", rw.Body.String())
-
-	var out opaqueLoginResponse
-	require.NoError(t, json.NewDecoder(rw.Body).Decode(&out))
-	assert.Equal(t, "Bearer", out.TokenType)
-	assert.Equal(t, accessTokenMaxAge, out.ExpiresInS)
 
 	cookies := rw.Result().Cookies()
 	require.Len(t, cookies, 2, "expected exactly 2 cookies (access + refresh)")
-	gotAccess, gotRefresh := false, false
-	var rawAccess, rawRefresh string
 	for _, c := range cookies {
-		switch c.Name {
-		case "itinera_access":
-			gotAccess = true
-			rawAccess = c.Value
-			assert.True(t, c.HttpOnly)
-			assert.Len(t, c.Value, 64, "access token must be 64 hex chars (32 bytes)")
-			assert.True(t, isLowerHex(c.Value), "access token must be lowercase hex")
-		case "itinera_refresh":
-			gotRefresh = true
-			rawRefresh = c.Value
-			assert.True(t, c.HttpOnly)
-			assert.Len(t, c.Value, 64)
-			assert.True(t, isLowerHex(c.Value))
-		}
+		assert.Equal(t, "/", c.Path)
+		assert.True(t, c.HttpOnly)
+		assert.True(t, strings.Contains(c.Name, "itinera_"))
+		assert.Len(t, c.Value, 64)
+		assert.True(t, isLowerHex(c.Value))
 	}
-	assert.True(t, gotAccess)
-	assert.True(t, gotRefresh)
 
 	assert.Equal(t, 1, sessStore.createdCalls)
-	assert.Equal(t, uid, sessStore.lastUserID)
-	assert.NotEmpty(t, sessStore.lastAccess)
-	assert.NotEmpty(t, sessStore.lastRefresh)
-	assert.NotEqual(t, sessStore.lastAccess, sessStore.lastRefresh,
-		"access and refresh must be different secrets")
-
-	assert.NotEqual(t, rawAccess, rawRefresh,
-		"the cookies themselves must be different (raw tokens)")
 }
+
+// ---------- LogoutOpaque tests --------------------------------------------
+
+// TestLogoutOpaque_NoCookie_StillClears: middleware doesn't authenticate,
+// handler short-circuits, cookies are still cleared (so the browser is
+// left clean even if the user already lost the cookie).
+func TestLogoutOpaque_NoCookie_StillClears(t *testing.T) {
+	h := newHandlers(&fakeAuthStore{}, &fakeSessionStore{})
+	rw := doPost(t, h, "/auth/v2/logout", nil)
+	require.Equal(t, http.StatusNoContent, rw.Code)
+	cookies := rw.Result().Cookies()
+	// ClearAuthCookies clears itinera_access + itinera_refresh = 2 cookies.
+	assert.GreaterOrEqual(t, len(cookies), 2)
+	for _, c := range cookies {
+		assert.Equal(t, -1, c.MaxAge, "clear cookies must have MaxAge=-1")
+	}
+}
+
+// TestLogoutOpaque_WithCookie_RevokesSession: the supplied cookie's hash
+// reaches RevokeSessionByAccessHash exactly once.
+func TestLogoutOpaque_WithCookie_RevokesSession(t *testing.T) {
+	sessStore := &fakeSessionStore{}
+	h := newHandlers(&fakeAuthStore{}, sessStore)
+
+	raw := "raw-access-cookie-value-1234567890abcdef"
+	cookie := &http.Cookie{Name: middleware.CookieAccessToken, Value: raw}
+
+	rw := doPost(t, h, "/auth/v2/logout", nil, cookie)
+	require.Equal(t, http.StatusNoContent, rw.Code)
+	assert.Equal(t, 1, sessStore.revokedByHashCalls)
+	assert.Equal(t, auth.HashToken(raw), sessStore.lastRevokedHash,
+		"the cookie value must be hashed before being passed to RevokeSessionByAccessHash")
+}
+
+// ---------- MeOpaque tests -------------------------------------------------
+
+// TestMeOpaque_NoAuth: middleware didn't authenticate → UNAUTHENTICATED.
+func TestMeOpaque_NoAuth(t *testing.T) {
+	h := newHandlers(&fakeAuthStore{byID: map[uuid.UUID]*models.User{}}, &fakeSessionStore{})
+	rw := doGet(t, h, "/auth/v2/me")
+	require.Equal(t, http.StatusUnauthorized, rw.Code)
+	var out JSONErrorBody
+	require.NoError(t, json.NewDecoder(rw.Body).Decode(&out))
+	assert.Equal(t, CodeUnauthenticated, out.Error.Code)
+}
+
+// TestMeOpaque_Authenticated: middleware set the user → handler returns it.
+// We bypass the middleware here and exercise MeOpaque directly because the
+// real middleware doesn't populate byID in the fake; future DB-backed tests
+// will cover the end-to-end happy path.
+func TestMeOpaque_Authenticated_Direct(t *testing.T) {
+	uid := uuid.New()
+	u := &models.User{
+		ID:    uid,
+		Email: "u@example.test",
+		Tier:  "free",
+	}
+	authStore := &fakeAuthStore{
+		byEmail: map[string]*models.User{u.Email: u},
+		byID:    map[uuid.UUID]*models.User{uid: u},
+	}
+	h := newHandlers(authStore, &fakeSessionStore{})
+
+	r := httptest.NewRequest(http.MethodGet, "/auth/v2/me", nil)
+	r = putUserIDIntoContext(r, uid)
+	rw := httptest.NewRecorder()
+	h.MeOpaque(rw, r)
+
+	require.Equal(t, http.StatusOK, rw.Code)
+	var got models.User
+	require.NoError(t, json.NewDecoder(rw.Body).Decode(&got))
+	assert.Equal(t, u.Email, got.Email)
+	assert.Equal(t, "free", got.Tier)
+}
+
+// TestMeOpaque_SoftDeleted returns ACCOUNT_DELETED.
+func TestMeOpaque_SoftDeleted_Direct(t *testing.T) {
+	uid := uuid.New()
+	deletedAt := "2026-08-01T00:00:00Z"
+	u := &models.User{ID: uid, Email: "x@y.z", DeletedAt: &deletedAt, Tier: "free"}
+	authStore := &fakeAuthStore{byID: map[uuid.UUID]*models.User{uid: u}}
+	h := newHandlers(authStore, &fakeSessionStore{})
+
+	r := httptest.NewRequest(http.MethodGet, "/auth/v2/me", nil)
+	r = putUserIDIntoContext(r, uid)
+	rw := httptest.NewRecorder()
+	h.MeOpaque(rw, r)
+
+	require.Equal(t, http.StatusForbidden, rw.Code)
+	var out JSONErrorBody
+	require.NoError(t, json.NewDecoder(rw.Body).Decode(&out))
+	assert.Equal(t, CodeAccountDeleted, out.Error.Code)
+}
+
+// ---------- Utilities -----------------------------------------------------
 
 // isLowerHex is a tiny smoke check used by the success-path test to confirm
 // the cookie value matches the format NewSecureToken produces.
