@@ -14,6 +14,7 @@ import (
 
 	"backend/internal/http/handlers"
 	"backend/internal/services"
+	"backend/internal/services/email"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
@@ -73,10 +74,11 @@ func main() {
 	expenseSvc := services.NewExpenseService(tripsRepo, expensesRepo, exchangeRateSvc)
 	tripSvc := services.NewTripService(pool, tripsRepo, placesRepo,
 		activityRepo, expensesRepo, eventsRepo)
+	emailSender := email.NewSender(cfg)
 
 	h := handlers.NewHandlers(tripsRepo, placesRepo, expensesRepo, authRepo,
 		activityRepo, eventsRepo, rateLimitRepo, analyticsRepo,
-		sessionRepo, expenseSvc, tripSvc, cfg)
+		sessionRepo, expenseSvc, tripSvc, emailSender, cfg)
 
 	router := setupRouter(cfg, h, pool)
 

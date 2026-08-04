@@ -5,6 +5,7 @@ import (
 	"backend/internal/database"
 	"backend/internal/http/middleware"
 	"backend/internal/services"
+	"backend/internal/services/email"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -28,6 +29,7 @@ type Handlers struct {
 	SessionRepo   database.SessionStore
 	ExpenseSvc    *services.ExpenseService
 	TripSvc       *services.TripService
+	EmailSender   email.Sender
 	Config        *config.Config
 }
 
@@ -43,6 +45,7 @@ func NewHandlers(
 	sessionRepo database.SessionStore,
 	expenseSvc *services.ExpenseService,
 	tripSvc *services.TripService,
+	emailSender email.Sender,
 	cfg *config.Config,
 ) *Handlers {
 	return &Handlers{
@@ -57,6 +60,7 @@ func NewHandlers(
 		SessionRepo:   sessionRepo,
 		ExpenseSvc:    expenseSvc,
 		TripSvc:       tripSvc,
+		EmailSender:   emailSender,
 		Config:        cfg,
 	}
 }
