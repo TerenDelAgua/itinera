@@ -15,7 +15,7 @@ import (
 )
 
 // opaque_auth_handlers.go implements the post-cutover auth endpoints
-// (Spec 017 §5). They mirror the JWT-cookie handlers in auth.go but use
+// They mirror the JWT-cookie handlers in auth.go but use
 // opaque access + refresh cookies hashed in `sessions`. They coexist with
 // the JWT tree during dual-stack; we'll retire auth.go's JWT handlers
 // when AUTH_V2_ENABLED=true and these have proven stable in production.
@@ -72,11 +72,15 @@ func (h *Handlers) LoginOpaque(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(input.Password)); err != nil {
-		// Anti-enumeration: same code + message on wrong password.
+		// Anti-enumeration: same code + message on wrong password so the
+		// caller can't tell "user doesn't exist" from "user exists,
+		// wrong password".
 		WriteError(w, http.StatusUnauthorized, CodeInvalidCredentials, "Invalid credentials")
 		return
 	}
 
+	// Generate the access + refresh tokens. The server stores ONLY the
+	// SHA-256 hashes; the raw values ride HttpOnly cookies.
 	rawAccess, err := auth.NewSecureToken()
 	if err != nil {
 		WriteError(w, http.StatusInternalServerError, CodeInternalError, "Token generation failed")

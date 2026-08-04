@@ -32,8 +32,8 @@ func RegisterApiRoutes(r chi.Router, h *Handlers) {
 		r.Post("/auth/register", h.Register)
 		r.Post("/auth/login", h.Login)
 
-		// Uses opaque access + refresh cookies.
-		// Mounted alongside the JWT path during the
+		// Post-cutover login. Uses opaque access +
+		// refresh cookies. Mounted alongside the JWT path during the
 		// dual-stack window. Behaviour is identical to /auth/login but
 		// the response omits the JWT and the cookies are `itinera_access`
 		// + `itinera_refresh` instead of `auth_token`. Handler name is
