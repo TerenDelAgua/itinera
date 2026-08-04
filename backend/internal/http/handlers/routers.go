@@ -32,6 +32,15 @@ func RegisterApiRoutes(r chi.Router, h *Handlers) {
 		r.Post("/auth/register", h.Register)
 		r.Post("/auth/login", h.Login)
 
+		// Post-cutover login. Uses opaque access +
+		// refresh cookies. Mounted alongside the JWT path during the
+		// dual-stack window. Behaviour is identical to /auth/login but
+		// the response omits the JWT and the cookies are `itinera_access`
+		// + `itinera_refresh` instead of `auth_token`. Handler name is
+		// LoginOpaque (see opaque_auth_handlers.go) — the route keeps the
+		// /v2/ suffix for spec compatibility.
+		r.Post("/auth/v2/login", h.LoginOpaque)
+
 		r.Get("/trips", h.ListTrips)
 		r.Post("/trips", h.CreateTrip)
 
