@@ -175,6 +175,19 @@ func setupRouter(cfg *config.Config, h *handlers.Handlers, pool *pgxpool.Pool) *
 	})
 
 	r.Route("/api/v1", func(router chi.Router) {
+		// Spec 017 §2.1 / §6.1 — auth v2 cutover is gated by AUTH_V2_ENABLED.
+		// While the flag is false, the legacy JWT tree is the only one
+		// registered; once it flips to true the new token tree takes over
+		// completely (no per-handler branching).
+		//
+		// In Fase 0 this is a no-op reservation: RegisterApiRoutes still
+		// registers the legacy tree. The branch exists so future PRs can
+		// mount the v2 tree without touching main.go's structure again.
+		if cfg.AuthV2Enabled {
+			log.Println("🟢 [auth] AUTH_V2_ENABLED=true — v2 router mounted (Spec 017 §6.1)")
+		} else {
+			log.Println("🟡 [auth] AUTH_V2_ENABLED=false — legacy JWT router mounted")
+		}
 		handlers.RegisterApiRoutes(router, h)
 	})
 
