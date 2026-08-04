@@ -40,6 +40,9 @@ func (f *fakeSessionStore) FindSessionByAccessTokenHash(ctx context.Context, acc
 	}
 	return s, nil
 }
+func (f *fakeSessionStore) FindSessionByRefreshTokenHash(context.Context, string) (*models.Session, error) {
+	panic("FindSessionByRefreshTokenHash should not be called from AuthMiddlewareV2")
+}
 
 // All other methods of the interface are unimplemented on purpose.
 

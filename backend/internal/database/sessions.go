@@ -198,7 +198,7 @@ func (r *SessionRepository) RevokeFamily(ctx context.Context, familyID uuid.UUID
 }
 
 // RevokeSessionByAccessHash revokes just the session row whose access cookie
-// the caller supplied. Used by the per-device logout flow (Spec 017 §5.3)
+// the caller supplied. Used by the per-device logout flow
 // because the handler knows the raw access token — it's the cookie — but
 // doesn't have the session.id on hand.
 //
@@ -215,6 +215,69 @@ func (r *SessionRepository) RevokeSessionByAccessHash(ctx context.Context, acces
 		return 0, err
 	}
 	return int(res.RowsAffected()), nil
+}
+
+// FindSessionByRefreshTokenHash is the symmetric counterpart of
+// FindSessionByAccessTokenHash. Used by /auth/v2/refresh — the handler
+// hashes the raw refresh cookie, looks the row up, and on reuse-detection
+// (rows whose refresh_token_hash matches but revoked_at IS NOT NULL) it
+// revokes the entire family.
+//
+// We deliberately separate this from FindSessionByAccessTokenHash so
+// future access-token-only flows (e.g. /me) don't return rows whose
+// refresh leg was already revoked.
+func (r *SessionRepository) FindSessionByRefreshTokenHash(ctx context.Context, refreshHash string) (*models.Session, error) {
+	if refreshHash == "" {
+		return nil, pgx.ErrNoRows
+	}
+
+	var s models.Session
+	var refreshRotatedAt, revokedAt pgtype.Timestamptz
+	var ua, ip pgtype.Text
+
+	err := r.Pool.QueryRow(ctx, `
+		SELECT
+			id, user_id, access_token_hash, refresh_token_hash, refresh_family,
+			refresh_rotated_at, user_agent, host(ip_address), created_at,
+			last_used_at, expires_at, revoked_at
+		FROM sessions
+		WHERE refresh_token_hash = $1
+		LIMIT 1
+	`, refreshHash).Scan(
+		&s.ID,
+		&s.UserID,
+		&s.AccessTokenHash,
+		&s.RefreshTokenHash,
+		&s.RefreshFamily,
+		&refreshRotatedAt,
+		&ua,
+		&ip,
+		&s.CreatedAt,
+		&s.LastUsedAt,
+		&s.ExpiresAt,
+		&revokedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if refreshRotatedAt.Valid {
+		v := refreshRotatedAt.Time.UTC().Format("2006-01-02T15:04:05Z07:00")
+		s.RefreshRotatedAt = &v
+	}
+	if revokedAt.Valid {
+		v := revokedAt.Time.UTC().Format("2006-01-02T15:04:05Z07:00")
+		s.RevokedAt = &v
+	}
+	if ua.Valid {
+		v := ua.String
+		s.UserAgent = &v
+	}
+	if ip.Valid {
+		v := ip.String
+		s.IPAddress = &v
+	}
+	return &s, nil
 }
 
 // RevokeAllSessionsForUser is used by the GDPR delete-account endpoint

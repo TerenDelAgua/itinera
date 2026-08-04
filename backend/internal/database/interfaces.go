@@ -205,6 +205,7 @@ type AnalyticsStore interface {
 type SessionStore interface {
 	CreateSession(ctx context.Context, userID uuid.UUID, accessHash, refreshHash string, expiresAt time.Time, userAgent, ipAddress *string) (*models.Session, error)
 	FindSessionByAccessTokenHash(ctx context.Context, accessHash string) (*models.Session, error)
+	FindSessionByRefreshTokenHash(ctx context.Context, refreshHash string) (*models.Session, error)
 	RotateSession(ctx context.Context, sessionID uuid.UUID, newAccessHash, newRefreshHash string, newExpiry time.Time) error
 	RevokeSession(ctx context.Context, sessionID uuid.UUID) error
 	RevokeSessionByAccessHash(ctx context.Context, accessHash string) (int, error)

@@ -32,8 +32,8 @@ func RegisterApiRoutes(r chi.Router, h *Handlers) {
 		r.Post("/auth/register", h.Register)
 		r.Post("/auth/login", h.Login)
 
-		// Spec 017 §5.2 — post-cutover login. Uses opaque access +
-		// refresh cookies. Mounted alongside the JWT path during the
+		// Uses opaque access + refresh cookies.
+		// Mounted alongside the JWT path during the
 		// dual-stack window. Behaviour is identical to /auth/login but
 		// the response omits the JWT and the cookies are `itinera_access`
 		// + `itinera_refresh` instead of `auth_token`. Handler name is
@@ -41,7 +41,7 @@ func RegisterApiRoutes(r chi.Router, h *Handlers) {
 		// /v2/ suffix for spec compatibility.
 		r.Post("/auth/v2/login", h.LoginOpaque)
 
-		// Spec 017 §5.3 / §5.7 — authenticated endpoints behind
+		// Authenticated endpoints behind
 		// AuthMiddlewareV2. Note: /auth/v2/logout and /auth/v2/me require
 		// the access-token cookie, NOT the JWT path. We mount
 		// AuthMiddlewareV2 alongside AuthMiddleware so during the
@@ -51,6 +51,13 @@ func RegisterApiRoutes(r chi.Router, h *Handlers) {
 			r.Post("/auth/v2/logout", h.LogoutOpaque)
 			r.Get("/auth/v2/me", h.MeOpaque)
 		})
+
+		// Refresh needs NO access cookie — by definition, the access
+		// cookie expired (or expired soon); the refresh cookie is the
+		// only credential the client still has. So it's a sibling of
+		// the auth group rather than a child: public access, no JWT
+		// middleware, no opaque middleware.
+		r.Post("/auth/v2/refresh", h.RefreshOpaque)
 
 		r.Get("/trips", h.ListTrips)
 		r.Post("/trips", h.CreateTrip)

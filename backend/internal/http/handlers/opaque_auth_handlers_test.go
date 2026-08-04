@@ -64,12 +64,24 @@ func (f *fakeAuthStore) UpdateUserPassword(context.Context, uuid.UUID, string) e
 
 var _ database.AuthStore = (*fakeAuthStore)(nil)
 
-// fakeSessionStore implements database.SessionStore with counters so each
-// test can verify how the handler exercised it.
+// fakeSessionStore implements database.SessionStore with counters and a
+// small session map keyed by refresh-hash. Each test seeds the map with the
+// scenarios it needs (active session, revoked session, unknown hash, ...)
+// and asserts behaviour by reading back the counters.
 type fakeSessionStore struct {
 	createdCalls       int
 	revokedByHashCalls int
 	lastRevokedHash    string
+	rotatedCalls       int
+
+	// byRefreshHash is the map the Find* queries read from. Tests can
+	// pre-seed it with a row whose RefreshFamily / RevokedAt match the
+	// scenario they want to exercise.
+	byRefreshHash map[string]*models.Session
+
+	// revokedFamilies accumulates UUIDs passed to RevokeFamily so a test
+	// can assert that the reuse-detection path actually fires.
+	revokedFamilies []uuid.UUID
 }
 
 func (f *fakeSessionStore) CreateSession(_ context.Context, _ uuid.UUID, _ string, _ string, _ time.Time, _, _ *string) (*models.Session, error) {
@@ -78,11 +90,15 @@ func (f *fakeSessionStore) CreateSession(_ context.Context, _ uuid.UUID, _ strin
 }
 
 func (f *fakeSessionStore) FindSessionByAccessTokenHash(_ context.Context, accessHash string) (*models.Session, error) {
-	// Used by AuthMiddlewareV2. Return a synthetic session when the hash
-	// matches the value we expect to mint in the test. For tests that
-	// don't authenticate through the middleware, ErrNoRows is fine.
 	if accessHash == "" {
 		return nil, pgx.ErrNoRows
+	}
+	return nil, pgx.ErrNoRows
+}
+
+func (f *fakeSessionStore) FindSessionByRefreshTokenHash(_ context.Context, refreshHash string) (*models.Session, error) {
+	if s, ok := f.byRefreshHash[refreshHash]; ok && s != nil {
+		return s, nil
 	}
 	return nil, pgx.ErrNoRows
 }
@@ -93,11 +109,16 @@ func (f *fakeSessionStore) RevokeSessionByAccessHash(_ context.Context, accessHa
 	return 1, nil
 }
 
-func (f *fakeSessionStore) RotateSession(context.Context, uuid.UUID, string, string, time.Time) error {
-	panic("not used in tests")
+func (f *fakeSessionStore) RotateSession(_ context.Context, _ uuid.UUID, _ string, _ string, _ time.Time) error {
+	f.rotatedCalls++
+	return nil
 }
+
 func (f *fakeSessionStore) RevokeSession(context.Context, uuid.UUID) error { panic("not used") }
-func (f *fakeSessionStore) RevokeFamily(context.Context, uuid.UUID) error { panic("not used") }
+func (f *fakeSessionStore) RevokeFamily(_ context.Context, familyID uuid.UUID) error {
+	f.revokedFamilies = append(f.revokedFamilies, familyID)
+	return nil
+}
 func (f *fakeSessionStore) RevokeAllSessionsForUser(context.Context, uuid.UUID) error {
 	panic("not used")
 }
@@ -148,9 +169,24 @@ func doGet(t *testing.T, h *Handlers, path string, cookies ...*http.Cookie) *htt
 
 // newTestRouter wires only AuthMiddlewareV2 in front of logout+me so the
 // tests don't have to set JWT cookies (which is the legacy tree, not the
-// one we're exercising here).
+// one we're exercising here). Refresh is mounted WITHOUT AuthMiddlewareV2
+// because, by definition, refresh is called when the access cookie is
+// missing or expired.
 func newTestRouter(h *Handlers) http.Handler {
-	return middleware.AuthMiddlewareV2(h.SessionRepo)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux := http.NewServeMux()
+
+	// Refresh stays at the root of the mux (no middleware).
+	mux.HandleFunc("/auth/v2/refresh", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.NotFound(w, r)
+			return
+		}
+		h.RefreshOpaque(w, r)
+	})
+
+	// Everything else goes through the opaque middleware to emulate the
+	// real router tree.
+	protected := middleware.AuthMiddlewareV2(h.SessionRepo)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := r.URL.Path
 		switch {
 		case path == "/auth/v2/logout" && r.Method == http.MethodPost:
@@ -163,6 +199,11 @@ func newTestRouter(h *Handlers) http.Handler {
 			http.NotFound(w, r)
 		}
 	}))
+	mux.Handle("/auth/v2/logout", protected)
+	mux.Handle("/auth/v2/me", protected)
+	mux.Handle("/auth/v2/login", protected)
+
+	return mux
 }
 
 // putUserIDIntoContext returns a request whose Context already has
@@ -355,4 +396,141 @@ func isLowerHex(s string) bool {
 		}
 	}
 	return true
+}
+
+// ---------- RefreshOpaque tests --------------------------------------------
+
+// TestRefreshOpaque_NoCookie: missing refresh cookie → 401, NO rotation.
+func TestRefreshOpaque_NoCookie(t *testing.T) {
+	sessStore := &fakeSessionStore{}
+	h := newHandlers(&fakeAuthStore{}, sessStore)
+
+	rw := doPost(t, h, "/auth/v2/refresh", nil)
+	require.Equal(t, http.StatusUnauthorized, rw.Code)
+
+	var out JSONErrorBody
+	require.NoError(t, json.NewDecoder(rw.Body).Decode(&out))
+	assert.Equal(t, CodeUnauthenticated, out.Error.Code)
+	assert.Equal(t, 0, sessStore.rotatedCalls)
+}
+
+// TestRefreshOpaque_UnknownRefresh: cookie value doesn't resolve to any
+// session → 401. Same anti-enumeration copy as the unknown-user branch.
+func TestRefreshOpaque_UnknownRefresh(t *testing.T) {
+	sessStore := &fakeSessionStore{byRefreshHash: map[string]*models.Session{}}
+	h := newHandlers(&fakeAuthStore{}, sessStore)
+
+	cookie := &http.Cookie{Name: middleware.CookieRefreshToken, Value: "any-value"}
+	rw := doPost(t, h, "/auth/v2/refresh", nil, cookie)
+	require.Equal(t, http.StatusUnauthorized, rw.Code)
+	assert.Equal(t, 0, sessStore.rotatedCalls)
+}
+
+// TestRefreshOpaque_Success_RotatesAndSetsCookies: real row in store →
+// rotation, two new cookies.
+func TestRefreshOpaque_Success_RotatesAndSetsCookies(t *testing.T) {
+	family := uuid.New()
+	expiresAt := time.Now().Add(1 * time.Hour).UTC().Format(time.RFC3339)
+	refreshRaw := "raw-refresh-cookie-aaaaaaaabbbbbbbb"
+	sessStore := &fakeSessionStore{
+		byRefreshHash: map[string]*models.Session{
+			auth.HashToken(refreshRaw): {
+				ID:               uuid.New(),
+				UserID:           uuid.New(),
+				RefreshTokenHash: auth.HashToken(refreshRaw),
+				RefreshFamily:    family,
+				ExpiresAt:        expiresAt,
+			},
+		},
+	}
+	h := newHandlers(&fakeAuthStore{}, sessStore)
+
+	cookie := &http.Cookie{Name: middleware.CookieRefreshToken, Value: refreshRaw}
+	rw := doPost(t, h, "/auth/v2/refresh", nil, cookie)
+
+	require.Equal(t, http.StatusOK, rw.Code, "body: %s", rw.Body.String())
+	assert.Equal(t, 1, sessStore.rotatedCalls)
+
+	cookies := rw.Result().Cookies()
+	require.Len(t, cookies, 2)
+	gotAccess, gotRefresh := false, false
+	var accessValue, refreshValue string
+	for _, c := range cookies {
+		switch c.Name {
+		case "itinera_access":
+			gotAccess = true
+			accessValue = c.Value
+		case "itinera_refresh":
+			gotRefresh = true
+			refreshValue = c.Value
+		}
+	}
+	assert.True(t, gotAccess)
+	assert.True(t, gotRefresh)
+	assert.NotEqual(t, accessValue, refreshValue, "new access and refresh must be different secrets")
+	assert.NotEqual(t, refreshValue, refreshRaw, "new refresh must NOT be the old one (defeats the rotation)")
+
+	// No family-wide revocation in the happy path.
+	assert.Empty(t, sessStore.revokedFamilies)
+}
+
+// TestRefreshOpaque_ReuseDetected_KillsFamily: row's RevokedAt set →
+// RevokeFamily invoked with the row's family, 403 TOKEN_REUSE_DETECTED.
+func TestRefreshOpaque_ReuseDetected_KillsFamily(t *testing.T) {
+	family := uuid.New()
+	revokedAt := time.Now().Add(-1 * time.Minute).UTC().Format(time.RFC3339)
+	refreshRaw := "stolen-refresh-cookie-ccccddddeee"
+	sessStore := &fakeSessionStore{
+		byRefreshHash: map[string]*models.Session{
+			auth.HashToken(refreshRaw): {
+				ID:               uuid.New(),
+				UserID:           uuid.New(),
+				RefreshTokenHash: auth.HashToken(refreshRaw),
+				RefreshFamily:    family,
+				RevokedAt:        &revokedAt,
+				ExpiresAt:        time.Now().Add(1 * time.Hour).UTC().Format(time.RFC3339),
+			},
+		},
+	}
+	h := newHandlers(&fakeAuthStore{}, sessStore)
+
+	cookie := &http.Cookie{Name: middleware.CookieRefreshToken, Value: refreshRaw}
+	rw := doPost(t, h, "/auth/v2/refresh", nil, cookie)
+
+	require.Equal(t, http.StatusForbidden, rw.Code)
+	var out JSONErrorBody
+	require.NoError(t, json.NewDecoder(rw.Body).Decode(&out))
+	assert.Equal(t, CodeReuseDetected, out.Error.Code)
+	require.Len(t, sessStore.revokedFamilies, 1, "RevokeFamily must fire once on reuse detection")
+	assert.Equal(t, family, sessStore.revokedFamilies[0],
+		"RevokeFamily must be called with the row's family")
+	assert.Equal(t, 0, sessStore.rotatedCalls, "no rotation on reuse-detected requests")
+}
+
+// TestRefreshOpaque_ExpiredRefresh: ExpiresAt in the past → 401, no rotation.
+func TestRefreshOpaque_ExpiredRefresh(t *testing.T) {
+	family := uuid.New()
+	expiresAt := time.Now().Add(-1 * time.Minute).UTC().Format(time.RFC3339)
+	refreshRaw := "expired-refresh-cookie-ffffffffff"
+	sessStore := &fakeSessionStore{
+		byRefreshHash: map[string]*models.Session{
+			auth.HashToken(refreshRaw): {
+				ID:               uuid.New(),
+				UserID:           uuid.New(),
+				RefreshTokenHash: auth.HashToken(refreshRaw),
+				RefreshFamily:    family,
+				ExpiresAt:        expiresAt,
+			},
+		},
+	}
+	h := newHandlers(&fakeAuthStore{}, sessStore)
+
+	cookie := &http.Cookie{Name: middleware.CookieRefreshToken, Value: refreshRaw}
+	rw := doPost(t, h, "/auth/v2/refresh", nil, cookie)
+
+	require.Equal(t, http.StatusUnauthorized, rw.Code)
+	var out JSONErrorBody
+	require.NoError(t, json.NewDecoder(rw.Body).Decode(&out))
+	assert.Equal(t, CodeSessionExpired, out.Error.Code)
+	assert.Equal(t, 0, sessStore.rotatedCalls)
 }
