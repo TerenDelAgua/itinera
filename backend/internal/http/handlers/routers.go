@@ -41,6 +41,24 @@ func RegisterApiRoutes(r chi.Router, h *Handlers) {
 		// /v2/ suffix for spec compatibility.
 		r.Post("/auth/v2/login", h.LoginOpaque)
 
+		// Authenticated endpoints behind
+		// AuthMiddlewareV2. Note: /auth/v2/logout and /auth/v2/me require
+		// the access-token cookie, NOT the JWT path. We mount
+		// AuthMiddlewareV2 alongside AuthMiddleware so during the
+		// dual-stack window either cookie succeeds — the handlers then
+		// short-circuit if the right middleware resolved them.
+		r.With(middleware.AuthMiddlewareV2(h.SessionRepo)).Group(func(r chi.Router) {
+			r.Post("/auth/v2/logout", h.LogoutOpaque)
+			r.Get("/auth/v2/me", h.MeOpaque)
+		})
+
+		// Refresh needs NO access cookie — by definition, the access
+		// cookie expired (or expired soon); the refresh cookie is the
+		// only credential the client still has. So it's a sibling of
+		// the auth group rather than a child: public access, no JWT
+		// middleware, no opaque middleware.
+		r.Post("/auth/v2/refresh", h.RefreshOpaque)
+
 		r.Get("/trips", h.ListTrips)
 		r.Post("/trips", h.CreateTrip)
 
