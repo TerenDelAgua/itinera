@@ -33,7 +33,7 @@ func Load() *Config {
 		InternalToken: getEnv("ITINERA_INTERNAL_TOKEN", ""),
 		AuthV2Enabled: getEnv("AUTH_V2_ENABLED", "false") == "true",
 		ResendAPIKey:  getEnv("RESEND_API_KEY", ""),
-		EmailFrom:     getEnv("EMAIL_FROM", "Itinera <hello@goitinera.app>"),
+		EmailFrom:     getEnv("EMAIL_FROM", "Itinera <hello@mail.itinera.app>"),
 	}
 }
 
