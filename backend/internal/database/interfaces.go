@@ -114,13 +114,45 @@ type ExpenseStore interface {
 // ── Auth ─────────────────────────────────────────────────────────────────────
 
 // AuthStore is the read/write contract for users and the guest-to-user trip
-// migration. The guest claim migration is named after its behaviour (moving
-// trips from a guest session into a user's account) rather than the legacy
-// "upgrade" wording.
+// migration. Each method maps 1:1 to a Spec 017 use case (see comments).
+//
+// Conventions:
+//   - Every method that accepts email goes through normalizeEmail internally,
+//     so casing and stray whitespace never escape the repo layer.
+//   - All "Get" methods return pgx.ErrNoRows when the row is missing; the
+//     caller decides the HTTP shape (404 vs 401 vs 403) without leaking the
+//     distinction in the API surface.
 type AuthStore interface {
-	CreateUser(ctx context.Context, email, password string) (*models.User, error)
+	// CreateUser persists a new account with a normalised email and the
+	// user's chosen locale. terms_accepted_at is set explicitly by the
+	// handler so the check that rejects terms_accepted=false stays in the
+	// HTTP layer (and can return 400 TERMS_NOT_ACCEPTED).
+	CreateUser(ctx context.Context, email, password, locale string) (*models.User, error)
+
+	// GetUserByEmail resolves the login flow and the forgot-password flow.
+	// Soft-deleted users (deleted_at IS NOT NULL) are returned; the login
+	// handler distinguishes them via user.DeletedAt and returns 403.
 	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
+
+	// GetUserByID is used by /auth/me and the future access-token middleware.
+	GetUserByID(ctx context.Context, id uuid.UUID) (*models.User, error)
+
+	// ClaimGuestTrips moves the guest's trips into the user's account.
+	// session_id is preserved on the trip (the cookie is still usable).
 	ClaimGuestTrips(ctx context.Context, sessionID string, userID uuid.UUID) (claimed int, err error)
+
+	// SoftDeleteUser marks the account as soft-deleted (deleted_at = now()).
+	// Returns the email so callers can clear in-memory caches.
+	SoftDeleteUser(ctx context.Context, userID uuid.UUID) (email string, err error)
+
+	// MarkUserAsHardDeleted anonymises a soft-deleted account after the
+	// 30-day retention window (Spec 017 §5.10). The row stays so analytics
+	// FK references remain valid.
+	MarkUserAsHardDeleted(ctx context.Context, userID uuid.UUID, randomStringHash string) error
+
+	// UpdateUserPassword writes a fresh bcrypt hash. Used by reset-password
+	// after the 6-digit code check passes.
+	UpdateUserPassword(ctx context.Context, userID uuid.UUID, newPassword string) error
 }
 
 // ── Events ───────────────────────────────────────────────────────────────────
@@ -163,4 +195,36 @@ type AnalyticsStore interface {
 	// Internal-vs-real session/trip counts (Spec 015 v1).
 	// Returns (internalTrips, realTrips, internalSessions, realSessions).
 	GetAnalyticsSessions(ctx context.Context) (int, int, int, int, error)
+}
+
+// ── Sessions (Spec 017 §3.1 #2) ──────────────────────────────────────────────
+
+// SessionStore owns the `sessions` table introduced by migration 017. Only
+// hashed tokens are stored here; the raw tokens are kept in HttpOnly cookies
+// (Spec 017 §4.5 constant-time compare).
+type SessionStore interface {
+	CreateSession(ctx context.Context, userID uuid.UUID, accessHash, refreshHash string, expiresAt time.Time, userAgent, ipAddress *string) (*models.Session, error)
+	FindSessionByAccessTokenHash(ctx context.Context, accessHash string) (*models.Session, error)
+	RotateSession(ctx context.Context, sessionID uuid.UUID, newAccessHash, newRefreshHash string, newExpiry time.Time) error
+	RevokeSession(ctx context.Context, sessionID uuid.UUID) error
+	RevokeFamily(ctx context.Context, familyID uuid.UUID) error
+	RevokeAllSessionsForUser(ctx context.Context, userID uuid.UUID) error
+	CountActiveSessionsForUser(ctx context.Context, userID uuid.UUID) (int, error)
+	CleanupExpiredSessions(ctx context.Context) (int64, error)
+}
+
+// ── PasswordReset (Spec 017 §3.1 #3) ──────────────────────────────────────────
+
+// PasswordResetStore owns the `password_reset_tokens` table. It enforces the
+// 5-attempts lockout and the "one active code per user" invariant described
+// in Spec 017 §5.7; rate limiting at the IP level lives elsewhere and must
+// happen BEFORE this store is called (see Spec 017 §4.6).
+type PasswordResetStore interface {
+	Create(ctx context.Context, userID uuid.UUID, hash string, expiresAt time.Time, ip *string) error
+	MarkPreviousAsUsed(ctx context.Context, userID uuid.UUID) error
+	FindActiveByHash(ctx context.Context, hash string) (*models.PasswordResetToken, error)
+	FindActiveByUser(ctx context.Context, userID uuid.UUID) (*models.PasswordResetToken, error)
+	RecordFailedAttempt(ctx context.Context, tokenID uuid.UUID) (attempts int, locked bool, err error)
+	MarkUsed(ctx context.Context, tokenID uuid.UUID) error
+	HardDeleteOldTokens(ctx context.Context) (int64, error)
 }

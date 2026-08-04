@@ -62,31 +62,44 @@ func (h *Handlers) setAuthCookie(w http.ResponseWriter, r *http.Request, token s
 // @Produce      json
 // @Param        user  body      object  true  "Registration data (email, password)"
 // @Success      200   {object}  handlers.TokenResponse
-// @Failure      400   {string}  string "Invalid request body"
-// @Failure      409   {string}  string "Email already exists"
+// @Failure      400   {object}  handlers.JSONErrorBody "Invalid request body"
+// @Failure      409   {object}  handlers.JSONErrorBody "Email already exists"
 // @Router       /auth/register [post]
 func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
-
 	var input struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
+		Locale   string `json:"locale"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		WriteError(w, http.StatusBadRequest, CodeValidationError, "Invalid request body")
 		return
 	}
+	if input.Email == "" || input.Password == "" {
+		WriteErrorWithFields(w, http.StatusBadRequest, CodeValidationError,
+			"Email and password are required",
+			map[string]any{
+				"email":    "REQUIRED",
+				"password": "REQUIRED",
+			})
+		return
+	}
+	if input.Locale == "" {
+		input.Locale = "en"
+	}
 
-	user, err := h.AuthRepo.CreateUser(r.Context(), input.Email, input.Password)
+	user, err := h.AuthRepo.CreateUser(r.Context(), input.Email, input.Password, input.Locale)
 	if err != nil {
-		http.Error(w, "Email already exists or DB error", http.StatusConflict)
+		// The partial unique index is case-insensitive, so
+		// INSERT collisions go to a 409. The body NEVER echoes err.Error().
+		WriteError(w, http.StatusConflict, CodeEmailAlreadyExists, "An account with this email already exists")
 		return
 	}
 
 	token, _ := h.generateToken(*user)
 	h.setAuthCookie(w, r, token)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(TokenResponse{Token: token, User: *user})
+	WriteJSON(w, http.StatusOK, TokenResponse{Token: token, User: *user})
 }
 
 // Login godoc
@@ -97,7 +110,7 @@ func (h *Handlers) Register(w http.ResponseWriter, r *http.Request) {
 // @Produce      json
 // @Param        user  body      object  true  "Login data (email, password)"
 // @Success      200   {object}  handlers.TokenResponse
-// @Failure      401   {string}  string "Invalid credentials"
+// @Failure      401   {object}  handlers.JSONErrorBody "Invalid credentials"
 // @Router       /auth/login [post]
 func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
 	var input struct {
@@ -106,25 +119,27 @@ func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		WriteError(w, http.StatusBadRequest, CodeValidationError, "Invalid request body")
 		return
 	}
 
 	user, err := h.AuthRepo.GetUserByEmail(r.Context(), input.Email)
 	if err != nil {
-		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		// Anti-enumeration: same response if the email doesn't exist OR if
+		// the password is wrong. The frontend uses the same "invalid
+		// credentials" copy so an attacker can't enumerate.
+		WriteError(w, http.StatusUnauthorized, CodeInvalidCredentials, "Invalid credentials")
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(input.Password)); err != nil {
-		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		WriteError(w, http.StatusUnauthorized, CodeInvalidCredentials, "Invalid credentials")
 		return
 	}
 
 	token, _ := h.generateToken(*user)
 	h.setAuthCookie(w, r, token)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(TokenResponse{Token: token, User: *user})
+	WriteJSON(w, http.StatusOK, TokenResponse{Token: token, User: *user})
 }
 
 func (h *Handlers) ClaimGuest(w http.ResponseWriter, r *http.Request) {
@@ -132,7 +147,7 @@ func (h *Handlers) ClaimGuest(w http.ResponseWriter, r *http.Request) {
 	userId, ok := userIdRaw.(uuid.UUID)
 
 	if !ok {
-		http.Error(w, "Authentication required", http.StatusUnauthorized)
+		WriteError(w, http.StatusUnauthorized, CodeUnauthenticated, "Authentication required")
 		return
 	}
 
@@ -141,13 +156,11 @@ func (h *Handlers) ClaimGuest(w http.ResponseWriter, r *http.Request) {
 
 	claimed, err := h.AuthRepo.ClaimGuestTrips(r.Context(), sessionId, userId)
 	if err != nil {
-		http.Error(w, "Migration failed", http.StatusInternalServerError)
+		WriteError(w, http.StatusInternalServerError, CodeInternalError, "Migration failed")
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]any{
+	WriteJSON(w, http.StatusOK, map[string]any{
 		"claimed_trips_count": claimed,
 		"message":             fmt.Sprintf("Hemos añadido %d viajes a tu cuenta", claimed),
 	})
