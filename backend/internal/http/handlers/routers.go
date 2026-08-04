@@ -57,6 +57,7 @@ func RegisterApiRoutes(r chi.Router, h *Handlers) {
 		r.With(middleware.AuthMiddlewareV2(h.SessionRepo)).Group(func(r chi.Router) {
 			r.Post("/auth/v2/logout", h.LogoutOpaque)
 			r.Get("/auth/v2/me", h.MeOpaque)
+			r.Delete("/auth/v2/account", h.DeleteAccountOpaque)
 		})
 
 		// Refresh needs NO access cookie — by definition, the access

@@ -145,6 +145,11 @@ type AuthStore interface {
 	// Returns the email so callers can clear in-memory caches.
 	SoftDeleteUser(ctx context.Context, userID uuid.UUID) (email string, err error)
 
+	// SoftDeleteUserCascade is the full GDPR delete:
+	// soft-delete the user, revoke all sessions, orphan the user's trips
+	// in a single transaction.
+	SoftDeleteUserCascade(ctx context.Context, userID uuid.UUID) (email string, err error)
+
 	// MarkUserAsHardDeleted anonymises a soft-deleted account after the
 	// 30-day retention window (Spec 017 §5.10). The row stays so analytics
 	// FK references remain valid.

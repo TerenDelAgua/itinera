@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/crypto/bcrypt"
@@ -211,6 +212,70 @@ func (r *AuthRepository) SoftDeleteUser(ctx context.Context, userID uuid.UUID) (
 		RETURNING email
 	`, userID).Scan(&email)
 	return email, err
+}
+
+// SoftDeleteUserCascade is the full GDPR delete: soft-delete
+// the user, revoke every active session, and orphan the user's trips by
+// clearing user_id + rewriting session_id to a sentinel so analytics
+// aggregations still resolve.
+//
+// All three steps run in a single transaction: a partial failure must not
+// leave a user deleted-but-still-signed-in or with trips still pointing at
+// them. The trip cascade is intentional — `users.id` has `ON DELETE
+// RESTRICT` on the FK (so we don't lose analytics rows referencing the
+// user), but the handler pipeline treats `user_id = NULL` as "guest" and
+// the sentinel session_id makes those rows easy to grep.
+//
+// Returns the email of the row we touched (empty + ErrNoRows when the user
+// doesn't exist) so the handler can surface a 404 to the client.
+func (r *AuthRepository) SoftDeleteUserCascade(ctx context.Context, userID uuid.UUID) (string, error) {
+	tx, err := r.Pool.Begin(ctx)
+	if err != nil {
+		return "", fmt.Errorf("begin tx: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+
+	// Step 1 — soft-delete user, capture email.
+	var email string
+	err = tx.QueryRow(ctx, `
+		UPDATE users
+		SET deleted_at = now(), updated_at = now()
+		WHERE id = $1
+		RETURNING email
+	`, userID).Scan(&email)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return "", pgx.ErrNoRows
+		}
+		return "", fmt.Errorf("soft-delete user: %w", err)
+	}
+
+	// Step 2 — revoke every session belonging to the user.
+	if _, err := tx.Exec(ctx, `
+		UPDATE sessions
+		SET revoked_at = now()
+		WHERE user_id = $1 AND revoked_at IS NULL
+	`, userID); err != nil {
+		return "", fmt.Errorf("revoke sessions: %w", err)
+	}
+
+	// Step 3 — orphan trips owned by the user. The sentinel session_id
+	// makes it easy to find these rows for cleanup later. The trip's
+	// own id is preserved so external share links still resolve to a
+	// tombstone instead of a 404.
+	if _, err := tx.Exec(ctx, `
+		UPDATE trips
+		SET user_id = NULL,
+		    session_id = 'deleted-' || id::text
+		WHERE user_id = $1
+	`, userID); err != nil {
+		return "", fmt.Errorf("orphan trips: %w", err)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return "", fmt.Errorf("commit tx: %w", err)
+	}
+	return email, nil
 }
 
 // MarkUserAsHardDeleted anonymises a user after the 30-day retention window

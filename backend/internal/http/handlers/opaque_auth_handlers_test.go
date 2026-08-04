@@ -31,10 +31,12 @@ import (
 // Only the methods the v2 handlers exercise are non-trivial; the rest panic
 // so a regression in a different handler is loud.
 type fakeAuthStore struct {
-	byEmail             map[string]*models.User
-	byID                map[uuid.UUID]*models.User
-	passwordUpdateCalls []uuid.UUID
-	createErr           error
+	byEmail                map[string]*models.User
+	byID                   map[uuid.UUID]*models.User
+	passwordUpdateCalls    []uuid.UUID
+	softDeleteCascadeCalls []uuid.UUID
+	createErr              error
+	softDeleteCascadeErr   error
 }
 
 func (f *fakeAuthStore) GetUserByEmail(_ context.Context, email string) (*models.User, error) {
@@ -77,6 +79,14 @@ func (f *fakeAuthStore) ClaimGuestTrips(context.Context, string, uuid.UUID) (int
 func (f *fakeAuthStore) SoftDeleteUser(context.Context, uuid.UUID) (string, error) {
 	panic("not used in tests")
 }
+
+func (f *fakeAuthStore) SoftDeleteUserCascade(_ context.Context, userID uuid.UUID) (string, error) {
+	f.softDeleteCascadeCalls = append(f.softDeleteCascadeCalls, userID)
+	if f.softDeleteCascadeErr != nil {
+		return "", f.softDeleteCascadeErr
+	}
+	return "user@example.test", nil
+}
 func (f *fakeAuthStore) MarkUserAsHardDeleted(context.Context, uuid.UUID, string) error {
 	panic("not used in tests")
 }
@@ -95,6 +105,11 @@ type fakeSessionStore struct {
 	// it with rows whose RefreshFamily / RevokedAt match the scenario.
 	byRefreshHash map[string]*models.Session
 
+	// byAccessHash mirrors byRefreshHash for the access-token lookup path.
+	// Same map type but the key is the SHA-256 of the access token. Tests
+	// pre-seed it to authenticate the request via the middleware.
+	byAccessHash map[string]*models.Session
+
 	// revokedFamilies accumulates UUIDs passed to RevokeFamily so a test
 	// can assert that the reuse-detection path actually fires.
 	revokedFamilies []uuid.UUID
@@ -111,6 +126,9 @@ func (f *fakeSessionStore) CreateSession(_ context.Context, _ uuid.UUID, _ strin
 func (f *fakeSessionStore) FindSessionByAccessTokenHash(_ context.Context, accessHash string) (*models.Session, error) {
 	if accessHash == "" {
 		return nil, pgx.ErrNoRows
+	}
+	if s, ok := f.byAccessHash[accessHash]; ok && s != nil {
+		return s, nil
 	}
 	return nil, pgx.ErrNoRows
 }
@@ -155,11 +173,11 @@ var _ database.SessionStore = (*fakeSessionStore)(nil)
 // a small in-memory map of active codes keyed by their hash. The FindActive
 // methods return ErrNoRows on miss; pre-seed to exercise the happy path.
 type fakeResetStore struct {
-	createCalls       int
-	markUsedCalls     []uuid.UUID
-	byHash            map[string]*models.PasswordResetToken
-	byUser            map[uuid.UUID]*models.PasswordResetToken
-	failAttempt       bool
+	createCalls   int
+	markUsedCalls []uuid.UUID
+	byHash        map[string]*models.PasswordResetToken
+	byUser        map[uuid.UUID]*models.PasswordResetToken
+	failAttempt   bool
 }
 
 func newFakeResetStore() *fakeResetStore {
@@ -308,6 +326,18 @@ func doGet(t *testing.T, h *Handlers, path string, cookies ...*http.Cookie) *htt
 	return rw
 }
 
+func doDelete(t *testing.T, h *Handlers, path string, cookies ...*http.Cookie) *httptest.ResponseRecorder {
+	t.Helper()
+	r := httptest.NewRequest(http.MethodDelete, path, nil)
+	for _, c := range cookies {
+		r.AddCookie(c)
+	}
+	rw := httptest.NewRecorder()
+	router := newTestRouter(h)
+	router.ServeHTTP(rw, r)
+	return rw
+}
+
 func newTestRouter(h *Handlers) http.Handler {
 	mux := http.NewServeMux()
 
@@ -356,12 +386,15 @@ func newTestRouter(h *Handlers) http.Handler {
 			h.LogoutOpaque(w, r)
 		case path == "/auth/v2/me" && r.Method == http.MethodGet:
 			h.MeOpaque(w, r)
+		case path == "/auth/v2/account" && r.Method == http.MethodDelete:
+			h.DeleteAccountOpaque(w, r)
 		default:
 			http.NotFound(w, r)
 		}
 	}))
 	mux.Handle("/auth/v2/logout", protected)
 	mux.Handle("/auth/v2/me", protected)
+	mux.Handle("/auth/v2/account", protected)
 
 	return mux
 }
@@ -412,6 +445,29 @@ func TestLoginOpaque_WrongPassword(t *testing.T) {
 	rw := doPost(t, h, "/auth/v2/login",
 		map[string]string{"email": "x@y.z", "password": "wrong-password"})
 	require.Equal(t, http.StatusUnauthorized, rw.Code)
+}
+
+// TestLoginOpaque_SoftDeletedBlocked: a soft-deleted user with the
+// correct password must NOT be able to sign in. Caught by the smoke
+// test on 2026-08-04: the original LoginOpaque skipped the DeletedAt
+// check, so the deleted account could re-login and silently undelete
+// itself via the refresh endpoint.
+func TestLoginOpaque_SoftDeletedBlocked(t *testing.T) {
+	hash, _ := bcrypt.GenerateFromPassword([]byte("right-password"), bcrypt.MinCost)
+	deletedAt := "2026-08-04T00:00:00Z"
+	u := &models.User{
+		ID:           uuid.New(),
+		Email:        "deleted@x.z",
+		PasswordHash: string(hash),
+		DeletedAt:    &deletedAt,
+	}
+	authStore := &fakeAuthStore{byEmail: map[string]*models.User{u.Email: u}}
+	h := newHandlers(authStore, &fakeSessionStore{}, newFakeResetStore(), &fakeEmailSender{})
+	rw := doPost(t, h, "/auth/v2/login",
+		map[string]string{"email": u.Email, "password": "right-password"})
+	require.Equal(t, http.StatusUnauthorized, rw.Code)
+	assert.Equal(t, CodeInvalidCredentials, mustDecodeError(t, rw).Code,
+		"deleted accounts must NOT surface a distinguishable error code")
 }
 
 func TestLoginOpaque_Success_ReturnsTokensAndSetsCookies(t *testing.T) {
@@ -775,6 +831,115 @@ func TestResetOpaque_HappyPath_UpdatesPasswordAndRevokesSessions(t *testing.T) {
 }
 
 // ---------- Utilities -----------------------------------------------------
+
+// ---------- DeleteAccountOpaque tests -------------------------------------
+
+// TestDeleteAccountOpaque_NoAuth verifies the middleware short-circuits
+// unauthenticated calls with UNAUTHENTICATED.
+func TestDeleteAccountOpaque_NoAuth(t *testing.T) {
+	h := newHandlers(&fakeAuthStore{}, &fakeSessionStore{}, newFakeResetStore(), &fakeEmailSender{})
+	rw := doDelete(t, h, "/auth/v2/account")
+	require.Equal(t, http.StatusUnauthorized, rw.Code)
+	assert.Equal(t, CodeUnauthenticated, mustDecodeError(t, rw).Code)
+}
+
+// TestDeleteAccountOpaque_HappyPath walks the full GDPR cascade path:
+// middleware authenticates → handler reads uid → cascade runs →
+// 204 + cookies cleared. The fakeAuthStore records the userID so the
+// test can assert the right user was soft-deleted.
+//
+// The middleware requires a cookie that maps to a session row, so the
+// test seeds fakeSessionStore.byHash with a precomputed hash. We compute
+// the raw value and let the store SHA-256 it via auth.HashToken.
+func TestDeleteAccountOpaque_HappyPath(t *testing.T) {
+	uid := uuid.New()
+	authStore := &fakeAuthStore{byID: map[uuid.UUID]*models.User{uid: {ID: uid}}}
+	sessStore := &fakeSessionStore{
+		byRefreshHash: map[string]*models.Session{},
+	}
+	rawCookie := "happy-path-access-cookie-1234567890"
+	sessStore.byAccessHash = map[string]*models.Session{
+		auth.HashToken(rawCookie): {
+			ID:     uuid.New(),
+			UserID: uid,
+		},
+	}
+	h := newHandlers(authStore, sessStore, newFakeResetStore(), &fakeEmailSender{})
+
+	rw := doDelete(t, h, "/auth/v2/account", &http.Cookie{
+		Name:  middleware.CookieAccessToken,
+		Value: rawCookie,
+	})
+	require.Equal(t, http.StatusNoContent, rw.Code, "body: %s", rw.Body.String())
+	assert.Equal(t, 1, len(authStore.softDeleteCascadeCalls))
+	assert.Equal(t, uid, authStore.softDeleteCascadeCalls[0])
+
+	// Cookies must be cleared on the way out.
+	cookies := rw.Result().Cookies()
+	assert.GreaterOrEqual(t, len(cookies), 2, "expect both itinera_access and itinera_refresh cleared")
+	for _, c := range cookies {
+		assert.Equal(t, -1, c.MaxAge)
+	}
+}
+
+// TestDeleteAccountOpaque_DBError: cascade failure returns 500 with a
+// generic INTERNAL_ERROR (no err.Error() leak per Spec §9.3).
+func TestDeleteAccountOpaque_DBError(t *testing.T) {
+	uid := uuid.New()
+	authStore := &fakeAuthStore{
+		byID:                 map[uuid.UUID]*models.User{uid: {ID: uid}},
+		softDeleteCascadeErr: errors.New("connection reset"),
+	}
+	sessStore := &fakeSessionStore{
+		byAccessHash: map[string]*models.Session{
+			"any-hash": {ID: uuid.New(), UserID: uid},
+		},
+	}
+	h := newHandlers(authStore, sessStore, newFakeResetStore(), &fakeEmailSender{})
+
+	// Bypass the middleware by setting the context directly: this test
+	// exercises the handler's error-mapping branch, not the auth flow.
+	r := httptest.NewRequest(http.MethodDelete, "/auth/v2/account", nil)
+	r = putUserIDIntoContext(r, uid)
+	rw := httptest.NewRecorder()
+	h.DeleteAccountOpaque(rw, r)
+	require.Equal(t, http.StatusInternalServerError, rw.Code)
+	out := mustDecodeError(t, rw)
+	assert.Equal(t, CodeInternalError, out.Code)
+	assert.NotContains(t, out.Message, "connection reset",
+		"raw DB error must NOT leak into the client-facing message")
+}
+
+// ---------- Utilities -----------------------------------------------------
+
+// TestStripPort covers the helper used to coerce http.Request.RemoteAddr
+// into a Postgres INET-compatible value. The function MUST handle IPv6
+// (which Go reports as "[::1]:54321") without dropping to "[" — that
+// mistake was caught by the smoke test on 2026-08-04 and would have
+// silently broken every register/login attempt over IPv6.
+func TestStripPort(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		name string
+		in   string
+		want string
+	}{
+		{"ipv4 with port", "127.0.0.1:54321", "127.0.0.1"},
+		{"ipv4 no port", "127.0.0.1", "127.0.0.1"},
+		{"ipv6 with port", "[::1]:54321", "::1"},
+		{"ipv6 no port", "::1", "::1"},
+		{"empty", "", ""},
+		{"hostname with port", "localhost:8080", "localhost"},
+		{"hostname no port", "localhost", "localhost"},
+	}
+	for _, c := range cases {
+		c := c
+		t.Run(c.name, func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, c.want, stripPort(c.in))
+		})
+	}
+}
 
 func isLowerHex(s string) bool {
 	for _, r := range s {

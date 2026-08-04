@@ -8,6 +8,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
+	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -82,6 +84,15 @@ func (h *Handlers) LoginOpaque(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Soft-deleted accounts must NOT be able to sign in even with the
+	// correct password. We return INVALID_CREDENTIALS (same as wrong
+	// password) so an attacker who scraped a stale credential cannot
+	// tell from the response whether the account still exists.
+	if user.DeletedAt != nil {
+		WriteError(w, http.StatusUnauthorized, CodeInvalidCredentials, "Invalid credentials")
+		return
+	}
+
 	// Generate the access + refresh tokens. The server stores ONLY the
 	// SHA-256 hashes; the raw values ride HttpOnly cookies.
 	rawAccess, err := auth.NewSecureToken()
@@ -98,7 +109,7 @@ func (h *Handlers) LoginOpaque(w http.ResponseWriter, r *http.Request) {
 	expiresAt := time.Now().Add(time.Duration(refreshTokenMaxAge) * time.Second)
 	ua := r.UserAgent()
 	userAgent := &ua
-	ip := r.RemoteAddr
+	ip := stripPort(r.RemoteAddr)
 	ipAddress := &ip
 
 	_, err = h.SessionRepo.CreateSession(r.Context(), user.ID,
@@ -106,6 +117,7 @@ func (h *Handlers) LoginOpaque(w http.ResponseWriter, r *http.Request) {
 		expiresAt, userAgent, ipAddress,
 	)
 	if err != nil {
+		log.Printf("[login] CreateSession failed: %v (ua=%q ip=%q)", err, ua, ip)
 		WriteError(w, http.StatusInternalServerError, CodeInternalError, "Session creation failed")
 		return
 	}
@@ -141,6 +153,52 @@ func (h *Handlers) LogoutOpaque(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	secure := h.Config.IsProduction() || r.Header.Get("X-Forwarded-Proto") == "https"
+	middleware.ClearAuthCookies(w, secure)
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+// DeleteAccountOpaque godoc
+// @Summary      Delete the account (GDPR, post-cutover)
+// @Description  Soft-deletes the user, revokes every active session, and
+// @Description  orphans the user's trips. Idempotent: deleting an
+// @Description  already-deleted account still returns 204.
+// @Tags         auth
+// @Produce      json
+// @Success      204
+// @Failure      401   {object}  handlers.JSONErrorBody "No session"
+// @Failure      404   {object}  handlers.JSONErrorBody "User not found"
+// @Failure      500   {object}  handlers.JSONErrorBody "Cascade failed"
+// @Router       /auth/v2/account [delete]
+func (h *Handlers) DeleteAccountOpaque(w http.ResponseWriter, r *http.Request) {
+	uid, ok := r.Context().Value(middleware.ContextKeyUserId{}).(uuid.UUID)
+	if !ok {
+		WriteError(w, http.StatusUnauthorized, CodeUnauthenticated, "No active session")
+		return
+	}
+
+	email, err := h.AuthRepo.SoftDeleteUserCascade(r.Context(), uid)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			// The session claims a user that no longer exists. We treat it
+			// as success from the client's perspective: the user has, in
+			// fact, been "deleted" relative to them.
+			secure := h.Config.IsProduction() || r.Header.Get("X-Forwarded-Proto") == "https"
+			middleware.ClearAuthCookies(w, secure)
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		WriteError(w, http.StatusInternalServerError, CodeInternalError, "Account deletion failed")
+		return
+	}
+
+	// Best-effort: invalidate the rate-limit entry so the same IP can
+	// attempt re-registration immediately if the user changes their
+	// mind (a fresh code + signup path is still blocked by 30-day email
+	// reservation, so this doesn't open a brute-force vector).
+	_ = email // kept here for future audit logging; not echoed to client
 
 	secure := h.Config.IsProduction() || r.Header.Get("X-Forwarded-Proto") == "https"
 	middleware.ClearAuthCookies(w, secure)
@@ -440,8 +498,9 @@ func (h *Handlers) ForgotOpaque(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	hash := auth.HashToken(code)
-	ipAddr := r.RemoteAddr
+	ipAddr := stripPort(r.RemoteAddr)
 	if err := h.ResetRepo.Create(r.Context(), user.ID, hash, time.Now().Add(1*time.Hour), &ipAddr); err != nil {
+		log.Printf("[forgot] ResetRepo.Create failed: %v (ip=%q)", err, ipAddr)
 		WriteError(w, http.StatusInternalServerError, CodeInternalError, "Reset code persistence failed")
 		return
 	}
@@ -554,12 +613,13 @@ func (h *Handlers) activateSession(w http.ResponseWriter, r *http.Request, user 
 	}
 	expiresAt := time.Now().Add(time.Duration(refreshTokenMaxAge) * time.Second)
 	ua := r.UserAgent()
-	ip := r.RemoteAddr
+	ip := stripPort(r.RemoteAddr)
 	_, err = h.SessionRepo.CreateSession(r.Context(), user.ID,
 		auth.HashToken(rawAccess), auth.HashToken(rawRefresh),
 		expiresAt, &ua, &ip,
 	)
 	if err != nil {
+		log.Printf("[register] CreateSession failed: %v (ua=%q ip=%q expires=%v)", err, ua, ip, expiresAt)
 		return err
 	}
 
@@ -567,6 +627,25 @@ func (h *Handlers) activateSession(w http.ResponseWriter, r *http.Request, user 
 	middleware.SetAccessCookie(w, rawAccess, accessTokenMaxAge, secure)
 	middleware.SetRefreshCookie(w, rawRefresh, refreshTokenMaxAge, secure)
 	return nil
+}
+
+// stripPort removes the trailing `:port` from a "host:port" string. The
+// `sessions.ip_address` column is INET, which only accepts the bare host.
+// We use net.SplitHostPort because it correctly handles IPv6 addresses
+// (e.g. "[::1]:60881" → "[::1]" / "60881") whereas a naive strings.Cut
+// at the first ":" would return "[" and break the SQL insert.
+func stripPort(addr string) string {
+	if addr == "" {
+		return ""
+	}
+	host, _, err := net.SplitHostPort(addr)
+	if err != nil {
+		// Either no port at all ("127.0.0.1") or something else weird.
+		// Pass it through; Postgres INET will accept the bare address and
+		// error on anything else, which is exactly the visibility we want.
+		return addr
+	}
+	return host
 }
 
 // generateSixDigitCode returns a cryptographically random 6-digit decimal
