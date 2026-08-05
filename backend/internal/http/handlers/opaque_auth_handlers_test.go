@@ -80,6 +80,10 @@ func (f *fakeAuthStore) SoftDeleteUser(context.Context, uuid.UUID) (string, erro
 	panic("not used in tests")
 }
 
+func (f *fakeAuthStore) HardDeleteExpired(context.Context, time.Duration, int) (int, error) {
+	panic("not used in tests")
+}
+
 func (f *fakeAuthStore) SoftDeleteUserCascade(_ context.Context, userID uuid.UUID) (string, error) {
 	f.softDeleteCascadeCalls = append(f.softDeleteCascadeCalls, userID)
 	if f.softDeleteCascadeErr != nil {

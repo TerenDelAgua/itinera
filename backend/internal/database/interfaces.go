@@ -150,9 +150,14 @@ type AuthStore interface {
 	// in a single transaction.
 	SoftDeleteUserCascade(ctx context.Context, userID uuid.UUID) (email string, err error)
 
+	// HardDeleteExpired anonymises users whose soft-delete timestamp is
+	// older than `after`. Implemented as a single batched
+	// call; the caller runs it on a cron / ticker.
+	HardDeleteExpired(ctx context.Context, after time.Duration, limit int) (int, error)
+
 	// MarkUserAsHardDeleted anonymises a soft-deleted account after the
-	// 30-day retention window (Spec 017 §5.10). The row stays so analytics
-	// FK references remain valid.
+	// 30-day retention window. The row stays so analytics FK references
+	// remain valid.
 	MarkUserAsHardDeleted(ctx context.Context, userID uuid.UUID, randomStringHash string) error
 
 	// UpdateUserPassword writes a fresh bcrypt hash. Used by reset-password
