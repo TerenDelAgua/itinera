@@ -1,11 +1,6 @@
 /**
- * Frontend mapping of the backend's error code registry (Spec 017 §9.2).
- *
- * The frontend NEVER branches on the human-readable `error.message` —
- * only on `error.code`. This file is the one place where the
- * code-to-string mapping lives, so when the backend renames a code
- * TypeScript catches every caller that needs updating.
- *
+ * Frontend mapping of the backend's error code registry.
+
  * The messages here are *fallback* copies of the ones the backend
  * emits in its 4 supported locales. They are used ONLY when the
  * server message cannot be shown (e.g. network errors, generic
@@ -19,6 +14,8 @@ export type ErrorCode =
     | 'PASSWORD_TOO_WEAK'
     | 'TERMS_NOT_ACCEPTED'
     | 'VALIDATION_ERROR'
+    | 'INVALID_CREDENTIALS'
+    | 'ACCOUNT_DELETED'
     | 'RATE_LIMITED'
     | 'UNAUTHENTICATED'
     | 'INTERNAL_ERROR'
@@ -64,6 +61,23 @@ const MESSAGES: Record<ErrorCode, ErrorMessages> = {
         es: 'Revisa los campos marcados.',
         ja: 'ハイライト表示された項目を確認してください。',
         id: 'Periksa kolom yang ditandai.'
+    },
+    INVALID_CREDENTIALS: {
+        // Anti-enumeration: the same string is returned whether the email
+        // does not exist or the password is wrong. Spec 017 §5.2 + §9.2.
+        en: 'Incorrect email or password.',
+        es: 'Email o contraseña incorrectos.',
+        ja: 'メールアドレスまたはパスワードが正しくありません。',
+        id: 'Email atau kata sandi salah.'
+    },
+    ACCOUNT_DELETED: {
+        // Soft-deleted accounts cannot sign in. The user is told to
+        // re-register after the 30-day retention window (Spec §5.9) so
+        // the same email becomes available again with a fresh hash.
+        en: 'This account was deleted. You can register again after 30 days.',
+        es: 'Esta cuenta fue eliminada. Puedes registrarte de nuevo en 30 días.',
+        ja: 'このアカウントは削除されました。30日後に再登録できます。',
+        id: 'Akun ini dihapus. Anda dapat mendaftar lagi setelah 30 hari.'
     },
     RATE_LIMITED: {
         en: 'Too many attempts. Please wait a moment.',

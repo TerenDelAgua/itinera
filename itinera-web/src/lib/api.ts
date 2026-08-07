@@ -4,7 +4,7 @@
 // Every request sets `credentials: 'include'` so the browser sends them.
 //
 // Error handling: backend returns `{ error: { code: string, message: string } }`
-// for every non-2xx response (Spec 017 §9.2). `apiFetch` parses that body
+// for every non-2xx response. `apiFetch` parses that body
 // and throws an `ApiError` carrying the structured `code`, so callers can
 // react to specific codes (e.g. EMAIL_ALREADY_EXISTS) without string-matching
 // the human-readable message.
@@ -69,7 +69,11 @@ export async function apiFetch<T = unknown>(
         ...rest,
         headers: finalHeaders,
         credentials: 'include',
-        body: body === undefined ? undefined : JSON.stringify(body)
+        // Tolerate both call shapes: legacy callers pass `JSON.stringify(obj)`
+        // (already a string), newer callers pass the plain object. Detecting the
+        // type here avoids breaking the ~30 existing call sites that pre-date
+        // this refactor.
+        body: body === undefined ? undefined : typeof body === 'string' ? body : JSON.stringify(body)
     });
 
     if (!response.ok) {

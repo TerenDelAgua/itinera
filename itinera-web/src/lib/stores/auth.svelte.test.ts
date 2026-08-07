@@ -24,7 +24,7 @@ function mockFetchOnce(status: number, body: unknown) {
     // 204/205/304 cannot carry a body in the Response constructor. Use
     // an empty body string and let the body slot stay null for those.
     const bodyText = status === 204 || status === 205 || status === 304 ? null : JSON.stringify(body);
-    vi.spyOn(global, 'fetch').mockResolvedValueOnce(
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
         new Response(bodyText, {
             status,
             headers: bodyText ? { 'Content-Type': 'application/json' } : {}
@@ -110,7 +110,7 @@ describe('auth.register', () => {
     });
 
     it('non-ApiError failure: still rejects and clears loading', async () => {
-        vi.spyOn(global, 'fetch').mockRejectedValueOnce(new TypeError('Network down'));
+        vi.spyOn(globalThis, 'fetch').mockRejectedValueOnce(new TypeError('Network down'));
 
         await expect(
             auth.register({ email: 'x@example.test', password: 'GoodPass1!' })

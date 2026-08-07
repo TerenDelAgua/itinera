@@ -198,6 +198,27 @@
       "error_terms_required": "続行するには利用規約に同意してください。",
       "error_network": "接続できません。ネットワークを確認してください。",
       "error_generic": "問題が発生しました。もう一度お試しください。"
+    },
+    "login": {
+      "title": "おかえりなさい",
+      "subtitle": "ログインして旅行にアクセス。",
+      "email_label": "メールアドレス",
+      "email_placeholder": "you@example.com",
+      "password_label": "パスワード",
+      "password_placeholder": "パスワード",
+      "password_toggle_show": "パスワードを表示",
+      "password_toggle_hide": "パスワードを隠す",
+      "forgot_cta": "パスワードをお忘れですか？",
+      "forgot_link_href": "/forgot",
+      "submit": "ログイン",
+      "submitting": "ログイン中...",
+      "register_link": "アカウントをお持ちでない方は{register}",
+      "register_cta": "新規登録",
+      "register_link_href": "/register",
+      "error_email_required": "メールアドレスは必須です。",
+      "error_password_required": "パスワードは必須です。",
+      "error_network": "接続できません。ネットワークを確認してください。",
+      "error_generic": "問題が発生しました。もう一度お試しください。"
     }
   },
   "transport": {

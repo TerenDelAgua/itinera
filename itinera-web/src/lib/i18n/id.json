@@ -198,6 +198,27 @@
       "error_terms_required": "Harap setujui ketentuan untuk melanjutkan.",
       "error_network": "Tidak ada koneksi. Periksa jaringan Anda dan coba lagi.",
       "error_generic": "Terjadi kesalahan. Silakan coba lagi."
+    },
+    "login": {
+      "title": "Selamat datang kembali",
+      "subtitle": "Masuk untuk mengakses perjalanan Anda.",
+      "email_label": "Email",
+      "email_placeholder": "anda@email.com",
+      "password_label": "Kata sandi",
+      "password_placeholder": "Kata sandi Anda",
+      "password_toggle_show": "Tampilkan kata sandi",
+      "password_toggle_hide": "Sembunyikan kata sandi",
+      "forgot_cta": "Lupa kata sandi?",
+      "forgot_link_href": "/forgot",
+      "submit": "Masuk",
+      "submitting": "Masuk...",
+      "register_link": "Belum punya akun? {register}",
+      "register_cta": "Daftar",
+      "register_link_href": "/register",
+      "error_email_required": "Email wajib diisi.",
+      "error_password_required": "Kata sandi wajib diisi.",
+      "error_network": "Tidak ada koneksi. Periksa jaringan Anda dan coba lagi.",
+      "error_generic": "Terjadi kesalahan. Silakan coba lagi."
     }
   },
   "transport": {

@@ -198,6 +198,27 @@
       "error_terms_required": "Acepta los términos para continuar.",
       "error_network": "Sin conexión. Comprueba tu red e inténtalo de nuevo.",
       "error_generic": "Algo ha ido mal. Inténtalo de nuevo."
+    },
+    "login": {
+      "title": "Bienvenido de vuelta",
+      "subtitle": "Inicia sesión para acceder a tus viajes.",
+      "email_label": "Email",
+      "email_placeholder": "tu@email.com",
+      "password_label": "Contraseña",
+      "password_placeholder": "Tu contraseña",
+      "password_toggle_show": "Mostrar contraseña",
+      "password_toggle_hide": "Ocultar contraseña",
+      "forgot_cta": "¿Olvidaste tu contraseña?",
+      "forgot_link_href": "/forgot",
+      "submit": "Iniciar sesión",
+      "submitting": "Iniciando sesión...",
+      "register_link": "¿No tienes cuenta? {register}",
+      "register_cta": "Crea una",
+      "register_link_href": "/register",
+      "error_email_required": "El email es obligatorio.",
+      "error_password_required": "La contraseña es obligatoria.",
+      "error_network": "Sin conexión. Comprueba tu red e inténtalo de nuevo.",
+      "error_generic": "Algo ha ido mal. Inténtalo de nuevo."
     }
   },
   "transport": {

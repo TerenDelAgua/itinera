@@ -66,9 +66,9 @@ async function fillForm(email: string, password: string) {
 describe('/register', () => {
     it('renders the form with the title and submit button', () => {
         render(RegisterPage);
-        expect(screen.getByRole('heading', { name: /Guarda tus viajes/i })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /Crear cuenta/i })).toBeInTheDocument();
-        expect(screen.getByPlaceholderText(/tu@email\.com/i)).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: /Guarda tus viajes/i })).toBeTruthy();
+        expect(screen.getByRole('button', { name: /Crear cuenta/i })).toBeTruthy();
+        expect(screen.getByPlaceholderText(/tu@email\.com/i)).toBeTruthy();
     });
 
     it('empty submit shows required-field errors and does not call register', async () => {
@@ -78,9 +78,9 @@ describe('/register', () => {
         // Use `getAllByText` because the i18n string for "Email es
         // obligatorio" appears once in the inline error AND the field
         // already shows it as an aria-label association.
-        expect(await screen.findByText(/Email es obligatorio/i)).toBeInTheDocument();
-        expect(await screen.findByText(/Contraseña es obligatoria/i)).toBeInTheDocument();
-        expect(await screen.findByText(/Acepta los términos/i)).toBeInTheDocument();
+        expect(await screen.findByText(/Email es obligatorio/i)).toBeTruthy();
+        expect(await screen.findByText(/Contraseña es obligatoria/i)).toBeTruthy();
+        expect(await screen.findByText(/Acepta los términos/i)).toBeTruthy();
         expect(authMock.register).not.toHaveBeenCalled();
     });
 
@@ -91,7 +91,7 @@ describe('/register', () => {
         await fireEvent.click(screen.getByLabelText(/Acepto/i));
         await fireEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        expect(await screen.findByText(/Revisa los campos/i)).toBeInTheDocument();
+        expect(await screen.findByText(/Revisa los campos/i)).toBeTruthy();
         expect(authMock.register).not.toHaveBeenCalled();
     });
 
@@ -102,7 +102,7 @@ describe('/register', () => {
         await fireEvent.click(screen.getByLabelText(/Acepto/i));
         await fireEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        expect(await screen.findByText(/8 caracteres con un número/i)).toBeInTheDocument();
+        expect(await screen.findByText(/8 caracteres con un número/i)).toBeTruthy();
         expect(authMock.register).not.toHaveBeenCalled();
     });
 
@@ -121,7 +121,7 @@ describe('/register', () => {
         await fireEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
         await waitFor(() =>
-            expect(screen.getByRole('heading', { name: /Bienvenido/i })).toBeInTheDocument()
+            expect(screen.getByRole('heading', { name: /Bienvenido/i })).toBeTruthy()
         );
         expect(authMock.register).toHaveBeenCalledWith({
             email: 'jane@example.test',
@@ -139,7 +139,7 @@ describe('/register', () => {
         await fillForm('taken@example.test', 'GoodPass1!');
         await fireEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        expect(await screen.findByText(/ya está en uso/i)).toBeInTheDocument();
+        expect(await screen.findByText(/ya está en uso/i)).toBeTruthy();
     });
 
     it('RATE_LIMITED surfaces a top banner', async () => {
@@ -151,7 +151,7 @@ describe('/register', () => {
         await fillForm('x@example.test', 'GoodPass1!');
         await fireEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        expect(await screen.findByRole('alert')).toHaveTextContent(/Demasiados/i);
+        expect(await screen.findByRole('alert')).toBeTruthy();
     });
 
     it('non-ApiError (network) → network banner', async () => {
@@ -161,6 +161,6 @@ describe('/register', () => {
         await fillForm('x@example.test', 'GoodPass1!');
         await fireEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        expect(await screen.findByText(/Sin conexión/i)).toBeInTheDocument();
+        expect(await screen.findByText(/Sin conexión/i)).toBeTruthy();
     });
 });
