@@ -1,0 +1,44 @@
+<script lang="ts">
+    /**
+     * Primary CTA button. Visual: orange background, white text, full
+     * width by default, with a spinner when `loading` is true.
+     *
+     * Disabled state comes from BOTH the parent (`disabled` prop) and
+     * the loading state — so a button mid-submission can't be tapped
+     * again accidentally.
+     */
+    import type { HTMLButtonAttributes } from 'svelte/elements';
+
+    type $$Props = HTMLButtonAttributes & {
+        loading?: boolean;
+        /** Render a full-width button. Default true. */
+        fullWidth?: boolean;
+    };
+
+    let {
+        loading = false,
+        fullWidth = true,
+        disabled = false,
+        type = 'button',
+        children,
+        ...rest
+    }: $$Props = $props();
+</script>
+
+<button
+    {type}
+    disabled={disabled || loading}
+    class="inline-flex items-center justify-center gap-2 h-12 px-5
+           bg-teren-primary hover:bg-teren-primary-hover text-white
+           font-semibold rounded-xl shadow-sm active:scale-[0.99]
+           transition-all
+           disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100
+           {fullWidth ? 'w-full' : ''}"
+    {...rest}
+>
+    {#if loading}
+        <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+        <span class="sr-only">Loading</span>
+    {/if}
+    {@render children?.()}
+</button>

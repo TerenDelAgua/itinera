@@ -165,9 +165,40 @@
   "errors": {
     "generic": "Terjadi kesalahan. Silakan coba lagi.",
     "date_out_of_bounds": "Tanggal harus antara {tripStart} dan {tripEnd}.",
-    "required_fields": "Harap lengkapi semua bidang yang wajib diisi.",
+    "required_fields": "Harap lengkapi semua kolom wajib.",
     "trip_not_found": "Kami tidak dapat menemukan perjalanan ini.",
     "invalid_place": "Tujuan yang dipilih tidak valid."
+  },
+  "auth": {
+    "register": {
+      "title": "Simpan perjalanan Anda ke cloud",
+      "subtitle": "Sinkronkan antar perangkat dan simpan rencana Anda selamanya.",
+      "email_label": "Email",
+      "email_placeholder": "anda@email.com",
+      "password_label": "Kata sandi",
+      "password_help": "Minimal 8 karakter, dengan angka atau simbol",
+      "password_toggle_show": "Tampilkan kata sandi",
+      "password_toggle_hide": "Sembunyikan kata sandi",
+      "terms_label": "Saya menyetujui {terms} dan kebijakan privasi",
+      "terms_link_text": "ketentuan",
+      "terms_link_href": "/legal/terms",
+      "privacy_link_href": "/legal/privacy",
+      "submit": "Buat akun",
+      "submitting": "Membuat...",
+      "success_title": "Selamat datang!",
+      "success_body": "Perjalanan Anda aman di cloud. Kami mengirim email selamat datang.",
+      "signin_cta": "Masuk",
+      "signin_link": "Sudah punya akun? {signin}",
+      "error_email_taken": "Email ini sudah digunakan. Masuk saja?",
+      "error_validation": "Periksa kolom yang ditandai.",
+      "error_rate_limit": "Terlalu banyak percobaan. Tunggu sebentar.",
+      "error_email_required": "Email wajib diisi.",
+      "error_password_required": "Kata sandi wajib diisi.",
+      "error_password_weak": "Gunakan minimal 8 karakter dengan angka atau simbol.",
+      "error_terms_required": "Harap setujui ketentuan untuk melanjutkan.",
+      "error_network": "Tidak ada koneksi. Periksa jaringan Anda dan coba lagi.",
+      "error_generic": "Terjadi kesalahan. Silakan coba lagi."
+    }
   },
   "transport": {
     "savings_estimated": "Perkiraan penghematan",

@@ -169,6 +169,37 @@
     "trip_not_found": "旅行が見つかりませんでした。",
     "invalid_place": "選択された目的地は無効です。"
   },
+  "auth": {
+    "register": {
+      "title": "旅行をクラウドに保存",
+      "subtitle": "デバイス間で同期し、計画をずっと残せます。",
+      "email_label": "メールアドレス",
+      "email_placeholder": "you@example.com",
+      "password_label": "パスワード",
+      "password_help": "8文字以上、数字または記号を含めてください",
+      "password_toggle_show": "パスワードを表示",
+      "password_toggle_hide": "パスワードを隠す",
+      "terms_label": "{terms}とプライバシーポリシーに同意します",
+      "terms_link_text": "利用規約",
+      "terms_link_href": "/legal/terms",
+      "privacy_link_href": "/legal/privacy",
+      "submit": "アカウントを作成",
+      "submitting": "作成中...",
+      "success_title": "ようこそ！",
+      "success_body": "旅行がクラウドに保存されました。ようこそメールをお送りしました。",
+      "signin_cta": "ログイン",
+      "signin_link": "アカウントをお持ちですか？{signin}",
+      "error_email_taken": "このメールアドレスは既に使われています。ログインしますか？",
+      "error_validation": "ハイライト表示された項目を確認してください。",
+      "error_rate_limit": "試行回数が多すぎます。しばらくお待ちください。",
+      "error_email_required": "メールアドレスは必須です。",
+      "error_password_required": "パスワードは必須です。",
+      "error_password_weak": "8文字以上で、数字または記号を含めてください。",
+      "error_terms_required": "続行するには利用規約に同意してください。",
+      "error_network": "接続できません。ネットワークを確認してください。",
+      "error_generic": "問題が発生しました。もう一度お試しください。"
+    }
+  },
   "transport": {
     "savings_estimated": "推定節約額",
     "jr_transport": "JR交通費",

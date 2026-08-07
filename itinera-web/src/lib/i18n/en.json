@@ -169,6 +169,37 @@
     "trip_not_found": "We couldn't find this trip.",
     "invalid_place": "The selected destination is invalid."
   },
+  "auth": {
+    "register": {
+      "title": "Save your trips to the cloud",
+      "subtitle": "Sync across devices and keep your plans forever.",
+      "email_label": "Email",
+      "email_placeholder": "you@example.com",
+      "password_label": "Password",
+      "password_help": "At least 8 characters, with a number or symbol",
+      "password_toggle_show": "Show password",
+      "password_toggle_hide": "Hide password",
+      "terms_label": "I accept the {terms} and privacy policy",
+      "terms_link_text": "terms",
+      "terms_link_href": "/legal/terms",
+      "privacy_link_href": "/legal/privacy",
+      "submit": "Create account",
+      "submitting": "Creating...",
+      "success_title": "Welcome!",
+      "success_body": "Your trips are safe in the cloud. We sent you a welcome email.",
+      "signin_cta": "Sign in",
+      "signin_link": "Already have an account? {signin}",
+      "error_email_taken": "This email is already in use. Sign in instead?",
+      "error_validation": "Please review the highlighted fields.",
+      "error_rate_limit": "Too many attempts. Please wait a moment.",
+      "error_email_required": "Email is required.",
+      "error_password_required": "Password is required.",
+      "error_password_weak": "Use at least 8 characters with a number or symbol.",
+      "error_terms_required": "Please accept the terms to continue.",
+      "error_network": "No connection. Check your network and try again.",
+      "error_generic": "Something went wrong. Please try again."
+    }
+  },
   "transport": {
     "savings_estimated": "Estimated savings",
     "jr_transport": "JR Transport",

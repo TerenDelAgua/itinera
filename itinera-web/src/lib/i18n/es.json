@@ -169,6 +169,37 @@
     "trip_not_found": "No hemos podido encontrar este viaje.",
     "invalid_place": "El destino seleccionado no es válido."
   },
+  "auth": {
+    "register": {
+      "title": "Guarda tus viajes en la nube",
+      "subtitle": "Sincroniza entre dispositivos y conserva tus planes para siempre.",
+      "email_label": "Email",
+      "email_placeholder": "tu@email.com",
+      "password_label": "Contraseña",
+      "password_help": "Mínimo 8 caracteres, con un número o símbolo",
+      "password_toggle_show": "Mostrar contraseña",
+      "password_toggle_hide": "Ocultar contraseña",
+      "terms_label": "Acepto los {terms} y la política de privacidad",
+      "terms_link_text": "términos",
+      "terms_link_href": "/legal/terms",
+      "privacy_link_href": "/legal/privacy",
+      "submit": "Crear cuenta",
+      "submitting": "Creando...",
+      "success_title": "¡Bienvenido!",
+      "success_body": "Tus viajes están a salvo en la nube. Te hemos enviado un email de bienvenida.",
+      "signin_cta": "Iniciar sesión",
+      "signin_link": "¿Ya tienes cuenta? {signin}",
+      "error_email_taken": "Este email ya está en uso. ¿Iniciamos sesión?",
+      "error_validation": "Revisa los campos marcados.",
+      "error_rate_limit": "Demasiados intentos. Espera un momento.",
+      "error_email_required": "El email es obligatorio.",
+      "error_password_required": "La contraseña es obligatoria.",
+      "error_password_weak": "Usa al menos 8 caracteres con un número o símbolo.",
+      "error_terms_required": "Acepta los términos para continuar.",
+      "error_network": "Sin conexión. Comprueba tu red e inténtalo de nuevo.",
+      "error_generic": "Algo ha ido mal. Inténtalo de nuevo."
+    }
+  },
   "transport": {
     "savings_estimated": "Ahorro estimado",
     "jr_transport": "Transporte JR",
