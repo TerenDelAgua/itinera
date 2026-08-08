@@ -180,7 +180,7 @@
       "email_placeholder": "tu@email.com",
       "password_label": "Contraseña",
       "password_placeholder": "Elige una contraseña",
-      "password_help": "Mínimo 8 caracteres",
+      "password_help": "Mínimo 8 caracteres, con un número y un símbolo",
       "password_toggle_show": "Mostrar contraseña",
       "password_toggle_hide": "Ocultar contraseña",
       "terms_label_pre": "Acepto los",
@@ -200,8 +200,9 @@
       "error_validation": "Revisa los campos marcados.",
       "error_rate_limit": "Demasiados intentos. Espera un momento.",
       "error_email_required": "El email es obligatorio.",
+      "error_email_format": "Introduce un email válido como tu@ejemplo.com.",
       "error_password_required": "La contraseña es obligatoria.",
-      "error_password_weak": "Usa al menos 8 caracteres con un número o símbolo.",
+      "error_password_weak": "Usa al menos 8 caracteres, incluyendo un número y un símbolo.",
       "error_terms_required": "Acepta los términos para continuar.",
       "error_network": "Sin conexión. Comprueba tu red e inténtalo de nuevo.",
       "error_generic": "Algo ha ido mal. Inténtalo de nuevo."
@@ -226,6 +227,7 @@
       "register_cta": "Crea una",
       "register_link_href": "/register",
       "error_email_required": "El email es obligatorio.",
+      "error_email_format": "Introduce un email válido como tu@ejemplo.com.",
       "error_password_required": "La contraseña es obligatoria.",
       "error_network": "Sin conexión. Comprueba tu red e inténtalo de nuevo.",
       "error_generic": "Algo ha ido mal. Inténtalo de nuevo."

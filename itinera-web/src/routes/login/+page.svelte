@@ -60,12 +60,30 @@
         if (!email.trim()) {
             emailError = $t("auth.login.error_email_required");
             ok = false;
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            emailError = $t("auth.login.error_email_format");
+            ok = false;
         }
         if (!password) {
             passwordError = $t("auth.login.error_password_required");
             ok = false;
         }
         return ok;
+    }
+
+    /**
+     * Single-field validation on blur (DS §3.7). Same rationale as in
+     * /register: surface "Revisa el formato del email" the moment the
+     * user leaves the field rather than waiting for submit.
+     */
+    function validateEmailOnBlur() {
+        if (!email.trim()) {
+            emailError = null;
+            return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+            emailError = $t("auth.login.error_email_format");
+        }
     }
 
     /**
@@ -149,7 +167,7 @@
         <form
             onsubmit={handleSubmit}
             novalidate
-            class="mx-6 mb-6 mt-4 bg-teren-surface rounded-xl border border-teren-border overflow-hidden
+            class="mx-6 mb-6 mt-4 bg-input rounded-xl border border-teren-border overflow-hidden
                    focus-within:border-teren-primary/70 focus-within:shadow-sm transition-colors"
         >
             {#if bannerError}
@@ -193,14 +211,21 @@
                         if (emailError) emailError = null;
                         clearBanner();
                     }}
+                    onblur={validateEmailOnBlur}
                     aria-invalid={emailError ? "true" : undefined}
+                    aria-describedby="login-email-error"
                     class="w-full h-11 mt-1 px-1 bg-transparent text-sm text-teren-text-main placeholder:text-teren-text-muted/40 focus:outline-none"
                 />
-                {#if emailError}
-                    <p class="text-xs text-error-base font-medium" role="alert">
-                        {emailError}
-                    </p>
-                {/if}
+                <!-- min-h-[20px] keeps the row height stable whether
+                     the error is rendered or not. -->
+                <p
+                    id="login-email-error"
+                    class="text-xs text-error-base font-medium min-h-[20px] mt-0.5"
+                    role="alert"
+                    aria-live="polite"
+                >
+                    {emailError ?? ""}
+                </p>
             </div>
 
             <!-- ROW 2: Password with eye toggle + Forgot link -->
@@ -286,7 +311,12 @@
                     </button>
                 </div>
                 {#if passwordError}
-                    <p class="text-xs text-error-base font-medium" role="alert">
+                    <p
+                        id="login-password-error"
+                        class="text-xs text-error-base font-medium min-h-[20px] mt-0.5"
+                        role="alert"
+                        aria-live="polite"
+                    >
                         {passwordError}
                     </p>
                 {/if}

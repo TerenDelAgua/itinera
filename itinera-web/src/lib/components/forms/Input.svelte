@@ -37,10 +37,10 @@
     {label}
   </label>
   <div
-    class="flex items-center bg-teren-surface border rounded-lg transition-colors
+    class="flex items-center bg-input border rounded-lg transition-colors
                {error
-      ? 'border-error-base bg-error-subtle/30'
-      : 'border-teren-border hover:border-teren-primary/40 focus-within:border-teren-primary focus-within:bg-teren-card'}"
+                   ? 'border-error-base bg-error-subtle/30'
+                   : 'border-teren-border hover:border-teren-primary/40 focus-within:border-teren-primary focus-within:bg-input'}"
   >
     <input
       id={inputId}

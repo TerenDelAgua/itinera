@@ -97,18 +97,21 @@ describe('/register', () => {
         expect(authMock.register).not.toHaveBeenCalled();
     });
 
-    it('invalid email format shows the validation message', async () => {
+    it('invalid email format shows the specific format message', async () => {
+        // Now that we have a dedicated email-format error key, the
+        // user sees "Enter a valid email like tu@ejemplo.com"
+        // instead of the generic "review the highlighted fields".
         render(RegisterPage);
         await fillForm('not-an-email', 'GoodPass1!');
         await fireEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        expect(await screen.findByText(/Revisa los campos/i)).toBeTruthy();
+        expect(await screen.findByText(/Introduce un email válido/i)).toBeTruthy();
         expect(authMock.register).not.toHaveBeenCalled();
     });
 
     it('short password (less than 8 chars) shows the weak-password error', async () => {
-        // Spec 017 only enforces min 8 chars — no symbol/number rule.
-        // So "short1!" should pass (8 chars) and "short" should fail.
+        // Spec 017 §5.1 enforces 3 rules: len ≥ 8, contains a digit,
+        // contains a symbol. "short" fails on length.
         render(RegisterPage);
         await fillForm('jane@example.test', 'short');
         await fireEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
@@ -117,31 +120,35 @@ describe('/register', () => {
         expect(authMock.register).not.toHaveBeenCalled();
     });
 
-    it('8-char letter-only password is accepted (no symbol rule)', async () => {
-        // Regression guard for Issue 4: we removed the bogus
-        // number/symbol rule, so a longer letter-only password must
-        // not be rejected client-side.
-        authMock.register.mockResolvedValueOnce({
-            id: 'usr_1',
-            email: 'jane@example.test',
-            tier: 'free' as const,
-            locale: 'es',
-            terms_accepted_at: '2026-08-04T10:00:00Z',
-            created_at: '2026-08-04T10:00:00Z'
-        });
+    it('password missing a digit is rejected client-side', async () => {
+        // "onlyLetters!" has 12 chars + symbol but no digit.
+        render(RegisterPage);
+        await fillForm('jane@example.test', 'onlyLetters!');
+        await fireEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
+        expect(await screen.findByText(/al menos 8 caracteres/i)).toBeTruthy();
+        expect(authMock.register).not.toHaveBeenCalled();
+    });
+
+    it('password missing a symbol is rejected client-side', async () => {
+        // "letters123" has 10 chars + digit but no symbol.
+        render(RegisterPage);
+        await fillForm('jane@example.test', 'letters123');
+        await fireEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
+
+        expect(await screen.findByText(/al menos 8 caracteres/i)).toBeTruthy();
+        expect(authMock.register).not.toHaveBeenCalled();
+    });
+
+    it('8-char letter-only password is rejected (symbol required)', async () => {
+        // Regression guard: a longer letter-only password must NOT
+        // be accepted because the spec mandates a digit AND a symbol.
         render(RegisterPage);
         await fillForm('jane@example.test', 'longerthan8');
         await fireEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        await waitFor(() =>
-            expect(screen.getByRole('heading', { name: /Bienvenido/i })).toBeTruthy()
-        );
-        expect(authMock.register).toHaveBeenCalledWith({
-            email: 'jane@example.test',
-            password: 'longerthan8',
-            locale: 'es'
-        });
+        expect(await screen.findByText(/al menos 8 caracteres/i)).toBeTruthy();
+        expect(authMock.register).not.toHaveBeenCalled();
     });
 
     it('happy path → success dialog with the welcome copy', async () => {
@@ -189,7 +196,12 @@ describe('/register', () => {
         await fillForm('x@example.test', 'GoodPass1!');
         await fireEvent.click(screen.getByRole('button', { name: /Crear cuenta/i }));
 
-        expect(await screen.findByRole('alert')).toHaveTextContent(/Demasiados/i);
+        // The page now has multiple role=alert elements (the
+        // per-field live regions + the banner). Pick the banner by
+        // its distinctive copy.
+        const alerts = await screen.findAllByRole('alert');
+        const banner = alerts.find((el) => /Demasiados/i.test(el.textContent ?? ''));
+        expect(banner).toBeDefined();
     });
 
     it('non-ApiError (network) → network banner', async () => {

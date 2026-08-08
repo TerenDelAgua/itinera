@@ -61,8 +61,29 @@
   });
 
   /**
+   * Password rules (must mirror Spec 017 §5.1 EXACTLY — the
+   * backend rejects with 400 if these aren't met, so a passing
+   * client-side check that the server rejects anyway is worse than
+   * useless: it makes the user re-submit and see "Invalid JSON"
+   * in the banner):
+   *   1. length ≥ 8 characters
+   *   2. contains at least one digit (0-9)
+   *   3. contains at least one non-alphanumeric symbol
+   */
+  function passwordIsStrong(p: string): boolean {
+    if (p.length < 8) return false;
+    let hasDigit = false;
+    let hasSymbol = false;
+    for (const ch of p) {
+      if (/\d/.test(ch)) hasDigit = true;
+      else if (!/[a-zA-Z]/.test(ch)) hasSymbol = true;
+    }
+    return hasDigit && hasSymbol;
+  }
+
+  /**
    * Inline pre-flight validation. Mirrors the server's exact
-   * password rule (Spec 017 §5.1: min 8 chars) — see Issue 4.
+   * password rule (Spec 017 §5.1: 8 chars + digit + symbol).
    */
   function validate(): boolean {
     let ok = true;
@@ -75,14 +96,14 @@
       emailError = $t("auth.register.error_email_required");
       ok = false;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      emailError = $t("auth.register.error_validation");
+      emailError = $t("auth.register.error_email_format");
       ok = false;
     }
 
     if (!password) {
       passwordError = $t("auth.register.error_password_required");
       ok = false;
-    } else if (password.length < 8) {
+    } else if (!passwordIsStrong(password)) {
       passwordError = $t("auth.register.error_password_weak");
       ok = false;
     }
@@ -93,6 +114,35 @@
     }
 
     return ok;
+  }
+
+  /**
+   * Single-field validation, fired on blur (DS §3.7). Used so the
+   * user gets the "Revisa el formato del email" hint the moment
+   * they leave a malformed email field, rather than waiting for
+   * submit. Only sets the error if the field has content — an
+   * empty blur should leave the placeholder visible, not a red
+   * "Required" message that hides the placeholder.
+   */
+  function validateEmailOnBlur() {
+    if (!email.trim()) {
+      // Empty: clear any prior error, the placeholder is the hint.
+      emailError = null;
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      emailError = $t("auth.register.error_email_format");
+    }
+  }
+
+  function validatePasswordOnBlur() {
+    if (!password) {
+      passwordError = null;
+      return;
+    }
+    if (!passwordIsStrong(password)) {
+      passwordError = $t("auth.register.error_password_weak");
+    }
   }
 
   /**
@@ -240,11 +290,11 @@
                  lines instead of three independent cards. The whole
                  surface reacts to focus-within / hover as one unit. -->
       <form
-        onsubmit={handleSubmit}
-        novalidate
-        class="mx-6 mb-6 mt-4 bg-teren-surface rounded-xl border border-teren-border overflow-hidden
-                       focus-within:border-teren-primary/70 focus-within:shadow-sm transition-colors"
-      >
+            onsubmit={handleSubmit}
+            novalidate
+            class="mx-6 mb-6 mt-4 bg-input rounded-xl border border-teren-border overflow-hidden
+                   focus-within:border-teren-primary/70 focus-within:shadow-sm transition-colors"
+        >
         {#if bannerError}
           <div
             class="bg-error-subtle border-b border-error-base/30 px-3 py-2 text-sm text-error-base font-medium flex items-center gap-2"
@@ -271,29 +321,36 @@
         <!-- ROW 1: Email (no trailing icon, no internal border
                      below because the divider between rows comes from
                      the section's border-b). -->
-        <div class="px-3 py-3 border-b border-teren-border/50">
-          <label
-            for="register-email"
-            class="text-xs font-semibold uppercase tracking-wide text-teren-text-muted"
-          >
-            {$t("auth.register.email_label")}
-          </label>
-          <input
-            id="register-email"
-            type="email"
-            placeholder={$t("auth.register.email_placeholder")}
-            autocomplete="email"
-            bind:value={email}
-            oninput={() => clearFieldError("email")}
-            aria-invalid={emailError ? "true" : undefined}
-            class="w-full h-11 mt-1 px-1 bg-transparent text-sm text-teren-text-main placeholder:text-teren-text-muted/40 focus:outline-none"
-          />
-          {#if emailError}
-            <p class="text-xs text-error-base font-medium" role="alert">
-              {emailError}
-            </p>
-          {/if}
-        </div>
+            <div class="px-3 py-3 border-b border-teren-border/50">
+              <label
+                for="register-email"
+                class="text-xs font-semibold uppercase tracking-wide text-teren-text-muted"
+              >
+                {$t("auth.register.email_label")}
+              </label>
+              <input
+                id="register-email"
+                type="email"
+                placeholder={$t("auth.register.email_placeholder")}
+                autocomplete="email"
+                bind:value={email}
+                oninput={() => clearFieldError("email")}
+                onblur={validateEmailOnBlur}
+                aria-invalid={emailError ? "true" : undefined}
+                aria-describedby="register-email-error"
+                class="w-full h-11 mt-1 px-1 bg-transparent text-sm text-teren-text-main placeholder:text-teren-text-muted/40 focus:outline-none"
+              />
+              <!-- min-h-[20px] keeps the layout stable so the field
+                   below doesn't jump when the error appears. -->
+              <p
+                id="register-email-error"
+                class="text-xs text-error-base font-medium min-h-[20px] mt-0.5"
+                role="alert"
+                aria-live="polite"
+              >
+                {emailError ?? ""}
+              </p>
+            </div>
 
         <!-- ROW 2: Password with eye toggle (§3.4: 44×44 tap
                      target inside the input, right-aligned). -->
@@ -317,7 +374,9 @@
               autocomplete="new-password"
               bind:value={password}
               oninput={() => clearFieldError("password")}
+              onblur={validatePasswordOnBlur}
               aria-invalid={passwordError ? "true" : undefined}
+              aria-describedby="register-password-error"
               class="w-full h-11 mt-1 px-1 bg-transparent text-sm text-teren-text-main placeholder:text-teren-text-muted/40 focus:outline-none"
               class:masked-password={!showPassword}
             />
@@ -367,13 +426,21 @@
             </button>
           </div>
           {#if passwordError}
-            <p class="text-xs text-error-base font-medium" role="alert">
+            <p
+              id="register-password-error"
+              class="text-xs text-error-base font-medium min-h-[20px] mt-0.5"
+              role="alert"
+              aria-live="polite"
+            >
               {passwordError}
             </p>
           {:else}
             <!-- The helper text now ONLY appears below the
-                             input, not duplicated as a placeholder. -->
-            <p class="text-xs text-teren-text-muted mt-1">
+                 input, not duplicated as a placeholder. -->
+            <p
+              id="register-password-help"
+              class="text-xs text-teren-text-muted min-h-[20px] mt-0.5"
+            >
               {$t("auth.register.password_help")}
             </p>
           {/if}

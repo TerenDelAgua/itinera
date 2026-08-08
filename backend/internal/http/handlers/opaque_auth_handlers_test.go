@@ -409,6 +409,42 @@ func putUserIDIntoContext(r *http.Request, uid uuid.UUID) *http.Request {
 	return r.WithContext(ctx)
 }
 
+// ---------- Password-strength helper tests (Spec 017 §5.1) ----------------
+//
+// Spec §5.1: "8 chars min, plus a digit and a non-alphanumeric symbol".
+// These tests pin the helper's contract so future "let's drop the
+// symbol rule" refactors don't slip through.
+func TestIsStrongEnoughPassword(t *testing.T) {
+	cases := []struct {
+		name string
+		pw   string
+		want bool
+	}{
+		// Reject — too short
+		{"empty", "", false},
+		{"7 chars even with rules", "Abc1!@#", false},
+
+		// Reject — length OK but missing pieces
+		{"8 letters only", "abcdefgh", false},
+		{"8 letters + digit, no symbol", "abcdefg1", false},
+		{"8 letters + symbol, no digit", "abcdefg!", false},
+		{"all digits no symbol", "12345678", false},
+		{"all symbols no digit", "!!@@##$$", false},
+
+		// Accept — 8 chars + digit + symbol
+		{"8 chars with digit and symbol", "abcdefg1!", true},
+		{"long strong password", "correct-horse-battery-staple-9", true},
+		{"minimum length exact", "1234567a!", true},
+		{"unicode letter plus digit and symbol", "pass1ñar!", true},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			require.Equal(t, tc.want, isStrongEnoughPassword(tc.pw),
+				"password %q should be %v", tc.pw, tc.want)
+		})
+	}
+}
+
 // ---------- LoginOpaque tests --------------------------------------------
 
 func TestLoginOpaque_EmptyBody(t *testing.T) {

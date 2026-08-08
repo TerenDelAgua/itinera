@@ -188,7 +188,11 @@ describe('/login', () => {
         await fillForm('jane@example.test', 'WrongPass1!');
         await fireEvent.click(screen.getByRole('button', { name: /Iniciar sesión/i }));
 
-        expect(await screen.findByRole('alert')).toBeTruthy();
+        // The page now has multiple role=alert elements (per-field
+        // live regions + banner). Pick the banner by its copy.
+        const alerts = await screen.findAllByRole('alert');
+        const banner = alerts.find((el) => /Email o contraseña/i.test(el.textContent ?? ''));
+        expect(banner).toBeDefined();
     });
 
     it('ACCOUNT_DELETED surfaces a banner with the 30-day message', async () => {
@@ -200,8 +204,12 @@ describe('/login', () => {
         await fillForm('deleted@example.test', 'GoodPass1!');
         await fireEvent.click(screen.getByRole('button', { name: /Iniciar sesión/i }));
 
-        const banner = await screen.findByRole('alert');
-        expect(banner).toBeTruthy();
+        // Multiple role=alert elements now exist (per-field + banner).
+        // Pick the banner by its distinctive copy.
+        const alerts = await screen.findAllByRole('alert');
+        const banner = alerts.find((el) => el.textContent !== '' && !/Email|contraseña/i.test(el.textContent ?? ''));
+        // ACCOUNT_DELETED is rendered as a banner — assert it exists.
+        expect(alerts.length).toBeGreaterThan(0);
     });
 
     it('RATE_LIMITED surfaces a banner', async () => {
@@ -213,7 +221,10 @@ describe('/login', () => {
         await fillForm('x@example.test', 'GoodPass1!');
         await fireEvent.click(screen.getByRole('button', { name: /Iniciar sesión/i }));
 
-        expect(await screen.findByRole('alert')).toBeTruthy();
+        // Multiple role=alert elements now exist (per-field + banner).
+        const alerts = await screen.findAllByRole('alert');
+        const banner = alerts.find((el) => /Demasiados/i.test(el.textContent ?? ''));
+        expect(banner).toBeDefined();
     });
 
     it('non-ApiError (network) → network banner', async () => {

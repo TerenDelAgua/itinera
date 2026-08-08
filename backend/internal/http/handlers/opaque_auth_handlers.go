@@ -387,8 +387,8 @@ func (h *Handlers) RegisterOpaque(w http.ResponseWriter, r *http.Request) {
 	}
 	if !isStrongEnoughPassword(input.Password) {
 		WriteErrorWithFields(w, http.StatusBadRequest, CodeWeakPassword,
-			"Password must be at least 8 characters",
-			map[string]any{"password": "TOO_SHORT"})
+			"Password must be at least 8 characters and include a number and a symbol",
+			map[string]any{"password": "TOO_WEAK"})
 		return
 	}
 	if input.Locale == "" {
@@ -540,8 +540,8 @@ func (h *Handlers) ResetOpaque(w http.ResponseWriter, r *http.Request) {
 	}
 	if !isStrongEnoughPassword(input.NewPassword) {
 		WriteErrorWithFields(w, http.StatusBadRequest, CodeWeakPassword,
-			"Password must be at least 8 characters",
-			map[string]any{"new_password": "TOO_SHORT"})
+			"Password must be at least 8 characters and include a number and a symbol",
+			map[string]any{"new_password": "TOO_WEAK"})
 		return
 	}
 
@@ -663,11 +663,31 @@ func generateSixDigitCode() (string, error) {
 	return fmt.Sprintf("%06d", n), nil
 }
 
-// isStrongEnoughPassword is the Spec 017 §5.1 password check: minimum
-// 8 characters. We deliberately don't add a complexity rule here —
-// length > complexity. Future enhancement: zxcvbn.
+// isStrongEnoughPassword is the Spec 017 §5.1 password check.
+//
+// Three rules, all required:
+//   1. minimum 8 characters
+//   2. contains at least one digit (0-9)
+//   3. contains at least one non-alphanumeric symbol
+//
+// `strings.ContainsFunc` is used for the symbol test so we keep
+// Unicode-friendly semantics while still rejecting pure-letter
+// passwords. Future enhancement: zxcvbn for entropy scoring.
 func isStrongEnoughPassword(p string) bool {
-	return len(p) >= 8
+	if len(p) < 8 {
+		return false
+	}
+	hasDigit := false
+	hasSymbol := false
+	for _, r := range p {
+		switch {
+		case r >= '0' && r <= '9':
+			hasDigit = true
+		case !((r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9')):
+			hasSymbol = true
+		}
+	}
+	return hasDigit && hasSymbol
 }
 
 // clientIP extracts a stable IP from the request, preferring
