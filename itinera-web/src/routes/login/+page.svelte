@@ -136,8 +136,12 @@
         if (bannerError) bannerError = null;
     }
 
-    onMount(async () => {
-        await auth.bootstrap();
+    onMount(() => {
+        // The /+layout.svelte owns the boot-time `/auth/v2/me` probe.
+        // By the time this onMount runs, `auth.user` is already
+        // populated (logged-in) or `null` (guest). We just branch on
+        // the synchronous `isLoggedIn` derived state — no extra fetch
+        // here, no second 401 in the console.
         if (auth.isLoggedIn) {
             goto(safeNext(), { replaceState: true });
         }

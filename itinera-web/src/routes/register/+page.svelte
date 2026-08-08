@@ -212,7 +212,9 @@
   }
 
   onMount(async () => {
-    await auth.bootstrap();
+    // The /+layout.svelte owns the boot-time `/auth/v2/me` probe.
+    // By the time this onMount runs, `auth.user` is already
+    // populated (logged-in) or `null` (guest). No extra fetch here.
     if (auth.isLoggedIn) {
       goto("/trips", { replaceState: true });
       return;

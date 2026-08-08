@@ -39,3 +39,40 @@ export interface RegisterInput {
     locale?: string;
     terms_accepted?: boolean;
 }
+
+/**
+ * Inputs accepted by `POST /auth/v2/forgot` (Spec 017 §5.7).
+ * Anti-enumeration: the backend ALWAYS returns 202 with the same
+ * generic message, regardless of whether the email exists or not.
+ * The frontend must reflect this — never show "user not found".
+ *
+ * `locale` is forwarded so the reset email is localised.
+ */
+export interface ForgotInput {
+    email: string;
+    locale?: string;
+}
+
+/**
+ * Inputs accepted by `POST /auth/v2/reset` (Spec 017 §5.8).
+ *
+ * `code` is the 6-digit numeric string the user received by email
+ * (leading zeros preserved — the backend zero-pads the input
+ * before SHA-256 hashing). `new_password` is validated against the
+ * same 3-rule policy as register.
+ */
+export interface ResetInput {
+    email: string;
+    code: string;
+    new_password: string;
+    locale?: string;
+}
+
+/**
+ * Response of `POST /auth/v2/forgot`. 202 Accepted with a generic
+ * acknowledgement. The server's actual outcome (code sent /
+ * user doesn't exist) is hidden from the caller.
+ */
+export interface ForgotResponse {
+    message: string;
+}

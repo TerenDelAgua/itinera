@@ -48,6 +48,13 @@
   onMount(() => {
     themeStore.init();
 
+    // Boot-time probe: ask the backend "do I have a session?". For
+    // guests this is a 401 and is the EXPECTED outcome (auth store
+    // handles it as a no-op). Centralising the call here means
+    // /login and /register don't need to re-probe — they can read
+    // `auth.isLoggedIn` synchronously.
+    void auth.bootstrap();
+
     // Update local state based on DOM to sync icons
     isDark = document.documentElement.classList.contains("dark");
 
