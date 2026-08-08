@@ -1,5 +1,12 @@
 // Lightweight HTTP client for the Itinera backend.
 //
+// API contract:
+//   - `VITE_API_URL` is the FULL base including the API prefix,
+//     e.g. `http://localhost:8080/api/v1`. Callers MUST pass a relative
+//     path WITHOUT the prefix (`apiFetch('/auth/v2/register')`) — the
+//     helper concatenates them. Pre-prefixed paths cause 404s from
+//     `/api/v1/api/v1/...`.
+//
 // Auth: cookies only (`session_id`, `itinera_access`, `itinera_refresh`).
 // Every request sets `credentials: 'include'` so the browser sends them.
 //

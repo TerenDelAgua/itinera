@@ -28,7 +28,9 @@ export interface RegisterResponse {
 }
 
 /**
- * Inputs accepted by `/api/v1/auth/v2/register`. `locale` is optional
+ * Inputs accepted by `POST /auth/v2/register` (mounted under the
+ * Vite-configured `VITE_API_URL`, which is `/api/v1`). `locale`
+ * is optional
  * and falls back to the i18n store's current locale.
  */
 export interface RegisterInput {

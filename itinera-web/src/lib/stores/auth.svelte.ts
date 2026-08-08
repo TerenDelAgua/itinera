@@ -53,7 +53,7 @@ class AuthStore {
     async bootstrap(): Promise<void> {
         if (this.user || this.loading) return;
         try {
-            const data = await apiFetch<AuthMeResponse>('/api/v1/auth/v2/me');
+            const data = await apiFetch<AuthMeResponse>('/auth/v2/me');
             this.user = data.user;
         } catch (e) {
             if (e instanceof ApiError && e.status === 401) {
@@ -73,7 +73,7 @@ class AuthStore {
         this.loading = true;
         this.lastError = null;
         try {
-            const data = await apiFetch<{ user: User }>('/api/v1/auth/v2/register', {
+            const data = await apiFetch<{ user: User }>('/auth/v2/register', {
                 method: 'POST',
                 body: {
                     email: input.email,
@@ -97,7 +97,7 @@ class AuthStore {
         this.loading = true;
         this.lastError = null;
         try {
-            const data = await apiFetch<{ user: User }>('/api/v1/auth/v2/login', {
+            const data = await apiFetch<{ user: User }>('/auth/v2/login', {
                 method: 'POST',
                 body: { email: input.email, password: input.password }
             });
@@ -122,7 +122,7 @@ class AuthStore {
         this.lastError = null;
         this.user = null;
         try {
-            await apiFetch<void>('/api/v1/auth/v2/logout', { method: 'POST' });
+            await apiFetch<void>('/auth/v2/logout', { method: 'POST' });
         } catch (e) {
             if (e instanceof ApiError && e.status >= 500) {
                 console.warn('Logout failed on server; local state cleared but server session may still be active in other tabs.');

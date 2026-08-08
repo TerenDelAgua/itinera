@@ -65,7 +65,10 @@ describe('auth.register', () => {
 
         // Verify the request itself: POST /auth/v2/register with JSON body.
         const call = (fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0];
-        expect(call[0]).toContain('/api/v1/auth/v2/register');
+        // The apiFetch helper prepends VITE_API_URL (which already
+        // includes `/api/v1`), so callers pass `/auth/v2/register`
+        // and the final URL is `${API_URL}/auth/v2/register`.
+        expect(call[0]).toMatch(/\/api\/v1\/auth\/v2\/register$/);
         expect(call[1].method).toBe('POST');
         const body = JSON.parse(call[1].body);
         expect(body).toEqual({

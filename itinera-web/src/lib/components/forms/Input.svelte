@@ -1,12 +1,6 @@
 <script lang="ts">
-  /**
-   * Text input wrapped with label + help + error states.
-   *
-   * The input is fully controlled (`bind:value` from the parent).
-   * The parent is responsible for trimming / validation; this
-   * component only renders state.
-   */
   import type { HTMLInputAttributes } from "svelte/elements";
+  import type { Snippet } from "svelte";
 
   type $$Props = HTMLInputAttributes & {
     label: string;
@@ -14,6 +8,7 @@
     error?: string | null;
     help?: string;
     autocomplete?: string;
+    trailingIcon?: Snippet;
   };
 
   let {
@@ -23,6 +18,7 @@
     help,
     id,
     type = "text",
+    trailingIcon,
     ...rest
   }: $$Props = $props();
 
@@ -43,8 +39,8 @@
   <div
     class="flex items-center bg-teren-surface border rounded-lg transition-colors
                {error
-      ? 'border-error-base/60 bg-error-subtle/30'
-      : 'border-teren-border focus-within:border-teren-primary focus-within:bg-teren-card'}"
+      ? 'border-error-base bg-error-subtle/30'
+      : 'border-teren-border hover:border-teren-primary/40 focus-within:border-teren-primary focus-within:bg-teren-card'}"
   >
     <input
       id={inputId}
@@ -55,6 +51,14 @@
       class="w-full h-11 px-3 bg-transparent text-sm text-teren-text-main placeholder:text-teren-text-muted/40 focus:outline-none"
       {...rest}
     />
+    {#if trailingIcon}
+      <!-- 44×44 tap target with the icon centered. The container
+                 reserves this slot unconditionally so the layout never
+                 shifts, even when no icon is provided. -->
+      <div class="shrink-0 w-11 h-11 flex items-center justify-center">
+        {@render trailingIcon()}
+      </div>
+    {/if}
   </div>
   {#if error}
     <p id={errorId} class="text-xs text-error-base font-medium" role="alert">

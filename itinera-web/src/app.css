@@ -136,6 +136,29 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   display: none;
   -webkit-appearance: none;
 }
+
+/* Mask an input's characters as password dots without using
+   `type="password"`. The whole reason we use this trick: Chromium
+   injects a native "reveal password" eye icon into <input
+   type="password"> that is NOT hideable via CSS, so the page-level
+   toggle button collides with it. By keeping the input as type=text
+   and masking with `text-security`, only the page-level toggle is
+   visible — there is no second eye.
+
+   - `-webkit-text-security: disc` covers Chrome, Edge, Safari
+   - `-moz-text-security` covers Firefox 88+
+*/
+input.masked-password {
+  -webkit-text-security: disc;
+  -moz-text-security: disc;
+  /* IE10+ fallback */
+  text-security: disc;
+}
+
+/* Hide the legacy Edge "reveal" button (pre-Chromium). */
+input::-ms-reveal {
+  display: none;
+}
 /* ─── Shared Animations ────────────────────────────────────────────────── */
 @keyframes fadeIn {
   from {
