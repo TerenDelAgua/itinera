@@ -257,6 +257,28 @@
       "error_network": "Sin conexión. Comprueba tu red e inténtalo de nuevo.",
       "error_generic": "Algo ha ido mal. Inténtalo de nuevo."
     },
+    "delete": {
+      "page_title": "Eliminar cuenta",
+      "title": "Eliminar tu cuenta",
+      "subtitle": "Marcamos tu cuenta como eliminada al instante y borramos tus datos en 30 días.",
+      "bullet1_title": "Tus viajes quedan anónimos.",
+      "bullet1_body": "Los viajes guardados se separan de tu email para que nadie más pueda reclamarlos.",
+      "bullet2_title": "Tus sesiones terminan.",
+      "bullet2_body": "Cerraremos sesión en todos tus dispositivos. No podemos deshacerlo.",
+      "bullet3_title": "Puedes volver a registrarte en 30 días.",
+      "bullet3_body": "Pasados 30 días el email queda libre y podrás crear una cuenta nueva con él.",
+      "start_cta": "Quiero eliminar mi cuenta",
+      "confirm_prompt": "Para confirmar, escribe {email} abajo.",
+      "confirm_hint": "No distingue mayúsculas. El botón permanece desactivado hasta que coincida.",
+      "confirm_cta": "Eliminar definitivamente",
+      "submitting": "Eliminando…",
+      "cancel_cta": "Cancelar",
+      "success_title": "Cuenta eliminada",
+      "success_body": "Has cerrado sesión. Los datos se eliminarán definitivamente en 30 días.",
+      "success_cta": "Volver al inicio",
+      "error_network": "Sin conexión. Comprueba tu red e inténtalo de nuevo.",
+      "error_generic": "Algo ha ido mal. Inténtalo de nuevo."
+    },
     "layout": {
       "logout": "Cerrar sesión"
     },

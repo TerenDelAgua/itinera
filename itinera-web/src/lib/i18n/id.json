@@ -257,6 +257,28 @@
       "error_network": "Tidak ada koneksi. Periksa jaringan Anda dan coba lagi.",
       "error_generic": "Terjadi kesalahan. Silakan coba lagi."
     },
+    "delete": {
+      "page_title": "Hapus akun",
+      "title": "Hapus akun Anda",
+      "subtitle": "Akun Anda langsung di-soft-delete dan data dihapus permanen dalam 30 hari.",
+      "bullet1_title": "Trip Anda menjadi anonim.",
+      "bullet1_body": "Trip yang disimpan dilepas dari email Anda agar tidak bisa diklaim orang lain.",
+      "bullet2_title": "Sesi Anda berakhir.",
+      "bullet2_body": "Anda keluar dari semua perangkat. Tidak dapat dibatalkan.",
+      "bullet3_title": "Anda bisa daftar ulang dalam 30 hari.",
+      "bullet3_body": "Setelah 30 hari, email dilepas dan Anda bisa membuat akun baru.",
+      "start_cta": "Saya ingin menghapus akun",
+      "confirm_prompt": "Untuk konfirmasi, ketik {email} di bawah.",
+      "confirm_hint": "Tidak peka huruf besar/kecil. Tombol tetap nonaktif sampai cocok.",
+      "confirm_cta": "Hapus permanen",
+      "submitting": "Menghapus…",
+      "cancel_cta": "Batal",
+      "success_title": "Akun dihapus",
+      "success_body": "Anda keluar. Data akan dihapus permanen dalam 30 hari.",
+      "success_cta": "Kembali ke beranda",
+      "error_network": "Tidak ada koneksi. Periksa jaringan Anda dan coba lagi.",
+      "error_generic": "Terjadi kesalahan. Silakan coba lagi."
+    },
     "layout": {
       "logout": "Keluar"
     },

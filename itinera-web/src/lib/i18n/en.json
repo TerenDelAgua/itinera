@@ -280,6 +280,28 @@
       "error_rate_limit": "Too many attempts. Try again later.",
       "error_network": "No connection. Check your network and try again.",
       "error_generic": "Something went wrong. Please try again."
+    },
+    "delete": {
+      "page_title": "Delete account",
+      "title": "Delete your account",
+      "subtitle": "Soft-deletes your account immediately and removes your data within 30 days.",
+      "bullet1_title": "Your trips become anonymous.",
+      "bullet1_body": "Trips you saved are detached from your email so future sign-ups can't claim them.",
+      "bullet2_title": "Your sessions end.",
+      "bullet2_body": "You'll be signed out on every device. We can't reverse this.",
+      "bullet3_title": "You can re-register in 30 days.",
+      "bullet3_body": "After 30 days the email is fully released and you can create a new account with it.",
+      "start_cta": "I want to delete my account",
+      "confirm_prompt": "To confirm, type {email} below.",
+      "confirm_hint": "Case-insensitive. The button stays disabled until it matches.",
+      "confirm_cta": "Delete permanently",
+      "submitting": "Deleting…",
+      "cancel_cta": "Cancel",
+      "success_title": "Account deleted",
+      "success_body": "You're signed out. The data will be removed permanently within 30 days.",
+      "success_cta": "Back to home",
+      "error_network": "No connection. Check your network and try again.",
+      "error_generic": "Something went wrong. Please try again."
     }
   },
   "transport": {

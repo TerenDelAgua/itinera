@@ -180,6 +180,28 @@ class AuthStore {
         }
     }
 
+    /**
+     * GDPR account deletion (Spec 017 §5.9). Idempotent: deleting an
+     * already-deleted account still resolves successfully because
+     * the backend's `SoftDeleteUserCascade` returns `pgx.ErrNoRows`
+     * for soft-deleted users, which the handler treats as 204.
+     *
+     * On success we wipe local state and the server clears the
+     * access/refresh cookies. The user is redirected to / from the
+     * caller (the delete-account page), not from here, so the
+     * caller controls the success UX.
+     */
+    async deleteAccount(): Promise<void> {
+        this.lastError = null;
+        try {
+            await apiFetch<void>('/auth/v2/account', { method: 'DELETE' });
+            this.user = null;
+        } catch (e) {
+            if (e instanceof ApiError) this.lastError = e;
+            throw e;
+        }
+    }
+
     /** Manually clear the last error, e.g. after the user dismisses a banner. */
     clearError(): void {
         this.lastError = null;
