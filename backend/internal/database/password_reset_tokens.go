@@ -78,7 +78,7 @@ func (r *PasswordResetRepository) FindActiveByHash(ctx context.Context, hash str
 	}
 
 	var t models.PasswordResetToken
-	var usedAt, lockedAt pgtype.Timestamptz
+	var expiresAt, usedAt, lockedAt, createdAt pgtype.Timestamptz
 	var ip pgtype.Text
 
 	err := r.Pool.QueryRow(ctx, `
@@ -91,19 +91,21 @@ func (r *PasswordResetRepository) FindActiveByHash(ctx context.Context, hash str
 		  AND expires_at > now()
 		LIMIT 1
 	`, hash).Scan(
-		&t.ID, &t.UserID, &t.TokenHash, &t.ExpiresAt, &usedAt, &t.Attempts,
-		&lockedAt, &t.CreatedAt, &ip,
+		&t.ID, &t.UserID, &t.TokenHash, &expiresAt, &usedAt, &t.Attempts,
+		&lockedAt, &createdAt, &ip,
 	)
 	if err != nil {
 		return nil, err
 	}
 
+	t.ExpiresAt = formatTimestamptz(expiresAt)
+	t.CreatedAt = formatTimestamptz(createdAt)
 	if usedAt.Valid {
-		v := usedAt.Time.UTC().Format("2006-01-02T15:04:05Z07:00")
+		v := formatTimestamptz(usedAt)
 		t.UsedAt = &v
 	}
 	if lockedAt.Valid {
-		v := lockedAt.Time.UTC().Format("2006-01-02T15:04:05Z07:00")
+		v := formatTimestamptz(lockedAt)
 		t.LockedAt = &v
 	}
 	if ip.Valid {
@@ -117,7 +119,7 @@ func (r *PasswordResetRepository) FindActiveByHash(ctx context.Context, hash str
 // viewer; not exposed via the API yet.
 func (r *PasswordResetRepository) FindActiveByUser(ctx context.Context, userID uuid.UUID) (*models.PasswordResetToken, error) {
 	var t models.PasswordResetToken
-	var usedAt, lockedAt pgtype.Timestamptz
+	var expiresAt, usedAt, lockedAt, createdAt pgtype.Timestamptz
 	var ip pgtype.Text
 
 	err := r.Pool.QueryRow(ctx, `
@@ -128,19 +130,21 @@ func (r *PasswordResetRepository) FindActiveByUser(ctx context.Context, userID u
 		ORDER BY created_at DESC
 		LIMIT 1
 	`, userID).Scan(
-		&t.ID, &t.UserID, &t.TokenHash, &t.ExpiresAt, &usedAt, &t.Attempts,
-		&lockedAt, &t.CreatedAt, &ip,
+		&t.ID, &t.UserID, &t.TokenHash, &expiresAt, &usedAt, &t.Attempts,
+		&lockedAt, &createdAt, &ip,
 	)
 	if err != nil {
 		return nil, err
 	}
 
+	t.ExpiresAt = formatTimestamptz(expiresAt)
+	t.CreatedAt = formatTimestamptz(createdAt)
 	if usedAt.Valid {
-		v := usedAt.Time.UTC().Format("2006-01-02T15:04:05Z07:00")
+		v := formatTimestamptz(usedAt)
 		t.UsedAt = &v
 	}
 	if lockedAt.Valid {
-		v := lockedAt.Time.UTC().Format("2006-01-02T15:04:05Z07:00")
+		v := formatTimestamptz(lockedAt)
 		t.LockedAt = &v
 	}
 	if ip.Valid {

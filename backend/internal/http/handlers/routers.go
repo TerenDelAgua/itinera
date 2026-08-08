@@ -41,6 +41,13 @@ func RegisterApiRoutes(r chi.Router, h *Handlers) {
 		// /v2/ suffix for spec compatibility.
 		r.Post("/auth/v2/login", h.LoginOpaque)
 
+		// Public: /auth/v2/register, /auth/v2/forgot, /auth/v2/reset
+		// All anti-enumeration by design:
+		// the body shape is identical whether the email exists or not.
+		r.Post("/auth/v2/register", h.RegisterOpaque)
+		r.Post("/auth/v2/forgot", h.ForgotOpaque)
+		r.Post("/auth/v2/reset", h.ResetOpaque)
+
 		// Authenticated endpoints behind
 		// AuthMiddlewareV2. Note: /auth/v2/logout and /auth/v2/me require
 		// the access-token cookie, NOT the JWT path. We mount
@@ -50,6 +57,7 @@ func RegisterApiRoutes(r chi.Router, h *Handlers) {
 		r.With(middleware.AuthMiddlewareV2(h.SessionRepo)).Group(func(r chi.Router) {
 			r.Post("/auth/v2/logout", h.LogoutOpaque)
 			r.Get("/auth/v2/me", h.MeOpaque)
+			r.Delete("/auth/v2/account", h.DeleteAccountOpaque)
 		})
 
 		// Refresh needs NO access cookie — by definition, the access

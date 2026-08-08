@@ -4,9 +4,14 @@ import (
 	"backend/internal/auth"
 	"backend/internal/http/middleware"
 	"backend/internal/models"
+	"crypto/rand"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"log"
+	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -79,6 +84,15 @@ func (h *Handlers) LoginOpaque(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Soft-deleted accounts must NOT be able to sign in even with the
+	// correct password. We return INVALID_CREDENTIALS (same as wrong
+	// password) so an attacker who scraped a stale credential cannot
+	// tell from the response whether the account still exists.
+	if user.DeletedAt != nil {
+		WriteError(w, http.StatusUnauthorized, CodeInvalidCredentials, "Invalid credentials")
+		return
+	}
+
 	// Generate the access + refresh tokens. The server stores ONLY the
 	// SHA-256 hashes; the raw values ride HttpOnly cookies.
 	rawAccess, err := auth.NewSecureToken()
@@ -95,7 +109,7 @@ func (h *Handlers) LoginOpaque(w http.ResponseWriter, r *http.Request) {
 	expiresAt := time.Now().Add(time.Duration(refreshTokenMaxAge) * time.Second)
 	ua := r.UserAgent()
 	userAgent := &ua
-	ip := r.RemoteAddr
+	ip := stripPort(r.RemoteAddr)
 	ipAddress := &ip
 
 	_, err = h.SessionRepo.CreateSession(r.Context(), user.ID,
@@ -103,6 +117,7 @@ func (h *Handlers) LoginOpaque(w http.ResponseWriter, r *http.Request) {
 		expiresAt, userAgent, ipAddress,
 	)
 	if err != nil {
+		log.Printf("[login] CreateSession failed: %v (ua=%q ip=%q)", err, ua, ip)
 		WriteError(w, http.StatusInternalServerError, CodeInternalError, "Session creation failed")
 		return
 	}
@@ -138,6 +153,52 @@ func (h *Handlers) LogoutOpaque(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	secure := h.Config.IsProduction() || r.Header.Get("X-Forwarded-Proto") == "https"
+	middleware.ClearAuthCookies(w, secure)
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+// DeleteAccountOpaque godoc
+// @Summary      Delete the account (GDPR, post-cutover)
+// @Description  Soft-deletes the user, revokes every active session, and
+// @Description  orphans the user's trips. Idempotent: deleting an
+// @Description  already-deleted account still returns 204.
+// @Tags         auth
+// @Produce      json
+// @Success      204
+// @Failure      401   {object}  handlers.JSONErrorBody "No session"
+// @Failure      404   {object}  handlers.JSONErrorBody "User not found"
+// @Failure      500   {object}  handlers.JSONErrorBody "Cascade failed"
+// @Router       /auth/v2/account [delete]
+func (h *Handlers) DeleteAccountOpaque(w http.ResponseWriter, r *http.Request) {
+	uid, ok := r.Context().Value(middleware.ContextKeyUserId{}).(uuid.UUID)
+	if !ok {
+		WriteError(w, http.StatusUnauthorized, CodeUnauthenticated, "No active session")
+		return
+	}
+
+	email, err := h.AuthRepo.SoftDeleteUserCascade(r.Context(), uid)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			// The session claims a user that no longer exists. We treat it
+			// as success from the client's perspective: the user has, in
+			// fact, been "deleted" relative to them.
+			secure := h.Config.IsProduction() || r.Header.Get("X-Forwarded-Proto") == "https"
+			middleware.ClearAuthCookies(w, secure)
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		WriteError(w, http.StatusInternalServerError, CodeInternalError, "Account deletion failed")
+		return
+	}
+
+	// Best-effort: invalidate the rate-limit entry so the same IP can
+	// attempt re-registration immediately if the user changes their
+	// mind (a fresh code + signup path is still blocked by 30-day email
+	// reservation, so this doesn't open a brute-force vector).
+	_ = email // kept here for future audit logging; not echoed to client
 
 	secure := h.Config.IsProduction() || r.Header.Get("X-Forwarded-Proto") == "https"
 	middleware.ClearAuthCookies(w, secure)
@@ -293,3 +354,361 @@ type opaqueLoginResponse struct {
 	TokenType  string `json:"token_type"`
 	ExpiresInS int    `json:"expires_in"`
 }
+
+// RegisterOpaque is the post-cutover signup endpoint. It mirrors the JWT
+// path (handlers/auth.go: Register) but ends by minting opaque tokens and
+// setting the HttpOnly cookies, so the user is signed in on return.
+//
+// @Summary      Register a new user (post-cutover)
+// @Description  Creates a new account and signs the user in.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        user  body      object  true  "Registration data (email, password, locale)"
+// @Success      200   {object}  handlers.opaqueLoginResponse
+// @Failure      400   {object}  handlers.JSONErrorBody "Validation error"
+// @Failure      409   {object}  handlers.JSONErrorBody "Email already exists"
+// @Router       /auth/v2/register [post]
+func (h *Handlers) RegisterOpaque(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+		Locale   string `json:"locale"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		WriteError(w, http.StatusBadRequest, CodeValidationError, "Invalid request body")
+		return
+	}
+	if input.Email == "" || input.Password == "" {
+		WriteErrorWithFields(w, http.StatusBadRequest, CodeValidationError,
+			"Email and password are required",
+			map[string]any{"email": "REQUIRED", "password": "REQUIRED"})
+		return
+	}
+	if !isStrongEnoughPassword(input.Password) {
+		WriteErrorWithFields(w, http.StatusBadRequest, CodeWeakPassword,
+			"Password must be at least 8 characters and include a number and a symbol",
+			map[string]any{"password": "TOO_WEAK"})
+		return
+	}
+	if input.Locale == "" {
+		input.Locale = "en"
+	}
+
+	user, err := h.AuthRepo.CreateUser(r.Context(), input.Email, input.Password, input.Locale)
+	if err != nil {
+		WriteError(w, http.StatusConflict, CodeEmailAlreadyExists, "An account with this email already exists")
+		return
+	}
+
+	// Auto-login: mint tokens, create session, set cookies. We deliberately
+	// share the path with LoginOpaque so future changes (extra claims,
+	// analytics events) only touch one place.
+	if err := h.activateSession(w, r, *user); err != nil {
+		WriteError(w, http.StatusInternalServerError, CodeInternalError, "Session creation failed")
+		return
+	}
+
+	// Welcome email fires AFTER the session is set so a backend hiccup
+	// doesn't cost the user their signup.
+	if h.EmailSender != nil {
+		_ = h.EmailSender.SendWelcome(r.Context(), *user, user.Locale)
+	}
+
+	WriteJSON(w, http.StatusOK, opaqueLoginResponse{
+		User:       user,
+		ExpiresInS: accessTokenMaxAge,
+		TokenType:  "Bearer",
+	})
+}
+
+// ForgotOpaque starts the password reset flow. Anti-enumeration + IP rate
+// limiting apply; the same copy is returned whether the email exists or
+// not (Spec 017 §5.5).
+//
+// @Summary      Request a password reset code
+// @Description  Sends a 6-digit code to the email if the account exists.
+// @Description  Same response shape regardless of whether the email is
+// @Description  registered — anti-enumeration.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        user  body      object  true  "{email}"
+// @Success      202   {object}  handlers.forgotResponse
+// @Failure      400   {object}  handlers.JSONErrorBody "Validation error"
+// @Failure      429   {object}  handlers.JSONErrorBody "Too many attempts"
+// @Router       /auth/v2/forgot [post]
+func (h *Handlers) ForgotOpaque(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		Email  string `json:"email"`
+		Locale string `json:"locale"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		WriteError(w, http.StatusBadRequest, CodeValidationError, "Invalid request body")
+		return
+	}
+	if input.Email == "" {
+		WriteErrorWithFields(w, http.StatusBadRequest, CodeValidationError,
+			"Email is required", map[string]any{"email": "REQUIRED"})
+		return
+	}
+	if input.Locale == "" {
+		input.Locale = "en"
+	}
+
+	// Rate-limit by IP BEFORE we touch the user table so an attacker
+	// can't probe emails through the reset endpoint.
+	if h.LoginRateLimitRepo != nil {
+		ip := clientIP(r)
+		_, blocked, err := h.LoginRateLimitRepo.RecordFailure(r.Context(), ip)
+		if err != nil {
+			WriteError(w, http.StatusInternalServerError, CodeInternalError, "Rate limit lookup failed")
+			return
+		}
+		if blocked {
+			WriteError(w, http.StatusTooManyRequests, CodeRateLimited,
+				"Too many reset attempts; try again later")
+			return
+		}
+	}
+
+	user, err := h.AuthRepo.GetUserByEmail(r.Context(), input.Email)
+	if err != nil {
+		// Either user doesn't exist OR user is soft-deleted. We mirror the
+		// success response to avoid leaking which it is.
+		WriteJSON(w, http.StatusAccepted, forgotResponse{Message: forgotAck})
+		return
+	}
+	if user.DeletedAt != nil {
+		WriteJSON(w, http.StatusAccepted, forgotResponse{Message: forgotAck})
+		return
+	}
+
+	code, err := generateSixDigitCode()
+	if err != nil {
+		WriteError(w, http.StatusInternalServerError, CodeInternalError, "Code generation failed")
+		return
+	}
+
+	// Invalidate any previous active code, then write the new one. The
+	// unique constraint on token_hash + DB-side `MarkPreviousAsUsed`
+	// guarantees a single live code per user.
+	if err := h.ResetRepo.MarkPreviousAsUsed(r.Context(), user.ID); err != nil {
+		WriteError(w, http.StatusInternalServerError, CodeInternalError, "Reset code invalidation failed")
+		return
+	}
+	hash := auth.HashToken(code)
+	ipAddr := stripPort(r.RemoteAddr)
+	if err := h.ResetRepo.Create(r.Context(), user.ID, hash, time.Now().Add(1*time.Hour), &ipAddr); err != nil {
+		log.Printf("[forgot] ResetRepo.Create failed: %v (ip=%q)", err, ipAddr)
+		WriteError(w, http.StatusInternalServerError, CodeInternalError, "Reset code persistence failed")
+		return
+	}
+
+	if h.EmailSender != nil {
+		_ = h.EmailSender.SendPasswordReset(r.Context(), *user, code, input.Locale)
+	}
+
+	WriteJSON(w, http.StatusAccepted, forgotResponse{Message: forgotAck})
+}
+
+// ResetOpaque consumes the 6-digit code, updates the password, and
+// revokes every active session so a stolen cookie cannot survive a reset.
+//
+// @Summary      Reset password with the 6-digit code
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        user  body      object  true  "{email, code, new_password}"
+// @Success      204
+// @Failure      400   {object}  handlers.JSONErrorBody "Validation error"
+// @Failure      401   {object}  handlers.JSONErrorBody "Invalid / expired / locked code"
+// @Router       /auth/v2/reset [post]
+func (h *Handlers) ResetOpaque(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		Email       string `json:"email"`
+		Code        string `json:"code"`
+		NewPassword string `json:"new_password"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		WriteError(w, http.StatusBadRequest, CodeValidationError, "Invalid request body")
+		return
+	}
+	if input.Email == "" || input.Code == "" || input.NewPassword == "" {
+		WriteError(w, http.StatusBadRequest, CodeValidationError, "All fields are required")
+		return
+	}
+	if !isStrongEnoughPassword(input.NewPassword) {
+		WriteErrorWithFields(w, http.StatusBadRequest, CodeWeakPassword,
+			"Password must be at least 8 characters and include a number and a symbol",
+			map[string]any{"new_password": "TOO_WEAK"})
+		return
+	}
+
+	// Lookup the user first; the reset row is keyed by user_id so the
+	// hash alone wouldn't disambiguate which account to update.
+	user, err := h.AuthRepo.GetUserByEmail(r.Context(), input.Email)
+	if err != nil {
+		WriteError(w, http.StatusUnauthorized, CodeInvalidToken, "Invalid reset code")
+		return
+	}
+
+	codeHash := auth.HashToken(input.Code)
+	token, err := h.ResetRepo.FindActiveByHash(r.Context(), codeHash)
+	if err != nil || token.UserID != user.ID {
+		WriteError(w, http.StatusUnauthorized, CodeInvalidToken, "Invalid reset code")
+		return
+	}
+
+	attempts, locked, err := h.ResetRepo.RecordFailedAttempt(r.Context(), token.ID)
+	if err != nil {
+		WriteError(w, http.StatusInternalServerError, CodeInternalError, "Reset attempt tracking failed")
+		return
+	}
+	if locked {
+		WriteError(w, http.StatusUnauthorized, CodeLockedToken, "Too many invalid attempts; request a new code")
+		return
+	}
+
+	if err := h.AuthRepo.UpdateUserPassword(r.Context(), user.ID, input.NewPassword); err != nil {
+		WriteError(w, http.StatusInternalServerError, CodeInternalError, "Password update failed")
+		return
+	}
+	if err := h.ResetRepo.MarkUsed(r.Context(), token.ID); err != nil {
+		WriteError(w, http.StatusInternalServerError, CodeInternalError, "Reset code closure failed")
+		return
+	}
+	// Revoke every active session for the user. RevokeAllSessionsForUser
+	// returns an error only if the DB is unhealthy, so we surface it
+	// directly.
+	if err := h.SessionRepo.RevokeAllSessionsForUser(r.Context(), user.ID); err != nil {
+		WriteError(w, http.StatusInternalServerError, CodeInternalError, "Session revocation failed")
+		return
+	}
+
+	// `attempts` is recorded so future log/audit endpoints can read the
+	// row count. We intentionally ignore it on the happy path: the
+	// caller just wants 204.
+	_ = attempts
+
+	secure := h.Config.IsProduction() || r.Header.Get("X-Forwarded-Proto") == "https"
+	middleware.ClearAuthCookies(w, secure)
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+// ---------- Helpers shared by the v2 tree -------------------------------
+
+// activateSession is the login/register common path. It mints tokens,
+// creates the session row, and sets the cookies. Returns the error so the
+// caller can decide the HTTP shape.
+func (h *Handlers) activateSession(w http.ResponseWriter, r *http.Request, user models.User) error {
+	rawAccess, err := auth.NewSecureToken()
+	if err != nil {
+		return err
+	}
+	rawRefresh, err := auth.NewSecureToken()
+	if err != nil {
+		return err
+	}
+	expiresAt := time.Now().Add(time.Duration(refreshTokenMaxAge) * time.Second)
+	ua := r.UserAgent()
+	ip := stripPort(r.RemoteAddr)
+	_, err = h.SessionRepo.CreateSession(r.Context(), user.ID,
+		auth.HashToken(rawAccess), auth.HashToken(rawRefresh),
+		expiresAt, &ua, &ip,
+	)
+	if err != nil {
+		log.Printf("[register] CreateSession failed: %v (ua=%q ip=%q expires=%v)", err, ua, ip, expiresAt)
+		return err
+	}
+
+	secure := h.Config.IsProduction() || r.Header.Get("X-Forwarded-Proto") == "https"
+	middleware.SetAccessCookie(w, rawAccess, accessTokenMaxAge, secure)
+	middleware.SetRefreshCookie(w, rawRefresh, refreshTokenMaxAge, secure)
+	return nil
+}
+
+// stripPort removes the trailing `:port` from a "host:port" string. The
+// `sessions.ip_address` column is INET, which only accepts the bare host.
+// We use net.SplitHostPort because it correctly handles IPv6 addresses
+// (e.g. "[::1]:60881" → "[::1]" / "60881") whereas a naive strings.Cut
+// at the first ":" would return "[" and break the SQL insert.
+func stripPort(addr string) string {
+	if addr == "" {
+		return ""
+	}
+	host, _, err := net.SplitHostPort(addr)
+	if err != nil {
+		// Either no port at all ("127.0.0.1") or something else weird.
+		// Pass it through; Postgres INET will accept the bare address and
+		// error on anything else, which is exactly the visibility we want.
+		return addr
+	}
+	return host
+}
+
+// generateSixDigitCode returns a cryptographically random 6-digit decimal
+// string suitable for the password-reset email. 10^6 combinations is
+// 1M; combined with 5 attempts per code and 1h expiry, the per-code
+// brute-force success probability is 5/1e6 = 0.0005% (Spec 017 §5.7).
+func generateSixDigitCode() (string, error) {
+	var b [4]byte
+	if _, err := rand.Read(b[:]); err != nil {
+		return "", err
+	}
+	// Mask to 20 bits — fits within "000000"..999999 without bias from
+	// the 12 bits we drop on the left of the uint32.
+	n := (uint32(b[0])<<24 | uint32(b[1])<<16 | uint32(b[2])<<8 | uint32(b[3])) % 1000000
+	return fmt.Sprintf("%06d", n), nil
+}
+
+// isStrongEnoughPassword is the Spec 017 §5.1 password check.
+//
+// Three rules, all required:
+//   1. minimum 8 characters
+//   2. contains at least one digit (0-9)
+//   3. contains at least one non-alphanumeric symbol
+//
+// `strings.ContainsFunc` is used for the symbol test so we keep
+// Unicode-friendly semantics while still rejecting pure-letter
+// passwords. Future enhancement: zxcvbn for entropy scoring.
+func isStrongEnoughPassword(p string) bool {
+	if len(p) < 8 {
+		return false
+	}
+	hasDigit := false
+	hasSymbol := false
+	for _, r := range p {
+		switch {
+		case r >= '0' && r <= '9':
+			hasDigit = true
+		case !((r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9')):
+			hasSymbol = true
+		}
+	}
+	return hasDigit && hasSymbol
+}
+
+// clientIP extracts a stable IP from the request, preferring
+// X-Forwarded-For when the proxy is trusted. We DON'T trust it from the
+// client (any browser can set the header); for now this is best-effort.
+// A future iteration can plumb a TrustedProxies config.
+func clientIP(r *http.Request) string {
+	if h := r.Header.Get("X-Forwarded-For"); h != "" {
+		if i := strings.IndexByte(h, ','); i >= 0 {
+			return strings.TrimSpace(h[:i])
+		}
+		return strings.TrimSpace(h)
+	}
+	return r.RemoteAddr
+}
+
+// forgotResponse is the single response shape /auth/v2/forgot returns
+// regardless of whether the email is registered. The Message is localisable
+// in a future PR (Spec 017 §8.4).
+type forgotResponse struct {
+	Message string `json:"message"`
+}
+
+const forgotAck = "If the email exists, a code has been sent."

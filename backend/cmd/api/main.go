@@ -3,6 +3,7 @@ package main
 import (
 	"backend/internal/config"
 	"backend/internal/database"
+	"backend/internal/jobs"
 	"context"
 	"log"
 	"net/http"
@@ -14,6 +15,7 @@ import (
 
 	"backend/internal/http/handlers"
 	"backend/internal/services"
+	"backend/internal/services/email"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
@@ -68,17 +70,41 @@ func main() {
 	rateLimitRepo := database.NewRateLimitRepository(pool)
 	analyticsRepo := database.NewAnalyticsRepository(pool)
 	sessionRepo := database.NewSessionRepository(pool)
+	resetRepo := database.NewPasswordResetRepository(pool)
+	loginRateLimitRepo := database.NewLoginRateLimitRepository(pool)
 
 	exchangeRateSvc := services.NewExchangeRateService(pool)
 	expenseSvc := services.NewExpenseService(tripsRepo, expensesRepo, exchangeRateSvc)
 	tripSvc := services.NewTripService(pool, tripsRepo, placesRepo,
 		activityRepo, expensesRepo, eventsRepo)
+	emailSender := email.NewSender(cfg)
 
 	h := handlers.NewHandlers(tripsRepo, placesRepo, expensesRepo, authRepo,
-		activityRepo, eventsRepo, rateLimitRepo, analyticsRepo,
-		sessionRepo, expenseSvc, tripSvc, cfg)
+		activityRepo, eventsRepo, rateLimitRepo, loginRateLimitRepo,
+		analyticsRepo, sessionRepo, resetRepo, expenseSvc, tripSvc,
+		emailSender, cfg)
 
 	router := setupRouter(cfg, h, pool)
+
+	// Background jobs. Spec 017 §5.10: every 24h, anonymise users
+	// soft-deleted >30 days ago. The job is context-aware — when the
+	// process receives SIGINT/SIGTERM and we cancel `bgCtx`, the in-flight
+	// cycle aborts cleanly and the goroutine exits.
+	bgCtx, bgCancel := context.WithCancel(context.Background())
+	cleanupCfg := jobs.AccountCleanupConfig{}
+	// ACCOUNT_CLEANUP_INTERVAL is a smoke-only override; production
+	// keeps the spec's 24h interval. Anything parseable by time.ParseDuration
+	// works; an invalid value is silently ignored so a typo can't crash
+	// the boot path.
+	if v := os.Getenv("ACCOUNT_CLEANUP_INTERVAL"); v != "" {
+		if d, err := time.ParseDuration(v); err == nil {
+			cleanupCfg.Interval = d
+			log.Printf("[account-cleanup] interval override from env: %s", d)
+		}
+	}
+	cleanupJob := jobs.NewAccountCleanupJob(authRepo, cleanupCfg)
+	cleanupJob.Start(bgCtx)
+	defer bgCancel()
 
 	server := &http.Server{
 		Addr:    ":" + cfg.Port,

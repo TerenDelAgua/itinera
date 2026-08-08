@@ -33,7 +33,7 @@ func NewSessionRepository(pool *pgxpool.Pool) *SessionRepository {
 // here (this table only stores hashed tokens).
 func (r *SessionRepository) CreateSession(ctx context.Context, userID uuid.UUID, accessHash, refreshHash string, expiresAt time.Time, userAgent, ipAddress *string) (*models.Session, error) {
 	var s models.Session
-	var refreshRotatedAt, revokedAt, lastUsedAt pgtype.Timestamptz
+	var createdAt, lastUsedAt, expiresAtOut, refreshRotatedAt, revokedAt pgtype.Timestamptz
 	var ua, ip pgtype.Text
 
 	if userAgent != nil {
@@ -68,21 +68,24 @@ func (r *SessionRepository) CreateSession(ctx context.Context, userID uuid.UUID,
 		&refreshRotatedAt,
 		&ua,
 		&ip,
-		&s.CreatedAt,
+		&createdAt,
 		&lastUsedAt,
-		&s.ExpiresAt,
+		&expiresAtOut,
 		&revokedAt,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("insert session: %w", err)
 	}
 
+	s.CreatedAt = formatTimestamptz(createdAt)
+	s.LastUsedAt = formatTimestamptz(lastUsedAt)
+	s.ExpiresAt = formatTimestamptz(expiresAtOut)
 	if refreshRotatedAt.Valid {
-		v := refreshRotatedAt.Time.UTC().Format("2006-01-02T15:04:05Z07:00")
+		v := formatTimestamptz(refreshRotatedAt)
 		s.RefreshRotatedAt = &v
 	}
 	if revokedAt.Valid {
-		v := revokedAt.Time.UTC().Format("2006-01-02T15:04:05Z07:00")
+		v := formatTimestamptz(revokedAt)
 		s.RevokedAt = &v
 	}
 	if ua.Valid {
@@ -105,7 +108,7 @@ func (r *SessionRepository) FindSessionByAccessTokenHash(ctx context.Context, ac
 	}
 
 	var s models.Session
-	var refreshRotatedAt, revokedAt pgtype.Timestamptz
+	var createdAt, lastUsedAt, expiresAtOut, refreshRotatedAt, revokedAt pgtype.Timestamptz
 	var ua, ip pgtype.Text
 
 	err := r.Pool.QueryRow(ctx, `
@@ -127,21 +130,24 @@ func (r *SessionRepository) FindSessionByAccessTokenHash(ctx context.Context, ac
 		&refreshRotatedAt,
 		&ua,
 		&ip,
-		&s.CreatedAt,
-		&s.LastUsedAt,
-		&s.ExpiresAt,
+		&createdAt,
+		&lastUsedAt,
+		&expiresAtOut,
 		&revokedAt,
 	)
 	if err != nil {
 		return nil, err
 	}
 
+	s.CreatedAt = formatTimestamptz(createdAt)
+	s.LastUsedAt = formatTimestamptz(lastUsedAt)
+	s.ExpiresAt = formatTimestamptz(expiresAtOut)
 	if refreshRotatedAt.Valid {
-		v := refreshRotatedAt.Time.UTC().Format("2006-01-02T15:04:05Z07:00")
+		v := formatTimestamptz(refreshRotatedAt)
 		s.RefreshRotatedAt = &v
 	}
 	if revokedAt.Valid {
-		v := revokedAt.Time.UTC().Format("2006-01-02T15:04:05Z07:00")
+		v := formatTimestamptz(revokedAt)
 		s.RevokedAt = &v
 	}
 	if ua.Valid {
@@ -232,7 +238,7 @@ func (r *SessionRepository) FindSessionByRefreshTokenHash(ctx context.Context, r
 	}
 
 	var s models.Session
-	var refreshRotatedAt, revokedAt pgtype.Timestamptz
+	var createdAt, lastUsedAt, expiresAtOut, refreshRotatedAt, revokedAt pgtype.Timestamptz
 	var ua, ip pgtype.Text
 
 	err := r.Pool.QueryRow(ctx, `
@@ -252,21 +258,24 @@ func (r *SessionRepository) FindSessionByRefreshTokenHash(ctx context.Context, r
 		&refreshRotatedAt,
 		&ua,
 		&ip,
-		&s.CreatedAt,
-		&s.LastUsedAt,
-		&s.ExpiresAt,
+		&createdAt,
+		&lastUsedAt,
+		&expiresAtOut,
 		&revokedAt,
 	)
 	if err != nil {
 		return nil, err
 	}
 
+	s.CreatedAt = formatTimestamptz(createdAt)
+	s.LastUsedAt = formatTimestamptz(lastUsedAt)
+	s.ExpiresAt = formatTimestamptz(expiresAtOut)
 	if refreshRotatedAt.Valid {
-		v := refreshRotatedAt.Time.UTC().Format("2006-01-02T15:04:05Z07:00")
+		v := formatTimestamptz(refreshRotatedAt)
 		s.RefreshRotatedAt = &v
 	}
 	if revokedAt.Valid {
-		v := revokedAt.Time.UTC().Format("2006-01-02T15:04:05Z07:00")
+		v := formatTimestamptz(revokedAt)
 		s.RevokedAt = &v
 	}
 	if ua.Valid {
@@ -318,4 +327,15 @@ func (r *SessionRepository) CleanupExpiredSessions(ctx context.Context) (int64, 
 		return 0, err
 	}
 	return res.RowsAffected(), nil
+}
+
+// formatTimestamptz renders a pgtype.Timestamptz as the canonical RFC3339
+// string the API uses for session timestamps. The models.Session fields
+// are typed `string` (not `time.Time`) because the JSON wire format is
+// always ISO-8601 — the conversion happens here, not on every read.
+func formatTimestamptz(t pgtype.Timestamptz) string {
+	if !t.Valid {
+		return ""
+	}
+	return t.Time.UTC().Format("2006-01-02T15:04:05Z07:00")
 }

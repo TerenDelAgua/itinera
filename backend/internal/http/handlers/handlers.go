@@ -5,6 +5,7 @@ import (
 	"backend/internal/database"
 	"backend/internal/http/middleware"
 	"backend/internal/services"
+	"backend/internal/services/email"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -17,18 +18,21 @@ import (
 // *Repository types satisfy them structurally, so swapping a real DB for a
 // test double or an alternative backend is a one-line change in main.go.
 type Handlers struct {
-	TripsRepo     database.TripStore
-	PlacesRepo    database.PlaceStore
-	ExpensesRepo  database.ExpenseStore
-	AuthRepo      database.AuthStore
-	ActivityRepo  database.ActivityStore
-	EventsRepo    database.EventStore
-	RateLimitRepo database.RateLimitStore
-	AnalyticsRepo database.AnalyticsStore
-	SessionRepo   database.SessionStore
-	ExpenseSvc    *services.ExpenseService
-	TripSvc       *services.TripService
-	Config        *config.Config
+	TripsRepo          database.TripStore
+	PlacesRepo         database.PlaceStore
+	ExpensesRepo       database.ExpenseStore
+	AuthRepo           database.AuthStore
+	ActivityRepo       database.ActivityStore
+	EventsRepo         database.EventStore
+	RateLimitRepo      database.RateLimitStore
+	LoginRateLimitRepo *database.LoginRateLimitRepository
+	AnalyticsRepo      database.AnalyticsStore
+	SessionRepo        database.SessionStore
+	ResetRepo          database.PasswordResetStore
+	ExpenseSvc         *services.ExpenseService
+	TripSvc            *services.TripService
+	EmailSender        email.Sender
+	Config             *config.Config
 }
 
 func NewHandlers(
@@ -39,25 +43,31 @@ func NewHandlers(
 	activityRepo database.ActivityStore,
 	eventsRepo database.EventStore,
 	rateLimitRepo database.RateLimitStore,
+	loginRateLimitRepo *database.LoginRateLimitRepository,
 	analyticsRepo database.AnalyticsStore,
 	sessionRepo database.SessionStore,
+	resetRepo database.PasswordResetStore,
 	expenseSvc *services.ExpenseService,
 	tripSvc *services.TripService,
+	emailSender email.Sender,
 	cfg *config.Config,
 ) *Handlers {
 	return &Handlers{
-		TripsRepo:     tripsRepo,
-		PlacesRepo:    placesRepo,
-		ExpensesRepo:  expensesRepo,
-		AuthRepo:      authRepo,
-		ActivityRepo:  activityRepo,
-		EventsRepo:    eventsRepo,
-		RateLimitRepo: rateLimitRepo,
-		AnalyticsRepo: analyticsRepo,
-		SessionRepo:   sessionRepo,
-		ExpenseSvc:    expenseSvc,
-		TripSvc:       tripSvc,
-		Config:        cfg,
+		TripsRepo:          tripsRepo,
+		PlacesRepo:         placesRepo,
+		ExpensesRepo:       expensesRepo,
+		AuthRepo:           authRepo,
+		ActivityRepo:       activityRepo,
+		EventsRepo:         eventsRepo,
+		RateLimitRepo:      rateLimitRepo,
+		LoginRateLimitRepo: loginRateLimitRepo,
+		AnalyticsRepo:      analyticsRepo,
+		SessionRepo:        sessionRepo,
+		ResetRepo:          resetRepo,
+		ExpenseSvc:         expenseSvc,
+		TripSvc:            tripSvc,
+		EmailSender:        emailSender,
+		Config:             cfg,
 	}
 }
 

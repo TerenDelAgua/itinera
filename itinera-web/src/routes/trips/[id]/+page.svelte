@@ -106,6 +106,18 @@
   async function loadAllData() {
     if (!tripId) return;
 
+    // Defensive guard: the route is `/trips/[id]` where `id` is a
+    // UUID. If the URL contains something else (e.g. the user
+    // typed `/trips/register` and SvelteKit matched `[id]`,
+    // yielding `id === "register"`), we redirect to the dashboard
+    // rather than sending the backend a malformed request and
+    // rendering a half-broken page.
+    const uuidLike = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidLike.test(tripId)) {
+      goto("/trips", { replaceState: true });
+      return;
+    }
+
     if (!summary) isLoading = true;
 
     try {
