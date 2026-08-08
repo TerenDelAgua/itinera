@@ -206,6 +206,9 @@
       "error_network": "Tidak ada koneksi. Periksa jaringan Anda dan coba lagi.",
       "error_generic": "Terjadi kesalahan. Silakan coba lagi."
     },
+    "layout": {
+      "logout": "Keluar"
+    },
     "login": {
       "title": "Selamat datang kembali",
       "subtitle": "Masuk untuk mengakses perjalanan Anda.",

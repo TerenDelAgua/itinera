@@ -206,6 +206,9 @@
       "error_network": "Sin conexión. Comprueba tu red e inténtalo de nuevo.",
       "error_generic": "Algo ha ido mal. Inténtalo de nuevo."
     },
+    "layout": {
+      "logout": "Cerrar sesión"
+    },
     "login": {
       "title": "Bienvenido de vuelta",
       "subtitle": "Inicia sesión para acceder a tus viajes.",

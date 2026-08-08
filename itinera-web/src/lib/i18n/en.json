@@ -206,6 +206,9 @@
       "error_network": "No connection. Check your network and try again.",
       "error_generic": "Something went wrong. Please try again."
     },
+    "layout": {
+      "logout": "Sign out"
+    },
     "login": {
       "title": "Welcome back",
       "subtitle": "Sign in to access your trips.",
