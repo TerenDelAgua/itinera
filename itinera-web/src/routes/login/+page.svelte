@@ -35,6 +35,12 @@
     let emailError = $state<string | null>(null);
     let passwordError = $state<string | null>(null);
     let bannerError = $state<string | null>(null);
+    /**
+     * Shows the "did you recently delete your account?" hint after a
+     * failed login. Set true on any credential failure, cleared when
+     * the user starts editing either field.
+     */
+    let showPostDeleteHint = $state(false);
 
     const currentLocale = $derived<Locale>($locale as Locale);
 
@@ -107,6 +113,11 @@
         // inputs and the server's anti-enumeration policy is "same
         // message whether the user exists or the password is wrong".
         bannerError = message;
+        // Show the post-delete hint whenever login fails. It doesn't
+        // leak account state (it's just a generic help banner) and it
+        // saves the user a confused "why does my password not work?"
+        // detour if they recently deleted + recreated their account.
+        showPostDeleteHint = true;
     }
 
     async function handleSubmit(e: Event) {
@@ -134,6 +145,7 @@
     /** Reset banner as soon as the user edits either field. */
     function clearBanner() {
         if (bannerError) bannerError = null;
+        if (showPostDeleteHint) showPostDeleteHint = false;
     }
 
     onMount(() => {
@@ -194,6 +206,52 @@
                         /><line x1="12" y1="16" x2="12.01" y2="16" />
                     </svg>
                     <span>{bannerError}</span>
+                </div>
+            {/if}
+            {#if showPostDeleteHint}
+                <!--
+                  Post-delete hint (Spec §5.9 §9.2):
+                  Shown after a failed login. Doesn't leak account state
+                  (any login failure triggers it), just tells the user
+                  about the 30-day retention window if they recently
+                  deleted + recreated their account.
+                -->
+                <div
+                    class="bg-teren-primary-subtle border-b border-teren-primary/30 px-3 py-2 text-sm text-teren-text-main flex items-start gap-2"
+                    role="status"
+                    aria-live="polite"
+                    data-testid="login-post-delete-hint"
+                >
+                    <svg
+                        class="w-4 h-4 shrink-0 text-teren-primary mt-0.5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        aria-hidden="true"
+                    >
+                        <circle cx="12" cy="12" r="10" /><line
+                            x1="12"
+                            y1="8"
+                            x2="12"
+                            y2="12"
+                        /><line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    <div>
+                        <p class="font-medium text-teren-text-main">
+                            {$t('auth.login.post_delete_hint_title')}
+                        </p>
+                        <p class="mt-0.5 text-teren-text-muted">
+                            {$t('auth.login.post_delete_hint_body', {
+                                register_link: ''
+                            })}<a
+                                href="/register"
+                                class="font-semibold text-teren-primary hover:text-teren-primary-hover underline-offset-2 hover:underline"
+                            >
+                                {$t('auth.login.post_delete_hint_register')}
+                            </a>
+                        </p>
+                    </div>
                 </div>
             {/if}
 

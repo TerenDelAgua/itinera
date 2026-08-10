@@ -207,6 +207,12 @@
       "error_network": "No connection. Check your network and try again.",
       "error_generic": "Something went wrong. Please try again."
     },
+    "sign_in": "Sign in",
+    "user_menu": {
+      "avatar_label": "Account of {email}",
+      "account_settings": "Account settings",
+      "sign_out": "Sign out"
+    },
     "layout": {
       "logout": "Sign out"
     },
@@ -226,6 +232,9 @@
       "register_link": "Don't have an account? {register}",
       "register_cta": "Create one",
       "register_link_href": "/register",
+      "post_delete_hint_title": "Can't sign in?",
+      "post_delete_hint_body": "If you deleted this account less than 30 days ago, the email may still be locked. Try again with your new password, or {register_link} if you recreated it.",
+      "post_delete_hint_register": "create a new account",
       "error_email_required": "Email is required.",
       "error_password_required": "Password is required.",
       "error_network": "No connection. Check your network and try again.",
@@ -245,6 +254,9 @@
       "change_email": "Wrong email? Edit it.",
       "signin_link": "Remembered it? {signin}",
       "signin_cta": "Sign in",
+      "post_delete_hint_title": "Didn't get the code?",
+      "post_delete_hint_body": "If you recently deleted this account, the code is suppressed during the 30-day retention window. You can {register_link} with the same email instead.",
+      "post_delete_hint_register": "create a new account",
       "error_email_required": "Email is required.",
       "error_email_format": "Enter a valid email like you@example.com.",
       "error_rate_limit": "Too many reset attempts. Try again later.",
@@ -284,7 +296,7 @@
     "delete": {
       "page_title": "Delete account",
       "title": "Delete your account",
-      "subtitle": "Soft-deletes your account immediately and removes your data within 30 days.",
+      "subtitle": "Your account will be deleted immediately and your data permanently removed within 30 days.",
       "bullet1_title": "Your trips become anonymous.",
       "bullet1_body": "Trips you saved are detached from your email so future sign-ups can't claim them.",
       "bullet2_title": "Your sessions end.",

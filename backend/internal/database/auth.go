@@ -41,6 +41,13 @@ func (r *AuthRepository) CreateUser(ctx context.Context, email, password, locale
 		locale = "en"
 	}
 
+	if _, err := r.Pool.Exec(ctx,
+		`DELETE FROM users WHERE LOWER(email) = $1 AND deleted_at IS NOT NULL`,
+		normalized,
+	); err != nil {
+		return nil, fmt.Errorf("purge soft-deleted user: %w", err)
+	}
+
 	var user models.User
 	var createdAt, updatedAt, termsAcceptedAt, deletedAt pgtype.Timestamptz
 
@@ -95,15 +102,13 @@ func (r *AuthRepository) GetUserByEmail(ctx context.Context, email string) (*mod
 	var user models.User
 	var createdAt, updatedAt, termsAcceptedAt, deletedAt pgtype.Timestamptz
 
-	// LOWER($1) matches the partial index idx_users_email_unique definition.
-	// For soft-deleted accounts we fall back to LOWER(email) without the WHERE
-	// so the GDPR login guard can still surface them.
 	query := `
 		SELECT
 			id, email, password_hash, created_at, tier, locale,
 			terms_accepted_at, updated_at, deleted_at
 		FROM users
 		WHERE LOWER(email) = $1
+		ORDER BY (deleted_at IS NULL) DESC, created_at DESC
 		LIMIT 1
 	`
 

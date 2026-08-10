@@ -1,12 +1,12 @@
 <script lang="ts">
   import "../app.css";
-  import { locale, t } from "$lib/i18n/store";
+  import { locale } from "$lib/i18n/store";
   import { resolve } from "$app/paths";
   import { localeToHtmlLang } from "$lib/utils/seo";
-  import { goto } from "$app/navigation";
 
   import { themeStore } from "$lib/stores/theme";
   import { auth } from "$lib/stores/auth.svelte";
+  import UserMenu from "$lib/components/user-menu/UserMenu.svelte";
   import { onMount } from "svelte";
   import { page } from "$app/state";
 
@@ -15,25 +15,6 @@
   let logoHref = $derived(
     page.url.pathname.startsWith("/") ? resolve("/") : resolve("/"),
   );
-
-  /**
-   * Logout is optimistic: we clear `auth.user` BEFORE the network
-   * call so the UI flips immediately. The auth store already swallows
-   * non-2xx responses (server failure ≠ failure to log out locally),
-   * but we still await the promise so the user can't double-tap while
-   * the request is in flight.
-   */
-  let isLoggingOut = $state(false);
-  async function handleLogout() {
-    if (isLoggingOut) return;
-    isLoggingOut = true;
-    try {
-      await auth.logout();
-      await goto("/", { replaceState: true });
-    } finally {
-      isLoggingOut = false;
-    }
-  }
 
   // Keep <html lang> in sync with the active locale. This is the SEO-i18n
   // strategy for F1: we rely on the lang attribute (which Google respects
@@ -171,61 +152,7 @@
             >
           {/if}
         </button>
-        <!-- 
-        <div
-          class="hidden md:flex items-center gap-2 text-teren-text-muted border-l border-teren-border pl-4 ml-2"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="opacity-70"
-            ><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle
-              cx="12"
-              cy="7"
-              r="4"
-            ></circle></svg
-          >
-          <span class="text-sm font-medium">teren_91@hotmail.com</span>
-        </div> -->
-
-        <!-- Logout button: only shown to authenticated users so we don't
-             render a useless control on the landing page / register /
-             login screens. Hidden on mobile (icon-only) to keep the
-             header compact on small viewports. -->
-        {#if auth.isLoggedIn}
-          <button
-            type="button"
-            onclick={handleLogout}
-            disabled={isLoggingOut}
-            data-testid="logout-button"
-            aria-label={$t('auth.layout.logout')}
-            class="text-sm font-semibold text-teren-text-main hover:text-teren-primary transition-all duration-200 flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 ml-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-              ><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline
-                points="16 17 21 12 16 7"
-              ></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg
-            >
-            <span class="hidden sm:inline">{$t('auth.layout.logout')}</span>
-          </button>
-        {/if}
+        <UserMenu />
       </div>
     </div>
   </header>

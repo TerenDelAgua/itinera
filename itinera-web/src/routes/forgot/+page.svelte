@@ -43,6 +43,14 @@
     let codeError = $state<string | null>(null);
     let passwordError = $state<string | null>(null);
     let bannerError = $state<string | null>(null);
+    /**
+     * After a 202 from /forgot, the email *might* have been suppressed
+     * because the account was soft-deleted. We can't tell which case
+     * the user is in (anti-enumeration), but we can offer a help
+     * banner that nudges them toward re-register if they recently
+     * deleted + recreated the account.
+     */
+    let showPostDeleteHint = $state(false);
 
     /** True after the user has requested a code — reveals the
      *  second-stage fields (code + new password). */
@@ -128,6 +136,10 @@
             codeSent = true;
             codeSentEmail = email.trim();
             bannerError = null;
+            // The 202 came back. If the email was soft-deleted, the
+            // backend suppressed the actual code — show a hint so the
+            // user knows "create a new account" is an option.
+            showPostDeleteHint = true;
         } catch (err) {
             if (err instanceof ApiError) {
                 if (err.code === "RATE_LIMITED") {
@@ -276,6 +288,51 @@
                         <span>{bannerError}</span>
                     </div>
                 {/if}
+                {#if showPostDeleteHint}
+                    <!--
+                      Post-delete hint (Spec §5.9 §9.2): shown after a
+                      202 from /forgot. Doesn't leak account state —
+                      just nudges the user toward re-registering if they
+                      recently deleted + recreated their account.
+                    -->
+                    <div
+                        class="bg-teren-primary-subtle border-b border-teren-primary/30 px-3 py-2 text-sm text-teren-text-main flex items-start gap-2"
+                        role="status"
+                        aria-live="polite"
+                        data-testid="forgot-post-delete-hint"
+                    >
+                        <svg
+                            class="w-4 h-4 shrink-0 text-teren-primary mt-0.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            aria-hidden="true"
+                        >
+                            <circle cx="12" cy="12" r="10" /><line
+                                x1="12"
+                                y1="8"
+                                x2="12"
+                                y2="12"
+                            /><line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        <div>
+                            <p class="font-medium">
+                                {$t('auth.forgot.post_delete_hint_title')}
+                            </p>
+                            <p class="mt-0.5 text-teren-text-muted">
+                                {$t('auth.forgot.post_delete_hint_body', {
+                                    register_link: ''
+                                })}<a
+                                    href="/register"
+                                    class="font-semibold text-teren-primary hover:text-teren-primary-hover underline-offset-2 hover:underline"
+                                >
+                                    {$t('auth.forgot.post_delete_hint_register')}
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                {/if}
 
                 <!-- ROW 1: Email (the only always-visible field).
                      Locked once the code is sent so the user can't
@@ -295,8 +352,9 @@
                         bind:value={email}
                         readonly={codeSent}
                         oninput={() => {
-                            if (emailError) emailError = null;
                             if (bannerError) bannerError = null;
+                            if (emailError) emailError = null;
+                            if (showPostDeleteHint) showPostDeleteHint = false;
                         }}
                         aria-invalid={emailError ? "true" : undefined}
                         aria-describedby="forgot-email-error"

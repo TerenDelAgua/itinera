@@ -9,6 +9,7 @@
   type $$Props = HTMLButtonAttributes & {
     loading?: boolean;
     fullWidth?: boolean;
+    variant?: "primary" | "destructive";
   };
 
   let {
@@ -16,6 +17,7 @@
     fullWidth = true,
     disabled = false,
     type = "button",
+    variant = "primary",
     children,
     ...rest
   }: $$Props = $props();
@@ -25,11 +27,13 @@
   {type}
   disabled={disabled || loading}
   class="inline-flex items-center justify-center gap-2 h-12 px-5
-           bg-teren-primary hover:bg-teren-primary-hover text-white
            font-semibold rounded-xl shadow-sm active:scale-[0.99]
            transition-all
            disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100
-           {fullWidth ? 'w-full' : ''}"
+           {fullWidth ? 'w-full' : ''}
+           {variant === 'destructive'
+    ? 'bg-error-base hover:bg-error-hover text-white'
+    : 'bg-teren-primary hover:bg-teren-primary-hover text-white'}"
   {...rest}
 >
   {#if loading}

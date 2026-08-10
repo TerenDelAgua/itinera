@@ -10,8 +10,12 @@ import { test, expect } from '@playwright/test';
  * El frontend siempre usa la misma URL.
  */
 test.describe('Ghost Mode Fork-On-Write', () => {
-	const demoTripId = 'demo-trip-123';
-	const forkedTripId = 'forked-trip-456';
+	// UUID-formatted fake ID. The trip detail page (/trips/[id]+page.svelte)
+	// rejects non-UUID ids with a /trips redirect — see the regex at the
+	// top of loadAllData(). We use a fake UUID here so the page accepts
+	// the route and loadAllData() runs.
+	const demoTripId = '00000000-0000-0000-0000-000000000123';
+	const forkedTripId = '00000000-0000-0000-0000-000000000456';
 	const editedName = 'Japón Clásico (Demo) - Mi Viaje';
 
 	/**
@@ -124,6 +128,21 @@ test.describe('Ghost Mode Fork-On-Write', () => {
 		// la consola del navegador.
 		await page.route('**/api/v1/events', async (route) => {
 			await route.fulfill({ json: { ok: true } });
+		});
+
+		// ── /auth/v2/me (Spec 017 §7.2: boot-time probe) ───────────────────────
+		// +layout.svelte fires this probe once at app boot (Spec 017 §7.9:
+		// "centralizar en +layout.svelte"). Without this mock the probe hits
+		// the real backend, returns 401 (no session cookie in tests), and the
+		// resulting unhandled error breaks the Promise.all chain in loadAllData.
+		await page.route('**/api/v1/auth/v2/me', async (route) => {
+			await route.fulfill({
+				status: 401,
+				json: {
+					error: 'INVALID_CREDENTIALS',
+					message: 'No session',
+				},
+			});
 		});
 	}
 

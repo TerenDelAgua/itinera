@@ -41,8 +41,20 @@ interface AuthMeResponse {
 class AuthStore {
     user = $state<User | null>(null);
     loading = $state(false);
-    /** Last error from a register/login/logout call. Cleared on entry. */
+    /**
+     * `true` while the boot-time `/auth/v2/me` probe is in flight.
+     * The UserMenu uses this to render a 32px skeleton instead of
+     * "Sign in" / Avatar — eliminates the layout-shift flash during
+     * the 200-500ms between the SSR HTML and the boot probe
+     * resolving.
+     */
+    isLoading = $state(false);
     lastError = $state<ApiError | null>(null);
+    /**
+     * In-flight bootstrap promise (single-flight). `null` when no
+     * probe is running. Not part of the public API.
+     */
+    _bootstrapInflight: Promise<void> | null = null;
 
     isLoggedIn = $derived(this.user !== null);
 
@@ -51,22 +63,32 @@ class AuthStore {
      * subsequent calls return immediately without re-fetching.
      */
     async bootstrap(): Promise<void> {
-        if (this.user || this.loading) return;
-        try {
-            const data = await apiFetch<AuthMeResponse>('/auth/v2/me');
-            this.user = data.user;
-        } catch (e) {
-            if (e instanceof ApiError && e.status === 401) {
-                // Expected for guests: leave `user` null, no error.
-                this.user = null;
-                return;
+        // Single-flight: if a bootstrap is already running, return the
+        // existing promise instead of issuing a second `/me` request.
+        if (this._bootstrapInflight) return this._bootstrapInflight;
+        if (this.user) return;
+        this.isLoading = true;
+        this._bootstrapInflight = (async () => {
+            try {
+                const data = await apiFetch<AuthMeResponse>('/auth/v2/me');
+                this.user = data.user;
+            } catch (e) {
+                if (e instanceof ApiError && e.status === 401) {
+                    // Expected for guests: leave `user` null, no error.
+                    this.user = null;
+                    return;
+                }
+                // Network or server down: surface as lastError but keep the
+                // guest state so the app remains usable.
+                if (e instanceof ApiError) {
+                    this.lastError = e;
+                }
+            } finally {
+                this.isLoading = false;
+                this._bootstrapInflight = null;
             }
-            // Network or server down: surface as lastError but keep the
-            // guest state so the app remains usable.
-            if (e instanceof ApiError) {
-                this.lastError = e;
-            }
-        }
+        })();
+        return this._bootstrapInflight;
     }
 
     async register(input: RegisterInput): Promise<User> {
