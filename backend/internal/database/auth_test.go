@@ -128,6 +128,59 @@ func TestAuthRepo_SoftAndHardDelete(t *testing.T) {
 	assert.Nil(t, final.TermsAcceptedAt, "terms_accepted_at must be cleared after hard delete")
 }
 
+// TestAuthRepo_ReregisterAfterSoftDelete covers the user flow:
+// 1. Register
+// 2. Soft-delete the account (DELETE /auth/v2/account)
+// 3. Re-register with the SAME email
+// 4. Login + forgot must find the NEW active row, not the old soft-deleted.
+//
+// Two backend guarantees:
+//   (a) CreateUser hard-deletes any soft-deleted row with the same email
+//       so /me and /login don't see two rows for one email.
+//   (b) GetUserByEmail returns the active row first even if a soft-deleted
+//       row lingered for some reason (ORDER BY deleted_at NULLS FIRST).
+func TestAuthRepo_ReregisterAfterSoftDelete(t *testing.T) {
+	pool := getTestPoolOrSkip(t)
+	repo := database.NewAuthRepository(pool)
+	ctx := context.Background()
+
+	email := uniqueEmail(t, "rereg")
+	defer cleanupUserByEmail(t, pool, email)
+
+	// 1. Register
+	u1, err := repo.CreateUser(ctx, email, "OldPass1!", "en")
+	require.NoError(t, err)
+
+	// 2. Soft-delete
+	_, err = repo.SoftDeleteUser(ctx, u1.ID)
+	require.NoError(t, err)
+
+	// Sanity: the row is still present but flagged.
+	deleted, err := repo.GetUserByEmail(ctx, email)
+	require.NoError(t, err)
+	require.NotNil(t, deleted.DeletedAt, "first row must be soft-deleted")
+
+	// 3. Re-register with the SAME email
+	u2, err := repo.CreateUser(ctx, email, "NewPass1!", "en")
+	require.NoError(t, err, "re-register must succeed after soft-delete")
+	assert.NotEqual(t, u1.ID, u2.ID, "the new user must be a distinct row")
+
+	// 4. GetUserByEmail must return the ACTIVE row (u2), not the soft-deleted one.
+	current, err := repo.GetUserByEmail(ctx, email)
+	require.NoError(t, err)
+	assert.Equal(t, u2.ID, current.ID, "GetUserByEmail must prefer the active row")
+	assert.Nil(t, current.DeletedAt, "returned row must not be soft-deleted")
+
+	// 5. Password hash check: the active row should authenticate with the
+	// new password, NOT the old one.
+	assert.True(t, bcrypt.CompareHashAndPassword(
+		[]byte(current.PasswordHash), []byte("NewPass1!"),
+	) == nil, "new password must match the new hash")
+	assert.NotNil(t, bcrypt.CompareHashAndPassword(
+		[]byte(current.PasswordHash), []byte("OldPass1!"),
+	), "old password must NOT match — proof the active row is u2 not u1")
+}
+
 // TestAuthRepo_UpdatePassword ensures the new password's hash is rewritten
 // AND the old password no longer verifies.
 func TestAuthRepo_UpdatePassword(t *testing.T) {

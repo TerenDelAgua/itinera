@@ -102,7 +102,7 @@
         >
           <div class="flex items-start gap-2">
             <svg
-              class="w-5 h-5 shrink-0 text-teren-primary mt-0.5"
+              class="w-5 h-5 shrink-0 text-error-base mt-0.5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -138,7 +138,12 @@
           </div>
         </div>
 
-        <PrimaryButton type="button" onclick={enterConfirm} fullWidth>
+        <PrimaryButton
+          type="button"
+          onclick={enterConfirm}
+          variant="destructive"
+          fullWidth
+        >
           {#snippet children()}
             {$t("auth.delete.start_cta")}
           {/snippet}

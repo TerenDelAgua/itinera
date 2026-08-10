@@ -148,7 +148,7 @@
   <a
     href="/login"
     data-testid="user-menu-signin"
-    class="text-sm font-semibold text-teren-primary hover:text-teren-primary-hover transition-colors px-3 py-1.5 rounded-lg hover:bg-teren-primary-subtle focus:outline-none focus:ring-2 focus:ring-teren-primary/30"
+    class="text-sm font-semibold text-teren-primary hover:text-teren-primary-hover transition-colors px-3 py-1.5 rounded-lg hover:bg-teren-interactive-hover focus:outline-none focus:ring-2 focus:ring-teren-primary/30"
   >
     {$t("auth.sign_in")}
   </a>
@@ -201,7 +201,7 @@
           tabindex="-1"
           data-testid="user-menu-account"
           onkeydown={handleAccountSettingsKeydown}
-          class="block px-4 py-2 text-sm text-teren-text-main hover:bg-teren-primary-subtle focus:bg-teren-primary-subtle focus:outline-none transition-colors"
+          class="block px-4 py-2 text-sm text-teren-text-main hover:bg-teren-interactive-hover focus:bg-teren-interactive-hover focus:outline-none transition-colors"
         >
           {$t("auth.user_menu.account_settings")}
         </a>
@@ -217,7 +217,7 @@
           tabindex="-1"
           data-testid="user-menu-signout"
           onclick={handleSignOut}
-          class="w-full text-left px-4 py-2 text-sm text-teren-text-main hover:bg-teren-primary-subtle focus:bg-teren-primary-subtle focus:outline-none transition-colors"
+          class="w-full text-left px-4 py-2 text-sm text-teren-text-main hover:bg-teren-interactive-hover focus:bg-teren-interactive-hover focus:outline-none transition-colors"
         >
           {$t("auth.user_menu.sign_out")}
         </button>
