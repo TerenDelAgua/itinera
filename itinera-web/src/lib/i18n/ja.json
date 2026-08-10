@@ -279,6 +279,12 @@
       "error_network": "接続できません。ネットワークを確認してください。",
       "error_generic": "問題が発生しました。もう一度お試しください。"
     },
+    "sign_in": "ログイン",
+    "user_menu": {
+      "avatar_label": "{email} のアカウント",
+      "account_settings": "アカウント設定",
+      "sign_out": "ログアウト"
+    },
     "layout": {
       "logout": "ログアウト"
     },

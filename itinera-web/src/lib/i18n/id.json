@@ -279,6 +279,12 @@
       "error_network": "Tidak ada koneksi. Periksa jaringan Anda dan coba lagi.",
       "error_generic": "Terjadi kesalahan. Silakan coba lagi."
     },
+    "sign_in": "Masuk",
+    "user_menu": {
+      "avatar_label": "Akun {email}",
+      "account_settings": "Pengaturan akun",
+      "sign_out": "Keluar"
+    },
     "layout": {
       "logout": "Keluar"
     },

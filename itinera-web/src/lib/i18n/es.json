@@ -279,6 +279,12 @@
       "error_network": "Sin conexión. Comprueba tu red e inténtalo de nuevo.",
       "error_generic": "Algo ha ido mal. Inténtalo de nuevo."
     },
+    "sign_in": "Iniciar sesión",
+    "user_menu": {
+      "avatar_label": "Cuenta de {email}",
+      "account_settings": "Ajustes de la cuenta",
+      "sign_out": "Cerrar sesión"
+    },
     "layout": {
       "logout": "Cerrar sesión"
     },

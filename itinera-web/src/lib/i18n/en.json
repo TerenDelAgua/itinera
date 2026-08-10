@@ -207,6 +207,12 @@
       "error_network": "No connection. Check your network and try again.",
       "error_generic": "Something went wrong. Please try again."
     },
+    "sign_in": "Sign in",
+    "user_menu": {
+      "avatar_label": "Account of {email}",
+      "account_settings": "Account settings",
+      "sign_out": "Sign out"
+    },
     "layout": {
       "logout": "Sign out"
     },

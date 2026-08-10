@@ -37,7 +37,7 @@
     // +layout.svelte's `/me` probe has populated auth.user by
     // now, so this is a synchronous read — no extra fetch.
     if (!auth.isLoggedIn) {
-      goto("/login?next=/settings/account", { replaceState: true });
+      goto("/login?next=/account", { replaceState: true });
     }
   });
 
