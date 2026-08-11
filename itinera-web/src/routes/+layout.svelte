@@ -5,6 +5,8 @@
   import { localeToHtmlLang } from "$lib/utils/seo";
 
   import { themeStore } from "$lib/stores/theme";
+  import { auth } from "$lib/stores/auth.svelte";
+  import UserMenu from "$lib/components/user-menu/UserMenu.svelte";
   import { onMount } from "svelte";
   import { page } from "$app/state";
 
@@ -26,6 +28,13 @@
 
   onMount(() => {
     themeStore.init();
+
+    // Boot-time probe: ask the backend "do I have a session?". For
+    // guests this is a 401 and is the EXPECTED outcome (auth store
+    // handles it as a no-op). Centralising the call here means
+    // /login and /register don't need to re-probe — they can read
+    // `auth.isLoggedIn` synchronously.
+    void auth.bootstrap();
 
     // Update local state based on DOM to sync icons
     isDark = document.documentElement.classList.contains("dark");
@@ -143,49 +152,7 @@
             >
           {/if}
         </button>
-        <!-- 
-        <div
-          class="hidden md:flex items-center gap-2 text-teren-text-muted border-l border-teren-border pl-4 ml-2"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="opacity-70"
-            ><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle
-              cx="12"
-              cy="7"
-              r="4"
-            ></circle></svg
-          >
-          <span class="text-sm font-medium">teren_91@hotmail.com</span>
-        </div> -->
-
-        <button
-          class="text-sm font-semibold text-teren-text-main hover:text-teren-primary transition-all duration-200 flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 ml-2"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            ><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline
-              points="16 17 21 12 16 7"
-            ></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg
-          >
-          <span class="hidden sm:inline">Salir</span>
-        </button>
+        <UserMenu />
       </div>
     </div>
   </header>

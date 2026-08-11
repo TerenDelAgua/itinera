@@ -3,8 +3,8 @@ services:
     image: postgres:16-alpine
     container_name: itinera-db
     environment:
-      - POSTGRES_USER=teren_dev
-      - POSTGRES_PASSWORD=qwerty123
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=itinera
     ports:
       - "5432:5432"
@@ -12,7 +12,7 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./migrations:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U teren_dev -d itinera"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d itinera"]
       interval: 5s
       timeout: 5s
       retries: 5
