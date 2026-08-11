@@ -31,6 +31,11 @@ const { apiFetchMock, authMock } = vi.hoisted(() => ({
         login: vi.fn(),
         bootstrap: vi.fn().mockResolvedValue(undefined),
         logout: vi.fn(),
+        // Spec 017 §5.6: claim-guest is called after a successful
+        // register to migrate any guest trips the user might have
+        // created before signing up. Resolves to 0 by default;
+        // individual tests can override via mockResolvedValueOnce(3).
+        claimGuest: vi.fn().mockResolvedValue(0),
         clearError: vi.fn()
     }
 }));

@@ -32,6 +32,11 @@ const { authMock, gotoMock } = vi.hoisted(() => ({
         login: vi.fn(),
         bootstrap: vi.fn().mockResolvedValue(undefined),
         logout: vi.fn(),
+        // Spec 017 §5.6: claim-guest is called after a successful login
+        // to migrate any guest trips the user might have created before
+        // signing in. Resolves to 0 by default; individual tests can
+        // override via `authMock.claimGuest.mockResolvedValueOnce(3)`.
+        claimGuest: vi.fn().mockResolvedValue(0),
         clearError: vi.fn()
     },
     gotoMock: vi.fn().mockResolvedValue(undefined)

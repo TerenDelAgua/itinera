@@ -182,3 +182,53 @@ describe('auth.clearError', () => {
         expect(auth.lastError).toBeNull();
     });
 });
+
+describe('auth.claimGuest', () => {
+    it('returns 0 when there is no active user', async () => {
+        auth.user = null;
+        const fetchSpy = vi.spyOn(globalThis, 'fetch');
+        const count = await auth.claimGuest();
+        expect(count).toBe(0);
+        // The fetch must NOT have been called when there's no user.
+        expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it('returns the claimed trips count on success', async () => {
+        auth.user = sampleUser;
+        mockFetchOnce(200, {
+            claimed_trips_count: 3,
+            message: 'Hemos añadido 3 viajes a tu cuenta'
+        });
+
+        const count = await auth.claimGuest();
+        expect(count).toBe(3);
+        expect(auth.lastError).toBeNull();
+    });
+
+    it('does NOT throw on 401 (Spec 017 §11.2 #18) — lastError is set, return 0', async () => {
+        auth.user = sampleUser;
+        mockFetchOnce(401, {
+            error: { code: 'UNAUTHENTICATED', message: 'No session' }
+        });
+
+        // The call must resolve, NOT reject, so the redirect in /login
+        // isn't blocked by a claim failure.
+        const count = await auth.claimGuest();
+        expect(count).toBe(0);
+        expect(auth.lastError).toBeInstanceOf(ApiError);
+        expect(auth.lastError?.code).toBe('UNAUTHENTICATED');
+        // Crucially: the user is still logged in. claimGuest is best-effort.
+        expect(auth.user).toEqual(sampleUser);
+    });
+
+    it('does NOT throw on 500 — local state stays consistent', async () => {
+        auth.user = sampleUser;
+        mockFetchOnce(500, {
+            error: { code: 'INTERNAL_ERROR', message: 'boom' }
+        });
+
+        const count = await auth.claimGuest();
+        expect(count).toBe(0);
+        expect(auth.user).toEqual(sampleUser);
+    });
+});
