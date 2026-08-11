@@ -9,13 +9,7 @@
  * We mock the API instead of standing up a real backend — the spec
  * only requires that the FRONTEND correctly maps server error codes
  * to i18n strings and renders the right banners.
- *
- * Stability note: when the Playwright suite runs in parallel with
- * other specs (default workers = 8) the dev server gets saturated
- * and Svelte hydration can race with our fill()/click() calls. We
- * mitigate this with `test.slow()` (3× the default timeout) and
- * `waitUntil: 'domcontentloaded'` plus `toBeEditable()` to ensure
- * the input is hydrated before we type into it.
+
  */
 import { test, expect } from '@playwright/test';
 

@@ -266,6 +266,80 @@ func TestAuthRepo_HardDeleteExpired_UniqueBcryptsPerUser(t *testing.T) {
 	}
 }
 
+// TestAuthRepo_ClaimGuestClearsSessionID covers the privacy invariant of
+// Spec 017 §5.6: claim-guest is a one-way transfer. After
+// ClaimGuestTrips runs, every migrated row must have user_id = $userID
+// AND session_id = NULL. Otherwise, the guest session cookie that
+// survives in the browser would still let the user see those trips
+// via the guest read path (which filters by session_id).
+//
+// Without the fix, this test fails: session_id stays non-NULL on the
+// migrated rows, the guest path keeps returning them, and a user
+// who logged out keeps seeing their account trips — a privacy leak
+// on shared devices.
+func TestAuthRepo_ClaimGuestClearsSessionID(t *testing.T) {
+	pool := getTestPoolOrSkip(t)
+	repo := database.NewAuthRepository(pool)
+	ctx := context.Background()
+
+	// Set up: a fresh user and two guest trips owned by a fake session.
+	email := uniqueEmail(t, "claim")
+	defer cleanupUserByEmail(t, pool, email)
+	t.Cleanup(func() {
+		_, _ = pool.Exec(ctx,
+			`DELETE FROM trips WHERE id IN ('00000000-0000-0000-0000-000000000c01', '00000000-0000-0000-0000-000000000c02')`)
+	})
+
+	u, err := repo.CreateUser(ctx, email, "Pa55word!", "en")
+	require.NoError(t, err)
+
+	const fakeSession = "claim-guest-session-xyz"
+	_, err = pool.Exec(ctx, `
+		INSERT INTO trips (id, name, session_id, created_at, base_currency, default_expense_currency, start_date, end_date)
+		VALUES
+		  ('00000000-0000-0000-0000-000000000c01', 'Trip A', $1, now(), 'EUR', 'EUR', '2026-01-01', '2026-01-10'),
+		  ('00000000-0000-0000-0000-000000000c02', 'Trip B', $1, now(), 'EUR', 'EUR', '2026-02-01', '2026-02-10')
+	`, fakeSession)
+	require.NoError(t, err)
+
+	// Pre-condition: both trips are owned by the fake session.
+	var preCount int
+	require.NoError(t, pool.QueryRow(ctx,
+		`SELECT count(*) FROM trips WHERE session_id = $1`, fakeSession,
+	).Scan(&preCount))
+	require.Equal(t, 2, preCount)
+
+	// Act: claim them into the new user.
+	claimed, err := repo.ClaimGuestTrips(ctx, fakeSession, u.ID)
+	require.NoError(t, err)
+	require.Equal(t, 2, claimed)
+
+	// Post-condition: user_id set, session_id NULL on every migrated row.
+	// pgx scans SQL NULL into a nil pointer, so sessionID being nil
+	// is the success case here.
+	for _, tripID := range []string{
+		"00000000-0000-0000-0000-000000000c01",
+		"00000000-0000-0000-0000-000000000c02",
+	} {
+		var userID uuid.UUID
+		var sessionID *string
+		err := pool.QueryRow(ctx, `
+			SELECT user_id, session_id FROM trips WHERE id = $1
+		`, tripID).Scan(&userID, &sessionID)
+		require.NoError(t, err)
+
+		assert.Equal(t, u.ID, userID, "trip %s must belong to the new user", tripID)
+		assert.Nil(t, sessionID, "session_id must be NULL after claim (got %q)", sessionID)
+	}
+
+	// The guest read path no longer matches: zero rows by session_id.
+	var postCount int
+	require.NoError(t, pool.QueryRow(ctx,
+		`SELECT count(*) FROM trips WHERE session_id = $1`, fakeSession,
+	).Scan(&postCount))
+	assert.Equal(t, 0, postCount, "guest path must not return claimed trips")
+}
+
 // TestAuthRepo_UpdatePassword ensures the new password's hash is rewritten
 // AND the old password no longer verifies.
 func TestAuthRepo_UpdatePassword(t *testing.T) {

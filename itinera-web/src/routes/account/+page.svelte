@@ -33,11 +33,8 @@
   let bannerError = $state<string | null>(null);
 
   onMount(() => {
-    // Guard: only logged-in users may reach this page. The
-    // +layout.svelte's `/me` probe has populated auth.user by
-    // now, so this is a synchronous read — no extra fetch.
     if (!auth.isLoggedIn) {
-      goto("/login?next=/account", { replaceState: true });
+      goto("/trips", { replaceState: true });
     }
   });
 
