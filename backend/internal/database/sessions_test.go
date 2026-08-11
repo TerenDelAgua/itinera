@@ -79,10 +79,14 @@ func TestSessions_RotateAndRevokeFamily(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, originalFamily, fetched.RefreshFamily,
 		"Spec 017 §4.3: rotation uses the SAME row, so the family is preserved")
-	assert.Nil(t, fetched.RefreshRotatedAt, "RotateSession bumps refresh_rotated_at; Scan sets it")
-	if fetched.RefreshRotatedAt != nil {
-		assert.True(t, strings.HasPrefix(*fetched.RefreshRotatedAt, "20"))
-	}
+	// RotateSession sets refresh_rotated_at = now(). FindSessionByAccessTokenHash
+	// then Scan-reads it back as a *string; we assert it's non-nil and looks
+	// like a 4-digit-year ISO timestamp ("2024-...", "2025-...", ...).
+	require.NotNil(t, fetched.RefreshRotatedAt,
+		"RotateSession bumps refresh_rotated_at; Scan must read it back")
+	assert.True(t, strings.HasPrefix(*fetched.RefreshRotatedAt, "20"),
+		"refresh_rotated_at should look like a 4-digit-year timestamp, got %q",
+		*fetched.RefreshRotatedAt)
 
 	// Revoke the entire family; subsequent lookups by either hash must fail.
 	require.NoError(t, sess.RevokeFamily(ctx, originalFamily))

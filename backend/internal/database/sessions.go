@@ -165,12 +165,20 @@ func (r *SessionRepository) FindSessionByAccessTokenHash(ctx context.Context, ac
 // extends the expiry. Callers verify the previous refresh hash matches the
 // supplied one BEFORE invoking this; otherwise the unique-key collision
 // raises an error and the caller revokes the family.
+//
+// IMPORTANT: refresh_family is intentionally PRESERVED across rotations
+// A family represents "all sessions descended from one
+// original login"; when we rotate the hashes we stay within the same
+// family so RevokeFamily can still log the user out everywhere if a
+// rotated token is later detected as reused. Regenerating the family
+// here would break the reuse-detection loop (the handler at §4.3 step 5
+// revokes by `refresh_family`, so a freshly-rotated token wouldn't
+// revoke its predecessor's row).
 func (r *SessionRepository) RotateSession(ctx context.Context, sessionID uuid.UUID, newAccessHash, newRefreshHash string, newExpiry time.Time) error {
 	_, err := r.Pool.Exec(ctx, `
 		UPDATE sessions
 		SET access_token_hash = $1,
 		    refresh_token_hash = $2,
-		    refresh_family = gen_random_uuid(),
 		    refresh_rotated_at = now(),
 		    last_used_at = now(),
 		    expires_at = $3
