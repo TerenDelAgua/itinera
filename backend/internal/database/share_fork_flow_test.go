@@ -20,6 +20,7 @@ import (
 	"backend/internal/http/middleware"
 	"backend/internal/models"
 	"backend/internal/services"
+	"backend/internal/services/email"
 )
 
 // TestShareForkFlow_EnableShareAfterMiddlewareFork is the regression test
@@ -41,6 +42,10 @@ func TestShareForkFlow_EnableShareAfterMiddlewareFork(t *testing.T) {
 	eventsRepo := database.NewEventRepository(pgPool)
 	rateLimitRepo := database.NewRateLimitRepository(pgPool)
 	analyticsRepo := database.NewAnalyticsRepository(pgPool)
+	sessionRepo := database.NewSessionRepository(pgPool)
+	resetRepo := database.NewPasswordResetRepository(pgPool)
+	loginRateLimitRepo := database.NewLoginRateLimitRepository(pgPool)
+	emailSender := email.NoopSender{}
 
 	exchangeRateSvc := services.NewExchangeRateService(pgPool)
 	expenseSvc := services.NewExpenseService(tripsRepo, expensesRepo, exchangeRateSvc)
@@ -49,7 +54,9 @@ func TestShareForkFlow_EnableShareAfterMiddlewareFork(t *testing.T) {
 	cfg := config.Load()
 	h := handlers.NewHandlers(
 		tripsRepo, placesRepo, expensesRepo, authRepo,
-		activityRepo, eventsRepo, rateLimitRepo, analyticsRepo, expenseSvc, tripSvc, cfg,
+		activityRepo, eventsRepo, rateLimitRepo, loginRateLimitRepo,
+		analyticsRepo, sessionRepo, resetRepo, expenseSvc, tripSvc,
+		emailSender, cfg,
 	)
 
 	ctx := context.Background()
@@ -140,6 +147,10 @@ func TestShareForkFlow_PublicEndpoint_JSONShape(t *testing.T) {
 	eventsRepo := database.NewEventRepository(pgPool)
 	rateLimitRepo := database.NewRateLimitRepository(pgPool)
 	analyticsRepo := database.NewAnalyticsRepository(pgPool)
+	sessionRepo := database.NewSessionRepository(pgPool)
+	resetRepo := database.NewPasswordResetRepository(pgPool)
+	loginRateLimitRepo := database.NewLoginRateLimitRepository(pgPool)
+	emailSender := email.NoopSender{}
 
 	exchangeRateSvc := services.NewExchangeRateService(pgPool)
 	expenseSvc := services.NewExpenseService(tripsRepo, expensesRepo, exchangeRateSvc)
@@ -147,7 +158,9 @@ func TestShareForkFlow_PublicEndpoint_JSONShape(t *testing.T) {
 	cfg := config.Load()
 	h := handlers.NewHandlers(
 		tripsRepo, placesRepo, expensesRepo, authRepo,
-		activityRepo, eventsRepo, rateLimitRepo, analyticsRepo, expenseSvc, tripSvc, cfg,
+		activityRepo, eventsRepo, rateLimitRepo, loginRateLimitRepo,
+		analyticsRepo, sessionRepo, resetRepo, expenseSvc, tripSvc,
+		emailSender, cfg,
 	)
 
 	ctx := context.Background()

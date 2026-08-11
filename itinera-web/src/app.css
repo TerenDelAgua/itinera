@@ -28,6 +28,11 @@
   --color-error-subtle: #fef2f2;
   --color-error-hover: #b91c1c;
 
+  /* Inputs (DS §2.1.1): slightly warmer than card so the field
+     doesn't merge with the surrounding card surface. */
+  --color-input: #fcfbfa; /* matches --color-teren-surface */
+  --color-input-bg: var(--color-input);
+
   /* Typography */
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
@@ -58,6 +63,12 @@ body {
   --color-teren-primary-subtle: #2c1f10;
 
   --color-teren-border: #3f3d38; /* Stone oscuro */
+
+  /* Inputs (DS §2.1.1): #272520 — visibly warmer than #1c1a17 so
+     inputs don't read as "holes" punched into the card. */
+  --color-input: #272520;
+  --color-input-bg: var(--color-input);
+  --color-input-text: #f5f4f1;
 
   --color-error-base: #f87171;
   --color-error-subtle: #2c1010;
@@ -130,11 +141,56 @@ html.light {
   color-scheme: light;
 }
 
+/* Browser autofill paints inputs with the OS accent colour (Chrome
+   uses a cool blue, Firefox a similar tint). That clashes with the
+   TEREN warm palette, so we override the WebKit autofill background
+   with `--color-input-bg` and force the text to the right colour.
+   The `box-shadow: 0 0 0 1000px … inset` trick is the standard way
+   to hide Chrome's blue tint without using `!important`. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--color-input-text);
+  -webkit-box-shadow: 0 0 0 1000px var(--color-input-bg) inset;
+  box-shadow: 0 0 0 1000px var(--color-input-bg) inset;
+  caret-color: var(--color-input-text);
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+input:autofill {
+  background-color: var(--color-input-bg);
+  color: var(--color-input-text);
+}
+
 /* Hide native browser calendar and time icons */
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="time"]::-webkit-calendar-picker-indicator {
   display: none;
   -webkit-appearance: none;
+}
+
+/* Mask an input's characters as password dots without using
+   `type="password"`. The whole reason we use this trick: Chromium
+   injects a native "reveal password" eye icon into <input
+   type="password"> that is NOT hideable via CSS, so the page-level
+   toggle button collides with it. By keeping the input as type=text
+   and masking with `text-security`, only the page-level toggle is
+   visible — there is no second eye.
+
+   - `-webkit-text-security: disc` covers Chrome, Edge, Safari
+   - `-moz-text-security` covers Firefox 88+
+*/
+input.masked-password {
+  -webkit-text-security: disc;
+  -moz-text-security: disc;
+  /* IE10+ fallback */
+  text-security: disc;
+}
+
+/* Hide the legacy Edge "reveal" button (pre-Chromium). */
+input::-ms-reveal {
+  display: none;
 }
 /* ─── Shared Animations ────────────────────────────────────────────────── */
 @keyframes fadeIn {

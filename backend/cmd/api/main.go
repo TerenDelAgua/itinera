@@ -3,6 +3,7 @@ package main
 import (
 	"backend/internal/config"
 	"backend/internal/database"
+	"backend/internal/jobs"
 	"context"
 	"log"
 	"net/http"
@@ -14,6 +15,7 @@ import (
 
 	"backend/internal/http/handlers"
 	"backend/internal/services"
+	"backend/internal/services/email"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
@@ -67,16 +69,42 @@ func main() {
 	eventsRepo := database.NewEventRepository(pool)
 	rateLimitRepo := database.NewRateLimitRepository(pool)
 	analyticsRepo := database.NewAnalyticsRepository(pool)
+	sessionRepo := database.NewSessionRepository(pool)
+	resetRepo := database.NewPasswordResetRepository(pool)
+	loginRateLimitRepo := database.NewLoginRateLimitRepository(pool)
 
 	exchangeRateSvc := services.NewExchangeRateService(pool)
 	expenseSvc := services.NewExpenseService(tripsRepo, expensesRepo, exchangeRateSvc)
 	tripSvc := services.NewTripService(pool, tripsRepo, placesRepo,
 		activityRepo, expensesRepo, eventsRepo)
+	emailSender := email.NewSender(cfg)
 
 	h := handlers.NewHandlers(tripsRepo, placesRepo, expensesRepo, authRepo,
-		activityRepo, eventsRepo, rateLimitRepo, analyticsRepo, expenseSvc, tripSvc, cfg)
+		activityRepo, eventsRepo, rateLimitRepo, loginRateLimitRepo,
+		analyticsRepo, sessionRepo, resetRepo, expenseSvc, tripSvc,
+		emailSender, cfg)
 
 	router := setupRouter(cfg, h, pool)
+
+	// Background jobs. Spec 017 §5.10: every 24h, anonymise users
+	// soft-deleted >30 days ago. The job is context-aware — when the
+	// process receives SIGINT/SIGTERM and we cancel `bgCtx`, the in-flight
+	// cycle aborts cleanly and the goroutine exits.
+	bgCtx, bgCancel := context.WithCancel(context.Background())
+	cleanupCfg := jobs.AccountCleanupConfig{}
+	// ACCOUNT_CLEANUP_INTERVAL is a smoke-only override; production
+	// keeps the spec's 24h interval. Anything parseable by time.ParseDuration
+	// works; an invalid value is silently ignored so a typo can't crash
+	// the boot path.
+	if v := os.Getenv("ACCOUNT_CLEANUP_INTERVAL"); v != "" {
+		if d, err := time.ParseDuration(v); err == nil {
+			cleanupCfg.Interval = d
+			log.Printf("[account-cleanup] interval override from env: %s", d)
+		}
+	}
+	cleanupJob := jobs.NewAccountCleanupJob(authRepo, cleanupCfg)
+	cleanupJob.Start(bgCtx)
+	defer bgCancel()
 
 	server := &http.Server{
 		Addr:    ":" + cfg.Port,
@@ -175,6 +203,19 @@ func setupRouter(cfg *config.Config, h *handlers.Handlers, pool *pgxpool.Pool) *
 	})
 
 	r.Route("/api/v1", func(router chi.Router) {
+		// Spec 017 §2.1 / §6.1 — auth v2 cutover is gated by AUTH_V2_ENABLED.
+		// While the flag is false, the legacy JWT tree is the only one
+		// registered; once it flips to true the new token tree takes over
+		// completely (no per-handler branching).
+		//
+		// In Fase 0 this is a no-op reservation: RegisterApiRoutes still
+		// registers the legacy tree. The branch exists so future PRs can
+		// mount the v2 tree without touching main.go's structure again.
+		if cfg.AuthV2Enabled {
+			log.Println("🟢 [auth] AUTH_V2_ENABLED=true — v2 router mounted (Spec 017 §6.1)")
+		} else {
+			log.Println("🟡 [auth] AUTH_V2_ENABLED=false — legacy JWT router mounted")
+		}
 		handlers.RegisterApiRoutes(router, h)
 	})
 
