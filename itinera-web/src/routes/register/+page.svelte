@@ -193,6 +193,15 @@
         password,
         locale: currentLocale,
       });
+      // Migrate any trips created as guest.
+      // Best-effort: a failed claim shows a banner via `auth.lastError`
+      // but doesn't block the user — they're already logged in.
+      const claimed = await auth.claimGuest();
+      if (claimed > 0) {
+        // Refresh the count for the next page so the badge on the
+        // avatar updates if needed (sets the banner via state).
+        guestTripsCount = claimed;
+      }
       showSuccess = true;
     } catch (err) {
       if (err instanceof ApiError) {
@@ -280,7 +289,7 @@
           {$t("auth.register.title")}
         </h1>
         <p
-          class="mt-1.5 text-sm text-teren-text-muted min-h-[1.25rem]"
+          class="mt-1.5 text-sm text-teren-text-muted min-h-5"
           data-testid="register-subtitle"
         >
           {subtitleText}
@@ -292,18 +301,18 @@
                  lines instead of three independent cards. The whole
                  surface reacts to focus-within / hover as one unit. -->
       <form
-            onsubmit={handleSubmit}
-            novalidate
-            class="mx-6 mb-6 mt-4 bg-input rounded-xl border border-teren-border overflow-hidden
+        onsubmit={handleSubmit}
+        novalidate
+        class="mx-6 mb-6 mt-4 bg-input rounded-xl border border-teren-border overflow-hidden
                    focus-within:border-teren-primary/70 focus-within:shadow-sm transition-colors"
-        >
+      >
         {#if bannerError}
           <div
             class="bg-error-subtle border-b border-error-base/30 px-3 py-2 text-sm text-error-base font-medium flex items-center gap-2"
             role="alert"
           >
             <svg
-              class="w-4 h-4 flex-shrink-0"
+              class="w-4 h-4 shrink-0"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -323,36 +332,36 @@
         <!-- ROW 1: Email (no trailing icon, no internal border
                      below because the divider between rows comes from
                      the section's border-b). -->
-            <div class="px-3 py-3 border-b border-teren-border/50">
-              <label
-                for="register-email"
-                class="text-xs font-semibold uppercase tracking-wide text-teren-text-muted"
-              >
-                {$t("auth.register.email_label")}
-              </label>
-              <input
-                id="register-email"
-                type="email"
-                placeholder={$t("auth.register.email_placeholder")}
-                autocomplete="email"
-                bind:value={email}
-                oninput={() => clearFieldError("email")}
-                onblur={validateEmailOnBlur}
-                aria-invalid={emailError ? "true" : undefined}
-                aria-describedby="register-email-error"
-                class="w-full h-11 mt-1 px-1 bg-transparent text-sm text-teren-text-main placeholder:text-teren-text-muted/40 focus:outline-none"
-              />
-              <!-- min-h-[20px] keeps the layout stable so the field
+        <div class="px-3 py-3 border-b border-teren-border/50">
+          <label
+            for="register-email"
+            class="text-xs font-semibold uppercase tracking-wide text-teren-text-muted"
+          >
+            {$t("auth.register.email_label")}
+          </label>
+          <input
+            id="register-email"
+            type="email"
+            placeholder={$t("auth.register.email_placeholder")}
+            autocomplete="email"
+            bind:value={email}
+            oninput={() => clearFieldError("email")}
+            onblur={validateEmailOnBlur}
+            aria-invalid={emailError ? "true" : undefined}
+            aria-describedby="register-email-error"
+            class="w-full h-11 mt-1 px-1 bg-transparent text-sm text-teren-text-main placeholder:text-teren-text-muted/40 focus:outline-none"
+          />
+          <!-- min-h-[20px] keeps the layout stable so the field
                    below doesn't jump when the error appears. -->
-              <p
-                id="register-email-error"
-                class="text-xs text-error-base font-medium min-h-[20px] mt-0.5"
-                role="alert"
-                aria-live="polite"
-              >
-                {emailError ?? ""}
-              </p>
-            </div>
+          <p
+            id="register-email-error"
+            class="text-xs text-error-base font-medium min-h-5 mt-0.5"
+            role="alert"
+            aria-live="polite"
+          >
+            {emailError ?? ""}
+          </p>
+        </div>
 
         <!-- ROW 2: Password with eye toggle (§3.4: 44×44 tap
                      target inside the input, right-aligned). -->
@@ -388,7 +397,7 @@
               aria-label={showPassword
                 ? $t("auth.register.password_toggle_hide")
                 : $t("auth.register.password_toggle_show")}
-              class="flex-shrink-0 w-11 h-11 flex items-center justify-center text-teren-text-muted hover:text-teren-primary transition-colors rounded-lg"
+              class="shrink-0 w-11 h-11 flex items-center justify-center text-teren-text-muted hover:text-teren-primary transition-colors rounded-lg"
             >
               {#if showPassword}
                 <svg
@@ -430,7 +439,7 @@
           {#if passwordError}
             <p
               id="register-password-error"
-              class="text-xs text-error-base font-medium min-h-[20px] mt-0.5"
+              class="text-xs text-error-base font-medium min-h-5 mt-0.5"
               role="alert"
               aria-live="polite"
             >
@@ -441,7 +450,7 @@
                  input, not duplicated as a placeholder. -->
             <p
               id="register-password-help"
-              class="text-xs text-teren-text-muted min-h-[20px] mt-0.5"
+              class="text-xs text-teren-text-muted min-h-5 mt-0.5"
             >
               {$t("auth.register.password_help")}
             </p>

@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+	"time"
 
 	"backend/internal/database"
 	"backend/internal/models"
@@ -135,10 +136,11 @@ func TestAuthRepo_SoftAndHardDelete(t *testing.T) {
 // 4. Login + forgot must find the NEW active row, not the old soft-deleted.
 //
 // Two backend guarantees:
-//   (a) CreateUser hard-deletes any soft-deleted row with the same email
-//       so /me and /login don't see two rows for one email.
-//   (b) GetUserByEmail returns the active row first even if a soft-deleted
-//       row lingered for some reason (ORDER BY deleted_at NULLS FIRST).
+//
+//	(a) CreateUser hard-deletes any soft-deleted row with the same email
+//	    so /me and /login don't see two rows for one email.
+//	(b) GetUserByEmail returns the active row first even if a soft-deleted
+//	    row lingered for some reason (ORDER BY deleted_at NULLS FIRST).
 func TestAuthRepo_ReregisterAfterSoftDelete(t *testing.T) {
 	pool := getTestPoolOrSkip(t)
 	repo := database.NewAuthRepository(pool)
@@ -179,6 +181,89 @@ func TestAuthRepo_ReregisterAfterSoftDelete(t *testing.T) {
 	assert.NotNil(t, bcrypt.CompareHashAndPassword(
 		[]byte(current.PasswordHash), []byte("OldPass1!"),
 	), "old password must NOT match — proof the active row is u2 not u1")
+}
+
+// TestAuthRepo_HardDeleteExpired_UniqueBcryptsPerUser covers Spec 017
+// §11.2 #16: "los 3 password_hash son distintos entre sí (no comparten
+// un valor fijo)".
+//
+// We insert 3 users whose deleted_at is set to "30 days ago" (the
+// threshold at which HardDeleteExpired kicks in) and run the job. The
+// post-condition: all 3 have email = `deleted-<uuid>@itinera.invalid`
+// and all 3 have DISTINCT password_hash values (otherwise a shared
+// hash would leak the cohort size to anyone with DB read access).
+func TestAuthRepo_HardDeleteExpired_UniqueBcryptsPerUser(t *testing.T) {
+	pool := getTestPoolOrSkip(t)
+	repo := database.NewAuthRepository(pool)
+	ctx := context.Background()
+
+	const n = 3
+	emails := make([]string, n)
+	for i := 0; i < n; i++ {
+		emails[i] = uniqueEmail(t, "harddel")
+	}
+	t.Cleanup(func() {
+		for _, e := range emails {
+			cleanupUserByEmail(t, pool, e)
+		}
+		// Anonymised rows land on `deleted-<uuid>@itinera.invalid` —
+		// they aren't matched by cleanupUserByEmail so we delete by
+		// the partial-unique-index filter for safety.
+		_, _ = pool.Exec(ctx,
+			"DELETE FROM users WHERE email LIKE 'deleted-%@itinera.invalid' AND id IN (SELECT id FROM users WHERE id::text LIKE '________-____-____-____-____________')")
+	})
+
+	ids := make([]uuid.UUID, n)
+	for i := 0; i < n; i++ {
+		u, err := repo.CreateUser(ctx, emails[i], "Pa55word!", "en")
+		require.NoError(t, err)
+		ids[i] = u.ID
+	}
+
+	// Force deleted_at = now() - 31 days so the job picks them up.
+	// The predicate in HardDeleteExpired is `deleted_at < now() - '30 days'`.
+	_, err := pool.Exec(ctx, `
+		UPDATE users SET deleted_at = now() - interval '31 days'
+		WHERE id = ANY($1)
+	`, ids)
+	require.NoError(t, err)
+
+	anonymised, err := repo.HardDeleteExpired(ctx, 30*24*time.Hour, 1000)
+	require.NoError(t, err)
+	assert.GreaterOrEqual(t, anonymised, n, "all 3 users must be anonymised in one cycle")
+
+	// Read the password_hash back for each row and assert they are
+	// pairwise distinct. This is the side-channel leak the spec
+	// calls out in §5.10 rationale.
+	hashes := make(map[string]struct{}, n)
+	for _, id := range ids {
+		var hash string
+		err := pool.QueryRow(ctx,
+			`SELECT password_hash FROM users WHERE id = $1`, id,
+		).Scan(&hash)
+		require.NoError(t, err)
+
+		// Each hash must look like a real bcrypt (cost $2a$10$ /
+		// $2b$12$). Hard-coded hashes would be much shorter.
+		assert.Regexp(t, regexp.MustCompile(`^\$2[ab]\$\d{2}\$.{53}$`), hash,
+			"hash must be a real bcrypt cost-N hash, not a stub")
+
+		_, dup := hashes[hash]
+		assert.False(t, dup, "hash %q must NOT be reused across users", hash)
+		hashes[hash] = struct{}{}
+	}
+
+	// And the email filter: every row must be anonymised, none
+	// should retain their original email.
+	for i, id := range ids {
+		var got string
+		require.NoError(t, pool.QueryRow(ctx,
+			`SELECT email FROM users WHERE id = $1`, id,
+		).Scan(&got))
+		assert.Regexp(t, regexp.MustCompile(`^deleted-[a-f0-9-]+@itinera\.invalid$`), got,
+			"email of user %d must be anonymised", i)
+		assert.NotEqual(t, emails[i], got)
+	}
 }
 
 // TestAuthRepo_UpdatePassword ensures the new password's hash is rewritten

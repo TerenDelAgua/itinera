@@ -224,6 +224,39 @@ class AuthStore {
         }
     }
 
+    /**
+     * Claim guest trips after a successful register/login (Spec 017 §5.6).
+     *
+     * When a user creates trips as guest (cookie `session_id`), then
+     * registers or logs in, the backend migrates those trips to the
+     * user. This call returns the number of trips claimed so the UI
+     * can show a toast ("We've added N trips to your account").
+     *
+     * Best-effort: a failed claim is NOT blocking. The user is logged
+     * in either way; we just couldn't migrate some trips right now.
+
+     * Returns 0 when there's no active user (caller shouldn't have
+     * invoked this; we short-circuit instead of failing).
+     */
+    async claimGuest(): Promise<number> {
+        if (!this.user) return 0;
+        try {
+            const data = await apiFetch<{ claimed_trips_count: number; message: string }>(
+                '/auth/v2/claim-guest',
+                { method: 'POST' }
+            );
+            return data.claimed_trips_count;
+        } catch (e) {
+            // Surface as lastError so a UI banner can offer the retry
+            // path, but don't throw — the caller may want to keep
+            // showing the logged-in state regardless.
+            if (e instanceof ApiError) {
+                this.lastError = e;
+            }
+            return 0;
+        }
+    }
+
     /** Manually clear the last error, e.g. after the user dismisses a banner. */
     clearError(): void {
         this.lastError = null;
