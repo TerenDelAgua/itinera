@@ -185,18 +185,13 @@ func (r *AuthRepository) GetUserByID(ctx context.Context, id uuid.UUID) (*models
 	return &user, nil
 }
 
-// ClaimGuestTrips moves every trip owned by a guest session into the given
-// user's account, preserving idempotency. It does NOT clear the session_id
-// column: the migration 017 spec keeps the guest session alive (its cookie
-// remains usable) until the user logs out, so the user can fall back to the
-// guest view if needed.
-//
 // Returns the count of affected rows (0 if the guest had no trip). Errors
 // are returned untouched so callers can wrap with context.
 func (r *AuthRepository) ClaimGuestTrips(ctx context.Context, sessionID string, userID uuid.UUID) (int, error) {
 	query := `
 		UPDATE trips
-		SET user_id = $1
+		SET user_id = $1,
+		    session_id = NULL
 		WHERE session_id = $2 AND user_id IS NULL
 	`
 	res, err := r.Pool.Exec(ctx, query, userID, sessionID)
