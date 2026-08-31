@@ -38,6 +38,14 @@ export interface RegisterInput {
     password: string;
     locale?: string;
     terms_accepted?: boolean;
+    // Spec 018 §7: frontend sends the legal-doc version it showed
+    // to the user at registration time, sourced from
+    // src/lib/legal/manifest.ts at build time. Backend Go ignores
+    // these for now (persistence is scope of Spec 017 §14), but
+    // the wire contract is fixed so future migrations can rely on
+    // it without breaking clients.
+    terms_version?: string;
+    privacy_version?: string;
 }
 
 /**

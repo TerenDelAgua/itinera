@@ -7,6 +7,7 @@
   import { themeStore } from "$lib/stores/theme";
   import { auth } from "$lib/stores/auth.svelte";
   import UserMenu from "$lib/components/user-menu/UserMenu.svelte";
+  import Footer from "$lib/components/Footer.svelte";
   import { onMount } from "svelte";
   import { page } from "$app/state";
 
@@ -39,6 +40,23 @@
     // Update local state based on DOM to sync icons
     isDark = document.documentElement.classList.contains("dark");
 
+    // Set --header-height CSS var to the real header height so the
+    // legal-page TOC and any other sticky-below-header UI can offset
+    // themselves correctly. We measure after layout and re-measure
+    // on resize because the header can change height with the
+    // viewport (locale/theme switchers wrap on narrow screens).
+    const measure = () => {
+      const h = document.querySelector("header");
+      if (h) {
+        document.documentElement.style.setProperty(
+          "--header-height",
+          `${h.getBoundingClientRect().height}px`,
+        );
+      }
+    };
+    measure();
+    window.addEventListener("resize", measure);
+
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const handler = () => {
       const saved = localStorage.getItem("teren-theme");
@@ -48,7 +66,10 @@
       isDark = document.documentElement.classList.contains("dark");
     };
     mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
+    return () => {
+      mq.removeEventListener("change", handler);
+      window.removeEventListener("resize", measure);
+    };
   });
 
   function handleToggleTheme() {
@@ -157,7 +178,9 @@
     </div>
   </header>
 
-  <main class="mx-auto flex-1 w-full max-w-6xl px-6 py-12">
+  <main class="flex-1 w-full">
     {@render childrenProp?.()}
   </main>
+
+  <Footer />
 </div>

@@ -220,3 +220,104 @@ input::-ms-reveal {
 .delay-700 {
   animation-delay: 700ms;
 }
+
+/* Legal-page prose styles. Applied via the `.legal-prose` class on
+   the rendered <article> in /terms and /privacy. Tokens reference
+   the Design System palette (--color-teren-*); we never hardcode
+   hex values here (CI grep-enforced). */
+.legal-prose {
+  color: var(--color-teren-text-main);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+.legal-prose h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-top: 2.25rem;
+  margin-bottom: 1rem;
+}
+.legal-prose h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  /* scroll-margin-top lets the TOC anchor links land below the
+     sticky header (header height is set as a CSS var in +layout). */
+  scroll-margin-top: calc(var(--header-height, 64px) + 16px);
+}
+.legal-prose h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+.legal-prose p {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.legal-prose ul,
+.legal-prose ol {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+.legal-prose ul li,
+.legal-prose ol li {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.legal-prose a {
+  color: var(--color-teren-primary);
+  text-underline-offset: 2px;
+}
+.legal-prose a:hover {
+  text-decoration: underline;
+}
+.legal-prose strong {
+  font-weight: 600;
+}
+.legal-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--color-teren-border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+.legal-prose th {
+  text-align: left;
+  color: var(--color-teren-text-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--color-teren-border);
+}
+.legal-prose td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--color-teren-border);
+}
+.legal-prose tr:last-child td {
+  border-bottom: 0;
+}
+.legal-prose hr {
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+  border-color: var(--color-teren-border);
+}
+.legal-prose code {
+  background-color: var(--color-teren-interactive-hover);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}
+.legal-prose blockquote {
+  border-left: 4px solid var(--color-teren-border);
+  padding-left: 1rem;
+  color: var(--color-teren-text-muted);
+  font-style: italic;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
