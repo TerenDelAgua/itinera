@@ -596,10 +596,18 @@ func TestMeOpaque_Authenticated_Direct(t *testing.T) {
 	h.MeOpaque(rw, r)
 
 	require.Equal(t, http.StatusOK, rw.Code)
-	var got models.User
+	// Body must wrap the user payload as `{ user: ... }` to match the
+	// shape of /auth/v2/login and /auth/v2/register. A flat shape
+	// would make the frontend's `auth.user` resolve to `undefined`,
+	// which made the UserMenu render with a "?" avatar and the
+	// trips page keep showing account-owned trips after refresh.
+	var got struct {
+		User *models.User `json:"user"`
+	}
 	require.NoError(t, json.NewDecoder(rw.Body).Decode(&got))
-	assert.Equal(t, u.Email, got.Email)
-	assert.Equal(t, "free", got.Tier)
+	require.NotNil(t, got.User, "expected wrapped {user: ...} body")
+	assert.Equal(t, u.Email, got.User.Email)
+	assert.Equal(t, "free", got.User.Tier)
 }
 
 func TestMeOpaque_SoftDeleted_Direct(t *testing.T) {
