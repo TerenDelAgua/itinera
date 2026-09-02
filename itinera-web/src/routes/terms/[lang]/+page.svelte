@@ -32,7 +32,7 @@
 
 <!-- Layout's <main> wraps us. Inner container to control prose width. -->
 <div class="max-w-[70ch] mx-auto px-4 sm:px-6 py-12 lg:py-16">
-  <header class="mb-10">
+  <header class="mb-10" data-testid="legal-meta-header">
     <!-- The h1 is provided by the rendered markdown's first line. -->
     <p class="text-sm text-teren-text-muted mb-2">
       <span
@@ -44,7 +44,7 @@
     <div
       class="text-sm text-teren-text-muted mt-4 flex flex-wrap items-center gap-x-4 gap-y-2"
     >
-      <span>
+      <span data-testid="legal-meta-version">
         {data.localeShown === "es" ? "Última actualización" : "Last updated"}:
         <time datetime={data.doc.meta.updated}>{data.doc.meta.updated}</time>
         ·
@@ -58,16 +58,6 @@
   <div class="lg:grid lg:grid-cols-[1fr_220px] lg:gap-12">
     <article class="legal-prose">
       {@html data.doc.html}
-
-      <details class="mt-16 border-t border-teren-border pt-8">
-        <summary
-          class="cursor-pointer text-sm text-teren-text-muted font-medium hover:text-teren-text-main transition"
-        >
-          {data.localeShown === "es"
-            ? "Historial de versiones"
-            : "Version history"}
-        </summary>
-      </details>
     </article>
 
     {#if data.doc.toc.length > 0}

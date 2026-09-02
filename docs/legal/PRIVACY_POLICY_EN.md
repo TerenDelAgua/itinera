@@ -2,7 +2,7 @@
 
 **EN version (governing language: ES — see /privacy?lang=es)**
 **Privacy Policy for Itinera**
-**Last updated:** 31 August 2026 · **Version:** 1.2
+**Last updated:** 1 September 2026 · **Version:** 1.0
 
 ---
 

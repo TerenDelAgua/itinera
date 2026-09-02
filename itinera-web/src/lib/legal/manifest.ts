@@ -20,7 +20,7 @@ export const LEGAL_DOCS = {
 	terms: {
 		es: {
 			version: '1.0',
-			updated: '2026-08-31',
+			updated: '2026-09-01',
 			title: 'Términos de Servicio de Itinera',
 			description:
 				'Condiciones de uso, propiedad intelectual, limitación de responsabilidad y jurisdicción aplicable al servicio Itinera.',
@@ -28,7 +28,7 @@ export const LEGAL_DOCS = {
 		},
 		en: {
 			version: '1.0',
-			updated: '2026-08-31',
+			updated: '2026-09-01',
 			title: 'Terms of Service for Itinera',
 			description:
 				'Conditions of use, intellectual property, limitation of liability, and applicable jurisdiction for the Itinera service.',
@@ -38,7 +38,7 @@ export const LEGAL_DOCS = {
 	privacy: {
 		es: {
 			version: '1.0',
-			updated: '2026-08-31',
+			updated: '2026-09-01',
 			title: 'Política de Privacidad de Itinera',
 			description:
 				'Información sobre el tratamiento de datos personales en Itinera conforme al RGPD y la LOPDGDD.',
@@ -46,7 +46,7 @@ export const LEGAL_DOCS = {
 		},
 		en: {
 			version: '1.0',
-			updated: '2026-08-31',
+			updated: '2026-09-01',
 			title: 'Privacy Policy for Itinera',
 			description:
 				'Information on the processing of personal data in Itinera in accordance with the GDPR and Spanish data protection law.',

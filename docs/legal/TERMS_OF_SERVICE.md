@@ -2,7 +2,7 @@
 
 **Versión ES (gobernante)**
 **Términos de Servicio de Itinera**
-**Última actualización:** 31 de agosto de 2026 · **Versión:** 1.2
+**Última actualización:** 1 de septiembre de 2026 · **Versión:** 1.0
 
 ---
 

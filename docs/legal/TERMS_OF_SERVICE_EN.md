@@ -2,7 +2,7 @@
 
 **EN version (governing language: ES — see /terms?lang=es)**
 **Terms of Service for Itinera**
-**Last updated:** 31 August 2026 · **Version:** 1.2
+**Last updated:** 1 September 2026 · **Version:** 1.0
 
 ---
 
