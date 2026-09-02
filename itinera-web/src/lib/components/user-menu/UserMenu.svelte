@@ -26,6 +26,8 @@
    * a 0-duration fallback when `prefers-reduced-motion: reduce`.
    */
   import { fly, fade } from "svelte/transition";
+  import { goto } from "$app/navigation";
+  import { invalidateAll } from "$app/navigation";
   import { auth } from "$lib/stores/auth.svelte";
   import { getInitials } from "$lib/utils/user";
   import { t } from "$lib/i18n/store";
@@ -115,10 +117,22 @@
    * The user sees an instant "logged out" state; if the server call
    * later fails, we already cleared local state and the worst case
    * is a stale session cookie that expires on its own.
+   *
+   * After the call we navigate to "/" and invalidate the load
+   * functions so any cached data (e.g. the trips list in /trips)
+   * refetches with the now-guest cookie set. Without this, the user
+   * would still see the previously-fetched account trips on screen
+   * until they manually reloaded.
    */
   async function handleSignOut() {
     isOpen = false;
     await auth.logout();
+    // `invalidateAll` flushes the SvelteKit load cache so dependent
+    // pages re-run `load` with the cleared cookies. We also `goto("/")`
+    // so even pages with no server load (e.g. /trips, which fetches
+    // /trips in onMount) get re-mounted and re-fetch.
+    await invalidateAll();
+    await goto("/", { invalidateAll: true });
   }
 
   function handleAccountSettingsKeydown(e: KeyboardEvent) {

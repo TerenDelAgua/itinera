@@ -211,9 +211,12 @@ func (h *Handlers) DeleteAccountOpaque(w http.ResponseWriter, r *http.Request) {
 // @Description  Returns the user identified by the access-token cookie.
 // @Description  The frontend hits this on every page load to validate the
 // @Description  session and pull tier / locale / display fields.
+// @Description  Body shape mirrors /auth/v2/login so the frontend can share
+// @Description  the same `AuthMeResponse = { user: User | null }` parser
+// @Description  without a special case. (Spec 019 §1.1)
 // @Tags         auth
 // @Produce      json
-// @Success      200  {object}  models.User
+// @Success      200  {object}  handlers.meResponse
 // @Failure      401  {object}  handlers.JSONErrorBody "No session"
 // @Failure      403  {object}  handlers.JSONErrorBody "Soft-deleted account"
 // @Router       /auth/v2/me [get]
@@ -239,11 +242,21 @@ func (h *Handlers) MeOpaque(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	WriteJSON(w, http.StatusOK, user)
+	WriteJSON(w, http.StatusOK, meResponse{User: user})
+}
+
+// meResponse wraps the user payload so the wire shape matches
+// /auth/v2/login and /auth/v2/register. The frontend expects
+// `{ user: User | null }`; a flat `{id, email, ...}` response made
+// `auth.user = undefined` after page refresh, which caused the
+// UserMenu avatar to render with no email (initials fell back to "?")
+// and `isLoggedIn` to read as true (undefined !== null).
+type meResponse struct {
+	User *models.User `json:"user"`
 }
 
 // RefreshOpaque issues a new access + refresh pair in exchange for the
-// refresh cookie (Spec 017 §5.4 / §4.3 sliding session).
+// refresh cookie.
 //
 // Flow:
 //  1. Read the itinera_refresh cookie and hash it.
@@ -666,9 +679,9 @@ func generateSixDigitCode() (string, error) {
 // isStrongEnoughPassword is the Spec 017 §5.1 password check.
 //
 // Three rules, all required:
-//   1. minimum 8 characters
-//   2. contains at least one digit (0-9)
-//   3. contains at least one non-alphanumeric symbol
+//  1. minimum 8 characters
+//  2. contains at least one digit (0-9)
+//  3. contains at least one non-alphanumeric symbol
 //
 // `strings.ContainsFunc` is used for the symbol test so we keep
 // Unicode-friendly semantics while still rejecting pure-letter

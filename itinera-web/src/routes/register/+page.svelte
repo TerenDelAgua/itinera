@@ -17,6 +17,7 @@
   import { goto } from "$app/navigation";
   import { locale, t } from "$lib/i18n/store";
   import { auth } from "$lib/stores/auth.svelte";
+  import { LEGAL_DOCS } from "$lib/legal/manifest";
   import { ApiError, apiFetch } from "$lib/api";
   import {
     resolveErrorMessage,
@@ -192,6 +193,12 @@
         email: email.trim(),
         password,
         locale: currentLocale,
+        // Spec 018 §7: send the legal-doc version the user accepted,
+        // sourced from manifest.ts (single source of truth). Backend
+        // currently ignores these (persistence is Spec 017 §14), but
+        // the wire contract is fixed.
+        terms_version: LEGAL_DOCS.terms.es.version,
+        privacy_version: LEGAL_DOCS.privacy.es.version,
       });
       // Migrate any trips created as guest.
       // Best-effort: a failed claim shows a banner via `auth.lastError`
@@ -472,7 +479,7 @@
               <a
                 href={$t("auth.register.terms_link_href")}
                 target="_blank"
-                rel="noopener"
+                rel="noopener noreferrer"
                 class="text-teren-primary underline underline-offset-2 hover:text-teren-primary-hover"
               >
                 {$t("auth.register.terms_link_text")}
@@ -481,7 +488,7 @@
               <a
                 href={$t("auth.register.privacy_link_href")}
                 target="_blank"
-                rel="noopener"
+                rel="noopener noreferrer"
                 class="text-teren-primary underline underline-offset-2 hover:text-teren-primary-hover"
               >
                 {$t("auth.register.privacy_link_text")}

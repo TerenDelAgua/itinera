@@ -147,6 +147,27 @@ describe('auth.bootstrap', () => {
         expect(auth.lastError?.code).toBe('INTERNAL_ERROR');
     });
 
+    // Regression: /auth/v2/me once returned the user payload flat
+    // instead of wrapped as `{ user: ... }`. The defensive
+    // `extractUser` narrowing in the store recovers from that shape
+    // so the UserMenu does not show a "?" avatar with `isLoggedIn`
+    // incorrectly true.
+    it('tolerates a flat user payload (legacy /me shape)', async () => {
+        mockFetchOnce(200, sampleUser);
+        await auth.bootstrap();
+        expect(auth.user).toEqual(sampleUser);
+        expect(auth.isLoggedIn).toBe(true);
+    });
+
+    it('tolerates an empty object payload (writes null, not undefined)', async () => {
+        mockFetchOnce(200, {});
+        await auth.bootstrap();
+        expect(auth.user).toBeNull();
+        // The crucial regression: `isLoggedIn` MUST be false even
+        // though `undefined !== null`. The derived now uses `!!user`.
+        expect(auth.isLoggedIn).toBe(false);
+    });
+
     it('is idempotent: a second call while loaded is a no-op', async () => {
         mockFetchOnce(200, { user: sampleUser });
         await auth.bootstrap();

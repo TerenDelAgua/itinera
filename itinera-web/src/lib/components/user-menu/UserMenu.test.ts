@@ -18,6 +18,16 @@ import UserMenu from './UserMenu.svelte';
 import { auth } from '$lib/stores/auth.svelte';
 import type { User } from '$lib/types/auth';
 
+// Mock SvelteKit navigation: UserMenu calls `goto` and
+// `invalidateAll` after `auth.logout()` so cached data (e.g. the
+// trips list) refetches with the cleared cookies. jsdom doesn't
+// initialise the SvelteKit client runtime, so we stub these to
+// resolvable no-ops.
+vi.mock('$app/navigation', () => ({
+    goto: vi.fn().mockResolvedValue(undefined),
+    invalidateAll: vi.fn().mockResolvedValue(undefined)
+}));
+
 // Mock i18n store so the component reads a deterministic translator
 // that echoes its key (with optional `{var}` substitution) — keeps
 // test assertions about visible labels language-agnostic. We mock
@@ -215,9 +225,10 @@ describe('UserMenu.svelte', () => {
     });
 
     // ─────────────────────── Test #21: sign-out flow
-    it('Sign out closes the menu and calls auth.logout()', async () => {
+    it('Sign out closes the menu, calls auth.logout(), then redirects', async () => {
         auth.user = userFixture;
         const logoutSpy = vi.spyOn(auth, 'logout').mockResolvedValue();
+        const { goto, invalidateAll } = await import('$app/navigation');
 
         render(UserMenu);
 
@@ -230,6 +241,11 @@ describe('UserMenu.svelte', () => {
 
         // The logout promise is awaited so observers can await.
         expect(logoutSpy).toHaveBeenCalledTimes(1);
+        // Then we flush the load cache and navigate to "/" so any
+        // page (e.g. /trips) re-runs its data fetch with the now-guest
+        // cookies instead of showing the stale account-owned trips.
+        expect(invalidateAll).toHaveBeenCalled();
+        expect(goto).toHaveBeenCalledWith('/', expect.objectContaining({ invalidateAll: true }));
     });
 
     // ─────────────────────── Test #22: a11y invariants

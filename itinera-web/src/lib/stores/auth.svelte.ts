@@ -32,10 +32,35 @@ interface RegisterInput {
     email: string;
     password: string;
     locale?: string;
+    // Spec 018 §7: forwarded to /auth/v2/register so the backend can
+    // pin the accepted legal-doc versions to the user account. The
+    // canonical type lives in `$lib/types/auth.ts`; we re-declare the
+    // optional version fields here because the store used to take a
+    // narrower shape and the tests in `register.test.ts` still build
+    // inputs without them. Adding them as optional keeps both
+    // callers working.
+    terms_version?: string;
+    privacy_version?: string;
 }
 
 interface AuthMeResponse {
     user: User | null;
+}
+
+/**
+ * Defensive narrowing: the backend should return `{ user: ... }`, but
+ * if a future deploy rolls back to a flat shape (or a misconfigured
+ * proxy strips the wrapper) we still resolve a sensible value rather
+ * than writing `undefined` into `this.user`. Returning `null` makes
+ * `isLoggedIn` correctly false so the UserMenu shows "Sign in".
+ */
+function extractUser(raw: unknown): User | null {
+    if (!raw || typeof raw !== 'object') return null;
+    const candidate = (raw as { user?: unknown }).user ?? (raw as User);
+    if (!candidate || typeof candidate !== 'object') return null;
+    const c = candidate as Partial<User>;
+    if (typeof c.id !== 'string' || typeof c.email !== 'string') return null;
+    return c as User;
 }
 
 class AuthStore {
@@ -56,7 +81,7 @@ class AuthStore {
      */
     _bootstrapInflight: Promise<void> | null = null;
 
-    isLoggedIn = $derived(this.user !== null);
+    isLoggedIn = $derived(!!this.user);
 
     /**
      * Bootstrap the session from cookies. Safe to call multiple times;
@@ -71,7 +96,7 @@ class AuthStore {
         this._bootstrapInflight = (async () => {
             try {
                 const data = await apiFetch<AuthMeResponse>('/auth/v2/me');
-                this.user = data.user;
+                this.user = extractUser(data);
             } catch (e) {
                 if (e instanceof ApiError && e.status === 401) {
                     // Expected for guests: leave `user` null, no error.
@@ -95,16 +120,22 @@ class AuthStore {
         this.loading = true;
         this.lastError = null;
         try {
-            const data = await apiFetch<{ user: User }>('/auth/v2/register', {
+            const data = await apiFetch<AuthMeResponse>('/auth/v2/register', {
                 method: 'POST',
                 body: {
                     email: input.email,
                     password: input.password,
-                    locale: input.locale
+                    locale: input.locale,
+                    terms_version: input.terms_version,
+                    privacy_version: input.privacy_version
                 }
             });
-            this.user = data.user;
-            return data.user;
+            const user = extractUser(data);
+            if (!user) {
+                throw new ApiError('INVALID_RESPONSE', 500, 'Register response missing user');
+            }
+            this.user = user;
+            return user;
         } catch (e) {
             if (e instanceof ApiError) {
                 this.lastError = e;
@@ -119,12 +150,16 @@ class AuthStore {
         this.loading = true;
         this.lastError = null;
         try {
-            const data = await apiFetch<{ user: User }>('/auth/v2/login', {
+            const data = await apiFetch<AuthMeResponse>('/auth/v2/login', {
                 method: 'POST',
                 body: { email: input.email, password: input.password }
             });
-            this.user = data.user;
-            return data.user;
+            const user = extractUser(data);
+            if (!user) {
+                throw new ApiError('INVALID_RESPONSE', 500, 'Login response missing user');
+            }
+            this.user = user;
+            return user;
         } catch (e) {
             if (e instanceof ApiError) {
                 this.lastError = e;

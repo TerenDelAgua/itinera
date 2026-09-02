@@ -176,7 +176,14 @@ describe('/register', () => {
         expect(authMock.register).toHaveBeenCalledWith({
             email: 'jane@example.test',
             password: 'GoodPass1!',
-            locale: 'es'
+            locale: 'es',
+            // Spec 018 §7: the frontend sends the version of the
+            // legal docs the user accepted (sourced from the
+            // manifest). The test asserts these are present; the
+            // backend currently ignores them (persistence is scope
+            // of Spec 017 §14).
+            terms_version: '1.0',
+            privacy_version: '1.0'
         });
     });
 
